@@ -1,0 +1,26 @@
+[[INFO ] 2024/11/05 11:18:18-859 AVPlayer::startPlay:73] start play file: C:\Users\HP\Documents\WeChat Files\wxid_6d4m9pwbz1k321\FileStorage\Video\2024-10\0819e938b22b9a7a883f8f29cda0e307.mp4
+[[INFO ] 2024/11/05 11:18:18-890 AVPlayer::setPlayerStateChanged:333] PlayerState state:1, error:0
+[[INFO ] 2024/11/05 11:18:19-281 AVPlayer::setPlayerStateChanged:333] PlayerState state:2, error:0
+[[INFO ] 2024/11/05 11:18:19-312 cvpublish::CommonLooper::Start:19] at CommonLooper create
+[[INFO ] 2024/11/05 11:18:19-312 cvpublish::CommonLooper::trampoline:7] at CommonLooper trampoline
+[[INFO ] 2024/11/05 11:18:19-312 cvpublish::AVDecoder::Loop:191] vidio decode thread start
+[[INFO ] 2024/11/05 11:18:19-312 cvpublish::CommonLooper::Start:19] at CommonLooper create
+[[INFO ] 2024/11/05 11:18:19-312 cvpublish::CommonLooper::trampoline:7] at CommonLooper trampoline
+[[INFO ] 2024/11/05 11:18:19-312 cvpublish::AVDecoder::Loop:195] audio decode thread start
+[[INFO ] 2024/11/05 11:18:19-453 AVPlayer::startPlay:182] play success.
+[[INFO ] 2024/11/05 11:18:19-453 AVPlayer::setPlayerStateChanged:333] PlayerState state:3, error:0
+[[INFO ] 2024/11/05 11:19:14-468 AVPlayer::read_thread:474] av_read_frame thread end.
+[[INFO ] 2024/11/05 11:19:14-468 cvpublish::AVDecoder::Loop:235] audio video decode thread end
+[[INFO ] 2024/11/05 11:19:14-468 cvpublish::AVDecoder::Loop:235] audio video decode thread end
+[[INFO ] 2024/11/05 11:19:14-484 AVPlayer::setPlayerStateChanged:333] PlayerState state:7, error:0
+[[INFO ] 2024/11/05 11:19:15-375 AVPlayer::startPlay:73] start play file: C:\Users\HP\Documents\WeChat Files\wxid_6d4m9pwbz1k321\FileStorage\Video\2024-10\0819e938b22b9a7a883f8f29cda0e307.mp4
+[[INFO ] 2024/11/05 11:19:15-375 AVPlayer::setPlayerStateChanged:333] PlayerState state:1, error:0
+[[INFO ] 2024/11/05 11:19:15-390 AVPlayer::setPlayerStateChanged:333] PlayerState state:2, error:0
+[[INFO ] 2024/11/05 11:19:15-390 cvpublish::CommonLooper::Start:19] at CommonLooper create
+[[INFO ] 2024/11/05 11:19:15-390 cvpublish::CommonLooper::trampoline:7] at CommonLooper trampoline
+[[INFO ] 2024/11/05 11:19:15-390 cvpublish::AVDecoder::Loop:191] vidio decode thread start
+[[INFO ] 2024/11/05 11:19:15-390 cvpublish::CommonLooper::Start:19] at CommonLooper create
+[[INFO ] 2024/11/05 11:19:15-390 cvpublish::CommonLooper::trampoline:7] at CommonLooper trampoline
+[[INFO ] 2024/11/05 11:19:15-390 cvpublish::AVDecoder::Loop:195] audio decode thread start
+[[INFO ] 2024/11/05 11:19:15-406 AVPlayer::startPlay:182] play success.
+[[INFO ] 2024/11/05 11:19:15-406 AVPlayer::setPlayerStateChanged:333] PlayerState state:3, error:0
