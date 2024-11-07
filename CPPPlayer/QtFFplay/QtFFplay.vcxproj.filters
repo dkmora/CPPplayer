@@ -119,10 +119,10 @@
     <QtMoc Include="PlayAudio.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="QtFFplay.h">
+    <QtMoc Include="OpenGlWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="OpenGlWidget.h">
+    <QtMoc Include="QtFFplay.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

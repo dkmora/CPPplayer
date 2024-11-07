@@ -391,21 +391,30 @@ int AVDecoder::getAudioFrame(uint8_t** data, size_t size) {
 			}
 			m_audio_buffer_index = 0;
 
+			// 初始化
+			if (m_audio_speed_convert == nullptr) {
+				m_audio_speed_convert = sonicCreateStream(m_resampler_params.dst_sample_rate, m_resampler_params.dst_nb_channels);
+			}
+
 			// 变速
 			if (audio_size > 0 && m_need_change_rate) {
 				m_need_change_rate = false;
-				// 初始化
-				if (m_audio_speed_convert) {
-					sonicDestroyStream(m_audio_speed_convert);
-				}
-				m_audio_speed_convert = sonicCreateStream(m_resampler_params.dst_sample_rate, m_resampler_params.dst_nb_channels);
+
 				// 设置变速系数
 				sonicSetSpeed(m_audio_speed_convert, m_pf_playback_rate);
 				sonicSetPitch(m_audio_speed_convert, 1.0);
 				sonicSetRate(m_audio_speed_convert, 1.0);
+
+			}
+			// 修改音量
+			if (m_need_change_volume)
+			{
+				m_need_change_volume = false;
+				// 设置音量
+				sonicSetVolume(m_audio_speed_convert, m_pf_volume);
 			}
 
-			if (!is_normal_playback_rate() && m_audio_buffer) {
+			if ((!is_normal_playback_rate() || !is_normal_playback_volume()) && m_audio_buffer) {
 				int actual_out_samples = m_dst_bufsize /
 					(m_resampler_params.dst_nb_channels * av_get_bytes_per_sample(m_resampler_params.dst_sample_fmt));
 				// 计算处理后的点数
@@ -599,6 +608,24 @@ void AVDecoder::setPlaybackRate(float rate)
 {
 	m_pf_playback_rate = rate;
 	setNeedChangeRate(true);
+}
+
+void AVDecoder::setPlaybackVolume(float volume)
+{
+	m_pf_volume = volume;
+	setNeedChangeVolume(true);
+}
+
+int AVDecoder::is_normal_playback_volume()
+{
+	if (m_pf_volume < 1.0f && m_pf_volume >= 0.00f)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
 }
 
 int AVDecoder::is_normal_playback_rate()

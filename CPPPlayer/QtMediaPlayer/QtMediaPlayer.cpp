@@ -10,10 +10,15 @@ QtMediaPlayer::QtMediaPlayer(QWidget* parent)
 	connect(ui.m_btn_pause, &QPushButton::clicked, this, &QtMediaPlayer::Pause);
 	connect(ui.m_slider_seek, &QSlider::valueChanged, this, &QtMediaPlayer::sloSliderSeek);
 	connect(ui.m_slider_playrate, &QSlider::valueChanged, this, &QtMediaPlayer::sloSliderRate);
+	connect(ui.m_slider_volume, &QSlider::valueChanged, this, &QtMediaPlayer::sloSliderVolume);
 
 	m_ffplay = new QtFFplay;
 	m_ffplay->setMediaPlayerEventHandler(m_MediaEventHandler.get());
-	ui.m_edit_address->setText("E://Program Files//JiJiDown//Download//testmovie.mp4");
+	ui.m_edit_address->setText("D:\\BaiduNetdiskDownload\\MP4\\hins2022.mp4");
+
+	ui.m_slider_volume->setMinimum(0);
+	ui.m_slider_volume->setMaximum(100);
+	ui.m_slider_volume->setValue(100);
 
 	ui.m_slider_playrate->setMinimum(0);
 	ui.m_slider_playrate->setMaximum(4);
@@ -23,6 +28,11 @@ QtMediaPlayer::QtMediaPlayer(QWidget* parent)
 	mainlayout->addWidget(m_ffplay->GetVideoView());
 	mainlayout->setMargin(0);
 	mainlayout->setSpacing(0);
+}
+
+QtMediaPlayer::~QtMediaPlayer()
+{
+	delete m_ffplay;
 }
 
 bool QtMediaPlayer::StartPublish() {
@@ -85,4 +95,10 @@ void QtMediaPlayer::sloSliderRate(int value) {
 		m_ffplay->Rate(2);
 		break;
 	}
+}
+
+void QtMediaPlayer::sloSliderVolume(int value)
+{
+	float fVolume = (float)value / 100;
+	m_ffplay->Volume(fVolume);
 }

@@ -28,6 +28,7 @@ class QtMediaPlayer : public QMainWindow
 
 public:
     QtMediaPlayer(QWidget *parent = Q_NULLPTR);
+	~QtMediaPlayer();
 
 private slots:
 	bool StartPublish();
@@ -35,6 +36,7 @@ private slots:
 	void Pause();
 	void sloSliderSeek(int value);
 	void sloSliderRate(int value);
+	void sloSliderVolume(int value);
 
 private:
     Ui::QPublishStreamClass ui;

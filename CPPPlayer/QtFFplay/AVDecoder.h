@@ -30,8 +30,12 @@ public:
 	int getAudioFrame(uint8_t** data, size_t size);
 	// 设置是否需要修改变速速率
 	void setNeedChangeRate(bool blchange) { m_need_change_rate = blchange; }
+	// 设置是否修改音量
+	void setNeedChangeVolume(bool blchange) { m_need_change_volume = blchange; }
 	// 设置变速速率
 	void setPlaybackRate(float rate);
+	// 设置音量
+	void setPlaybackVolume(float volume);
 	// 获取音频重采样参数
 	audio_resampler_params_t* get_resampler_params() { return &m_resampler_params; }
 
@@ -54,6 +58,7 @@ private:
      */
 	double compute_target_delay(double delay, AVClock& avclock);
 
+	int is_normal_playback_volume();
 	int is_normal_playback_rate();
 
 private:
@@ -95,6 +100,10 @@ private:
 	double m_frame_timer = 0.0f;     // 记录最后一帧播放的时刻
 	double m_frame_drops_late = 0;       // 丢弃视频frame计数
 	double m_remaining_time = 0.0;     /* 休眠等待，remaining_time的计算在video_refresh中 */
+
+	//修改音量
+	bool m_need_change_volume = false;
+	float m_pf_volume = 1.0f;
 
 	// 变速相关
 	bool m_need_change_rate = false;

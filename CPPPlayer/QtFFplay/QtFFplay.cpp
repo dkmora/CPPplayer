@@ -58,3 +58,7 @@ void QtFFplay::Seek(int64_t pos, int64_t rel, int seek_by_bytes) {
 void QtFFplay::Rate(double speed) {
 	m_avplayer->Rate(speed);
 }
+
+void QtFFplay::Volume(float volume){
+	m_avplayer->Volume(volume);
+}

@@ -21,6 +21,7 @@ public:
 	int64_t GetDuration() { return m_avplayer->get_file_duration(); }
 	void Seek(int64_t pos, int64_t rel, int seek_by_bytes);
 	void Rate(double speed);
+	void Volume(float volume);
 
 	void setMediaPlayerEventHandler(MediaPlayerEventHandler* eventHandler) { m_avplayer->setMediaPlayerEventHandler(eventHandler); }
 

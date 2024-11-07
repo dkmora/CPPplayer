@@ -237,6 +237,14 @@ void AVPlayer::Rate(double speed) {
 	m_audio_decode_thread->setPlaybackRate(speed);
 }
 
+void AVPlayer::Volume(float volume)
+{
+	if (!m_isplay)
+		return;
+
+	m_audio_decode_thread->setPlaybackVolume(volume);
+}
+
 RET_CODE AVPlayer::allocation_decoder(FFDecoder* coder, int stream) {
 	int ret;
 

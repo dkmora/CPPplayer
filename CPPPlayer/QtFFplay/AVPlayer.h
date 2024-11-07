@@ -58,6 +58,11 @@ public:
 	void Rate(double speed);
 
 	/*
+    * @brief 改变音量
+    */
+	void Volume(float volume);
+
+	/*
 	* @brief 获取文件的总时长
 	*/
 	int64_t get_file_duration() { if (m_avformat_context == nullptr) return 0; else return m_avformat_context->duration; }
