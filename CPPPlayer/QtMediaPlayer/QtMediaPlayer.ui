@@ -20,6 +20,9 @@
    <string>QPublishStream</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -58,6 +61,13 @@
             </layout>
            </item>
            <item>
+            <widget class="QSlider" name="m_slider_seek">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_5">
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout">
@@ -79,13 +89,6 @@
                 <widget class="QPushButton" name="m_btn_stop_publishstream">
                  <property name="text">
                   <string>stop</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QSlider" name="m_slider_seek">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
                  </property>
                 </widget>
                </item>
