@@ -39,6 +39,9 @@ public:
 	// 获取音频重采样参数
 	audio_resampler_params_t* get_resampler_params() { return &m_resampler_params; }
 
+	AVFrame* getVideoAVFrame();
+	AVFrame* getAudioAVFrame();
+
 private:
 	virtual void Loop();
 	int  decoder_frame();

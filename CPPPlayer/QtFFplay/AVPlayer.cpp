@@ -67,7 +67,7 @@ void AVPlayer::mediaCommand() {
 }
 
 RET_CODE AVPlayer::startPlay() {
-	if (m_isplay)
+	if (m_isDone)
 		return RET_FAIL;
 
 	LogInfo("start play file: %s", m_file_name.c_str());
@@ -177,7 +177,7 @@ RET_CODE AVPlayer::startPlay() {
 
 	// 开始解码
 	m_readframe_callback_time = 0;
-	m_isplay = true;
+	m_isDone = true;
 	m_read_thread = new std::thread(&AVPlayer::read_thread, this);
 	LogInfo("play success.");
 	ONPLAYERSTATECHANGED_EVENT(PLAYER_STATE_PLAYING, PLAYER_ERROR_NONE);
@@ -185,14 +185,14 @@ RET_CODE AVPlayer::startPlay() {
 }
 
 void AVPlayer::stopPlay() {
-	//if (!m_isplay) {
-	//	qDebug() << "AVPlayer::stopPlay() m_isplay is false;";
+	//if (!m_isDone) {
+	//	qDebug() << "AVPlayer::stopPlay() m_isDone is false;";
 	//	return;
 	//}
 
 	qDebug() << "AVPlayer::stopPlay() start;";
 	m_bReadFrame = false; // 打断阻塞
-	m_isplay = false; // 结束标志
+	m_isDone = false; // 结束标志
 	// 结束数据读取线程
 	if (m_read_thread != nullptr) {
 		m_read_thread->join();
@@ -206,7 +206,7 @@ void AVPlayer::stopPlay() {
 }
 
 void AVPlayer::Pause() {
-	if (!m_isplay)
+	if (!m_isDone)
 		return;
 
 	m_paused = !m_paused;
@@ -215,7 +215,7 @@ void AVPlayer::Pause() {
 }
 
 void AVPlayer::Seek(int64_t pos, int64_t rel, int seek_by_bytes) {
-	if (!m_isplay)
+	if (!m_isDone)
 		return;
 
 	if (!m_seek_req) {
@@ -230,7 +230,7 @@ void AVPlayer::Seek(int64_t pos, int64_t rel, int seek_by_bytes) {
 }
 
 void AVPlayer::Rate(double speed) {
-	if (!m_isplay)
+	if (!m_isDone)
 		return;
 
 	m_video_decode_thread->setPlaybackRate(speed);
@@ -239,7 +239,7 @@ void AVPlayer::Rate(double speed) {
 
 void AVPlayer::Volume(float volume)
 {
-	if (!m_isplay)
+	if (!m_isDone)
 		return;
 
 	m_audio_decode_thread->setPlaybackVolume(volume);
@@ -375,7 +375,7 @@ void AVPlayer::Release() {
 
 cvpublish::AVDecoder* AVPlayer::getVidioDecode() 
 { 
-	if (m_isplay) {
+	if (m_isDone) {
 		return m_video_decode_thread;
 	}
 	return nullptr;
@@ -383,14 +383,14 @@ cvpublish::AVDecoder* AVPlayer::getVidioDecode()
 
 cvpublish::AVDecoder* AVPlayer::getAudioDecode() 
 {
-	if (m_isplay) {
+	if (m_isDone) {
 		return m_audio_decode_thread;
 	}
 	return nullptr;
 }
 
 void AVPlayer::read_thread() {
-	while(m_isplay){
+	while(m_isDone){
 		int ret;
 		if (m_seek_req) { // 是否有seek请求
 			int64_t seek_target = m_seek_pos;
@@ -459,7 +459,7 @@ void AVPlayer::read_thread() {
 				else { // 被打断阻塞 强制结束播放
 					ONPLAYERSTATECHANGED_EVENT(PLAYER_STATE_PLAYBACK_COMPLETED, PLAYER_ERROR_NONE);
 				}
-				//m_isplay = false;
+				//m_isDone = false;
 				break; // thread end
 			}
 

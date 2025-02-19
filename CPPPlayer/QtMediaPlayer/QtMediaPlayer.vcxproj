@@ -118,8 +118,26 @@
     <QtRcc Include="QtMediaPlayer.qrc" />
     <QtUic Include="QtMediaPlayer.ui" />
     <QtMoc Include="QtMediaPlayer.h" />
+    <ClCompile Include="Common\DragShadow.cpp" />
+    <ClCompile Include="Common\FrameLess.cpp" />
+    <ClCompile Include="EDIT\VideoListWidget.cpp" />
+    <ClCompile Include="EDIT\VideoScaleWidget.cpp" />
     <ClCompile Include="QtMediaPlayer.cpp" />
     <ClCompile Include="main.cpp" />
+    <QtUic Include="VideoListWidget.ui" />
+    <QtUic Include="VideoScaleWidget.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="EDIT\VideoScaleWidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="EDIT\VideoListWidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Common\DragShadow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Common\FrameLess.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -111,6 +111,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Montage\AnalyzeFrame.cpp" />
+    <ClCompile Include="Montage\MuxerVideo.cpp" />
     <ClCompile Include="OpenGlWidget.cpp" />
     <ClCompile Include="PlayVideo.cpp" />
     <ClCompile Include="QtFFplay.cpp" />
@@ -126,6 +128,8 @@
     <ClInclude Include="ffmpegbase.h" />
     <ClInclude Include="mediabase.h" />
     <ClInclude Include="MediaPlayerEvent.h" />
+    <ClInclude Include="Montage\AnalyzeFrame.h" />
+    <ClInclude Include="Montage\MuxerVideo.h" />
     <ClInclude Include="MyAudioResample.h" />
     <ClInclude Include="MyDevice.h" />
     <ClInclude Include="YUV420P_Render.h" />

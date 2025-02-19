@@ -17,6 +17,9 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
+    <Filter Include="Montage">
+      <UniqueIdentifier>{d9a72d51-f720-4248-9427-86b6e05827a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qtffplay_global.h">
@@ -67,6 +70,12 @@
     <ClInclude Include="YUV420P_Render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Montage\MuxerVideo.h">
+      <Filter>Montage</Filter>
+    </ClInclude>
+    <ClInclude Include="Montage\AnalyzeFrame.h">
+      <Filter>Montage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioSource.cpp">
@@ -113,6 +122,12 @@
     </ClCompile>
     <ClCompile Include="YUV420P_Render.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Montage\MuxerVideo.cpp">
+      <Filter>Montage</Filter>
+    </ClCompile>
+    <ClCompile Include="Montage\AnalyzeFrame.cpp">
+      <Filter>Montage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

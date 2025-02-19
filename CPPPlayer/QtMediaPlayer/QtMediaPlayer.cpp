@@ -14,7 +14,7 @@ QtMediaPlayer::QtMediaPlayer(QWidget* parent)
 
 	m_ffplay = new QtFFplay;
 	m_ffplay->setMediaPlayerEventHandler(m_MediaEventHandler.get());
-	ui.m_edit_address->setText("D:\\BaiduNetdiskDownload\\MP4\\hins2022.mp4");
+	ui.m_edit_address->setText("D:\\github\\bin\\Win32\\Debug\\sound_in_sync_test.mp4");
 
 	ui.m_slider_volume->setMinimum(0);
 	ui.m_slider_volume->setMaximum(100);

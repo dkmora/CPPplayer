@@ -155,7 +155,7 @@ private:
 	std::condition_variable* m_cond_t_read_thread = nullptr; // 唤醒读取数据线程条件变量
 
 	// 视频操作
-	bool m_isplay = false;
+	bool m_isDone = false;
 	bool m_paused = false; // 暂停
 	bool m_playInit = false;
 	int  m_eof = 0;        // 是否读取结束

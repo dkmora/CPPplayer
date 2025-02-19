@@ -21,6 +21,18 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{efe3195e-3822-4843-a603-e783daac97d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\EDIT">
+      <UniqueIdentifier>{ab090ece-3653-4d69-8e21-483d1f19b6ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EDIT">
+      <UniqueIdentifier>{b1511e4f-b7fb-4cb0-816c-f1cc7488a9d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{e1bcc276-8bdb-4caa-9630-7c71edaf09fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="QtMediaPlayer.qrc">
@@ -40,5 +52,39 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EDIT\VideoScaleWidget.cpp">
+      <Filter>EDIT</Filter>
+    </ClCompile>
+    <ClCompile Include="EDIT\VideoListWidget.cpp">
+      <Filter>EDIT</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\DragShadow.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\FrameLess.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="VideoScaleWidget.ui">
+      <Filter>UI\EDIT</Filter>
+    </QtUic>
+    <QtUic Include="VideoListWidget.ui">
+      <Filter>UI\EDIT</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="EDIT\VideoScaleWidget.h">
+      <Filter>EDIT</Filter>
+    </QtMoc>
+    <QtMoc Include="EDIT\VideoListWidget.h">
+      <Filter>EDIT</Filter>
+    </QtMoc>
+    <QtMoc Include="Common\DragShadow.h">
+      <Filter>Common</Filter>
+    </QtMoc>
+    <QtMoc Include="Common\FrameLess.h">
+      <Filter>Common</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

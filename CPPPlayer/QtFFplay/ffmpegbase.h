@@ -11,6 +11,7 @@ extern "C"
 #include "libavutil/log.h"
 #include "libavutil/time.h"
 #include "libavutil/common.h"
+#include "libavutil/opt.h"
 }
 
 #include <mutex>

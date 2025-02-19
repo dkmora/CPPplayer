@@ -40,8 +40,9 @@ AVDecoder::AVDecoder(FFDecoder* ffmpegdecoder, AVPacketQueue* avpacketQueue, AVC
 	}
 	else if (m_codec_type == AVMEDIA_TYPE_VIDEO) {
 		m_avframe_yuv420 = av_frame_alloc();
-		m_avframe_yuv420->width = 1280;
-		m_avframe_yuv420->height = 720;
+		m_avframe_yuv420->width = m_decoder->codec_context->width;
+		m_avframe_yuv420->height = m_decoder->codec_context->height;
+		m_avframe_yuv420->format = AV_PIX_FMT_YUV420P;
 
 		//转换器上下文  转换方法需要
 		m_img_convert_ctx = sws_getContext(m_decoder->codec_context->width, m_decoder->codec_context->height,
@@ -353,7 +354,7 @@ display:
 			// 格式转换 
 			if (got_picture) {
 				sp = vp;
-				sws_scale(m_img_convert_ctx, (const uint8_t * const*)sp->frame->data, sp->frame->linesize, 0,
+				int _height = sws_scale(m_img_convert_ctx, (const uint8_t * const*)sp->frame->data, sp->frame->linesize, 0,
 					m_decoder->codec_context->height, m_avframe_yuv420->data, m_avframe_yuv420->linesize);
 
 				*y = m_avframe_yuv420->data[0];
@@ -638,6 +639,80 @@ int AVDecoder::is_normal_playback_rate()
 	{
 		return 0;
 	}
+}
+
+
+AVFrame* AVDecoder::getVideoAVFrame()
+{
+	Frame* vp = NULL;
+
+	if (m_avpacketqueue->video_frame_queue_nb_remaining() <= 0) // 判断队列是否为空
+		return NULL;
+
+	vp = m_avpacketqueue->video_frame_queue_peek();  // 读取待显示帧
+
+	// 格式转换 
+	if (vp) {
+		int _height = sws_scale(m_img_convert_ctx, (const uint8_t* const*)vp->frame->data, vp->frame->linesize, 0,
+			m_decoder->codec_context->height, m_avframe_yuv420->data, m_avframe_yuv420->linesize);
+
+		m_avframe_yuv420->pts = vp->frame->pts;
+		m_video_index++;
+	}
+	m_avpacketqueue->video_frame_queue_next();  // 当前vp帧出队列
+	return m_avframe_yuv420;
+}
+
+AVFrame* AVDecoder::getAudioAVFrame()
+{
+    Frame* af = NULL;
+
+	if (m_avpacketqueue->audio_frame_queue_nb_remaining() <= 0) 
+		return NULL;
+
+    if (!(af = m_avpacketqueue->audio_frame_get())) {
+        return NULL;
+    }
+
+	//int64_t out_pts = 0;
+	//// 4. 音频重采样
+	//int ret_size = m_audioresample.audio_resampler_send_frame(af->frame);
+	//if (ret_size <= 0) {
+	//	printf("can't get %d samples, ret_size:%d, cur_size:%d\n", m_resampler_params.dst_nb_samples, ret_size, m_audioresample.audio_resampler_get_fifo_size());
+	//}
+	//ret_size = m_audioresample.audio_resampler_receive_frame(m_resampler_params.dst_data, m_resampler_params.dst_nb_samples, &out_pts);
+	//if (ret_size > 0) {
+	//	// 获取给定音频属性参数所需的缓冲区大小
+	//	m_dst_bufsize = av_samples_get_buffer_size(&m_resampler_params.dst_linesize, m_resampler_params.dst_nb_channels, ret_size, m_resampler_params.dst_sample_fmt, 1);
+	//	if (m_dst_bufsize < 0) {
+	//		fprintf(stderr, "Could not get sample buffer size\n");
+	//		return NULL;
+	//	}
+	//	//av_fast_malloc(&m_audio_buffer1, &m_audio_buf1_size, m_dst_bufsize); // 如果缓冲区足够大重用缓冲区，否则重新malloc
+	//	//if (!m_audio_buffer1)
+	//	//	return AVERROR(ENOMEM);
+	//	m_audio_buffer1 = m_resampler_params.dst_data[0];
+	//	m_audio_buffer = m_audio_buffer1;
+	//	m_audio_index++;
+	//}
+
+	AVFrame* dst_frame = av_frame_alloc();
+	dst_frame->format = af->frame->format;
+	dst_frame->channel_layout = af->frame->channel_layout;
+	dst_frame->sample_rate = af->frame->sample_rate;
+	dst_frame->nb_samples = af->frame->nb_samples;
+	if (av_frame_get_buffer(dst_frame, 0) < 0) {
+		fprintf(stderr, "Failed to allocate buffer for dst dst_frame\n");
+		av_frame_free(&dst_frame);
+		return NULL;
+	}
+
+	if (av_frame_copy(dst_frame, af->frame) < 0) {
+		av_frame_free(&dst_frame);
+		return NULL;
+	}
+	m_avpacketqueue->audio_frame_queue_next();
+	return dst_frame;
 }
 
 }
