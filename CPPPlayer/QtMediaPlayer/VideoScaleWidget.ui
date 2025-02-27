@@ -51,23 +51,59 @@
       <item>
        <widget class="QWidget" name="widget_3" native="true">
         <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
-          <widget class="QWidget" name="videolist" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>110</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>110</height>
-            </size>
-           </property>
+          <widget class="QScrollArea" name="scrollArea">
            <property name="styleSheet">
-            <string notr="true"/>
+            <string notr="true">QScrollArea { background-color: transparent; border:0px;}
+	QScrollArea QWidget { background-color: transparent; } </string>
            </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOn</enum>
+           </property>
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="m_scrollArea_mixed">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>681</width>
+              <height>352</height>
+             </rect>
+            </property>
+            <widget class="QPushButton" name="btnExportVideo">
+             <property name="geometry">
+              <rect>
+               <x>602</x>
+               <y>1</y>
+               <width>75</width>
+               <height>23</height>
+              </rect>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">color:white;</string>
+             </property>
+             <property name="text">
+              <string>导出</string>
+             </property>
+            </widget>
+           </widget>
           </widget>
          </item>
         </layout>

@@ -29,6 +29,12 @@
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
      <widget class="QWidget" name="widget" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>855</width>
+        <height>336</height>
+       </size>
+      </property>
       <property name="styleSheet">
        <string notr="true">QWidget{background-color: rgb(38, 38, 38);}
 QLabel{color:white;}
@@ -37,7 +43,14 @@ QPushButton{color:white;}
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QWidget" name="m_widget_video" native="true"/>
+        <widget class="QWidget" name="m_widget_video" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>837</width>
+           <height>212</height>
+          </size>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QFrame" name="playframe">
@@ -200,13 +213,53 @@ QPushButton{color:white;}
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>873</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color:white</string>
+   </property>
+   <widget class="QMenu" name="m_export_menu">
+    <property name="styleSheet">
+     <string notr="true">color:white;</string>
+    </property>
+    <property name="title">
+     <string>菜单</string>
+    </property>
+    <widget class="QMenu" name="menu">
+     <property name="title">
+      <string>文件</string>
+     </property>
+     <addaction name="actionExport"/>
+     <addaction name="actionInto"/>
+    </widget>
+    <addaction name="menu"/>
+   </widget>
+   <addaction name="m_export_menu"/>
+  </widget>
+  <action name="actionExport">
+   <property name="text">
+    <string>导出</string>
+   </property>
+  </action>
+  <action name="actionInto">
+   <property name="text">
+    <string>导入</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>VideoScaleWidget</class>
    <extends>QWidget</extends>
-   <header location="global">./EDIT/VideoScaleWidget.h</header>
+   <header location="global">./Montage/VideoScaleWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

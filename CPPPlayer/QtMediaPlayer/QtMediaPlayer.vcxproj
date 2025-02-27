@@ -21,6 +21,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -116,28 +117,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="QtMediaPlayer.qrc" />
+    <QtUic Include="ExportVideoWidget.ui" />
     <QtUic Include="QtMediaPlayer.ui" />
     <QtMoc Include="QtMediaPlayer.h" />
     <ClCompile Include="Common\DragShadow.cpp" />
     <ClCompile Include="Common\FrameLess.cpp" />
-    <ClCompile Include="EDIT\VideoListWidget.cpp" />
-    <ClCompile Include="EDIT\VideoScaleWidget.cpp" />
+    <ClCompile Include="Export\ExportVideoWidget.cpp" />
+    <ClCompile Include="Montage\VideoListWidget.cpp" />
+    <ClCompile Include="Montage\VideoScaleWidget.cpp" />
     <ClCompile Include="QtMediaPlayer.cpp" />
     <ClCompile Include="main.cpp" />
     <QtUic Include="VideoListWidget.ui" />
     <QtUic Include="VideoScaleWidget.ui" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="EDIT\VideoScaleWidget.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="EDIT\VideoListWidget.h" />
-  </ItemGroup>
-  <ItemGroup>
     <QtMoc Include="Common\DragShadow.h" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Common\FrameLess.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Montage\VideoScaleWidget.h" />
+    <QtMoc Include="Montage\VideoListWidget.h" />
+    <QtMoc Include="Export\ExportVideoWidget.h" />
+    <ClInclude Include="gQGlobal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

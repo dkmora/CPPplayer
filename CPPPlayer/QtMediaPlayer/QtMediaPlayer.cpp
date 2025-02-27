@@ -1,9 +1,13 @@
 #include "QtMediaPlayer.h"
 
+QtMediaPlayer* g_MediaPlayer = nullptr;
+
 QtMediaPlayer::QtMediaPlayer(QWidget* parent)
 	: QMainWindow(parent),
 	m_MediaEventHandler(new CMediaPlayerEvent(*this))
 {
+	g_MediaPlayer = this;
+
 	ui.setupUi(this);
 	connect(ui.m_btn_start_publishstream, &QPushButton::clicked, this, &QtMediaPlayer::StartPublish);
 	connect(ui.m_btn_stop_publishstream, &QPushButton::clicked, this, &QtMediaPlayer::StopPublish);
@@ -28,6 +32,21 @@ QtMediaPlayer::QtMediaPlayer(QWidget* parent)
 	mainlayout->addWidget(m_ffplay->GetVideoView());
 	mainlayout->setMargin(0);
 	mainlayout->setSpacing(0);
+
+	// QMenu
+	connect(ui.actionExport, &QAction::triggered, this, [=] {
+		if (m_export_video_widget == nullptr)
+		{
+			m_export_video_widget = new ExportVideoWidget(this);
+		}
+
+		auto region = m_export_video_widget->rect();
+		region.moveCenter(this->rect().center());
+		auto posX = region.x();
+		auto posY = region.y();
+		m_export_video_widget->move(posX, posY);
+		m_export_video_widget->show();
+	});
 }
 
 QtMediaPlayer::~QtMediaPlayer()
@@ -101,4 +120,55 @@ void QtMediaPlayer::sloSliderVolume(int value)
 {
 	float fVolume = (float)value / 100;
 	m_ffplay->Volume(fVolume);
+}
+
+
+//void QtMediaPlayer::dragEnterEvent(QDragEnterEvent* event) //拖动文件到窗口，触发
+//{
+//	if (event->mimeData()->hasUrls())
+//	{
+//		event->acceptProposedAction(); //事件数据中存在路径，方向事件
+//	}
+//	else
+//	{
+//		event->ignore();
+//	}
+//}
+//
+//void QtMediaPlayer::dragMoveEvent(QDragMoveEvent* event) //拖动文件到窗口移动文件，触发
+//{
+//	qDebug() << "123";
+//}
+//
+//void QtMediaPlayer::dropEvent(QDropEvent* event) //拖动文件到窗口释放文件，触发
+//{
+//	const QMimeData* mimeData = event->mimeData();
+//	if (mimeData->hasUrls())
+//	{
+//		QList<QUrl> urls = mimeData->urls();
+//		QString fileName = urls.at(0).toLocalFile();
+//		m_text_edit->setText(fileName);
+//	}
+//
+//}
+
+bool QtMediaPlayer::nativeEvent(const QByteArray& eventType, void* message, long* result) {
+	if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG") {
+		MSG* pMsg = reinterpret_cast<MSG*>(message);
+		if (pMsg->message == WM_DROPFILES) {
+			HDROP hDropInfo = (HDROP)pMsg->wParam;
+			wchar_t szFilePathName[_MAX_PATH] = { 0 };
+			const UINT nNumOfFiles = DragQueryFile(hDropInfo, 0xFFFFFFFF, NULL, 0);
+			if (nNumOfFiles > 0) {
+				// DragQueryFile第二个参数为拖入文件的索引
+				DragQueryFile(hDropInfo, 0, szFilePathName, _MAX_PATH); //直接取第一个 入参UINT iFile  = 0
+				const QString currentfile = QString::fromWCharArray(szFilePathName);
+				// currentfile 为当前拖拽文件
+				// OnDragFinished(currentfile);
+				emit sigDragFileEvent(currentfile);
+			}
+			DragFinish(hDropInfo);
+		}
+	}
+	return false;
 }

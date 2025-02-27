@@ -4,6 +4,8 @@
 #include "ui_QtMediaPlayer.h"
 #include "QtFFplay.h"
 #include "MediaPlayerEvent.h"
+#include "./Export/ExportVideoWidget.h"
+
 #include <QDebug>
 #include <QHBoxLayout>
 
@@ -30,6 +32,12 @@ public:
     QtMediaPlayer(QWidget *parent = Q_NULLPTR);
 	~QtMediaPlayer();
 
+protected:
+	//void dragEnterEvent(QDragEnterEvent* event) Q_DECL_OVERRIDE;
+	//void dragMoveEvent(QDragMoveEvent* event) Q_DECL_OVERRIDE;
+	//void dropEvent(QDropEvent* event) Q_DECL_OVERRIDE;
+	bool nativeEvent(const QByteArray& eventType, void* message, long* result);
+
 private slots:
 	bool StartPublish();
 	void StopPublish();
@@ -38,9 +46,16 @@ private slots:
 	void sloSliderRate(int value);
 	void sloSliderVolume(int value);
 
+signals:
+	void sigDragFileEvent(QString path);
+
 private:
     Ui::QPublishStreamClass ui;
 	QtFFplay* m_ffplay;
 	std::unique_ptr<MediaPlayerEventHandler> m_MediaEventHandler;
+
+	ExportVideoWidget* m_export_video_widget = nullptr;
 };
+
+extern QtMediaPlayer* g_MediaPlayer;
 

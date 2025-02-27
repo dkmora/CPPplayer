@@ -3,8 +3,7 @@
 #include "ui_VideoScaleWidget.h"
 #include "VideoListWidget.h"
 #include "Common/FrameLess.h"
-
-#include <QTextEdit>
+#include <QList>
 
 class VideoScaleWidget : public QWidget
 {
@@ -13,13 +12,8 @@ public:
     VideoScaleWidget(QWidget* parent = nullptr);
     ~VideoScaleWidget();
 
-protected:
-    void dragEnterEvent(QDragEnterEvent* event);
-    void dropEvent(QDropEvent* event);
-
 private:
     Ui::VideoScaleWidget ui;
-    VideoListWidget* m_VideoListWidget;
-    FrameLess* fremeLess;
-    QTextEdit* m_text_edit = nullptr;
+    QList<VideoListWidget*> m_video_list;
+    MuxerVideo   m_muxer_video;
 };

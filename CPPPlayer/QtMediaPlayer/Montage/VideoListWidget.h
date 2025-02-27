@@ -12,12 +12,13 @@ class VideoListWidget : public QWidget
 {
     Q_OBJECT
 public:
-    VideoListWidget(QWidget* parent = nullptr);
+    VideoListWidget(QString filename, QWidget* parent = nullptr);
     ~VideoListWidget();
+
+    AnalyzeFrameEngine* getAnalyzeFrameEngine() { return &m_analyzeframe; }
 
 private:
     Ui::VideoListWidget ui;
-    AnalyzeFrame m_analyzeframe;
-    MuxerVideo   m_muxer_video;
+    AnalyzeFrameEngine m_analyzeframe;
     int m_timeline = 0;
 };
