@@ -2,6 +2,7 @@
 #include "QtMediaPlayer.h"
 #include <QtWidgets/QApplication>
 #include <objbase.h>
+#include "AnalyzeManager.h"
 
 void EnableDrag(QMainWindow& w) {
     ChangeWindowMessageFilter(WM_DROPFILES, 1);
@@ -19,6 +20,9 @@ int main(int argc, char *argv[])
 {
 	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
     QApplication a(argc, argv);
+
+    AnalyzeManager::getInstance();
+
     QtMediaPlayer w;
     EnableDrag(w);
     g_MediaPlayer = &w;

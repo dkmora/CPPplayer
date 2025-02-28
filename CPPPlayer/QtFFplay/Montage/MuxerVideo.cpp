@@ -10,7 +10,7 @@ MuxerVideo::~MuxerVideo()
 }
 
 
-bool MuxerVideo::startMuxer(std::string _file_name, int _width, int _hright, int _fps, int _sample_rate, int _channels)
+bool MuxerVideo::startMuxer(std::string _file_name, int _width, int _height, int _fps, int _sample_rate, int _channels)
 {
     m_fmt_ctx = nullptr;
     if (avformat_alloc_output_context2(&m_fmt_ctx, nullptr, "mp4", _file_name.c_str()) < 0) {
@@ -19,7 +19,7 @@ bool MuxerVideo::startMuxer(std::string _file_name, int _width, int _hright, int
     }
 
     // Ìí¼ÓÊÓÆµÁ÷
-    m_video_stream = add_video_stream(m_fmt_ctx, AV_CODEC_ID_H264, _width, _hright, _fps);
+    m_video_stream = add_video_stream(m_fmt_ctx, AV_CODEC_ID_H264, _width, _height, _fps);
     if (!m_video_stream) {
         std::cerr << "Failed to create video stream\n";
         return -1;

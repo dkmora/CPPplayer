@@ -94,6 +94,8 @@ typedef struct FFDecoder {
 	AVRational	start_pts_tb;       // 初始化时是stream的time_base
 	int64_t		next_pts = 0;           // 记录最近一次解码后的frame的pts，当解出来的部分帧没有有效的pts时则使用next_pts进行推算
 	AVRational	next_pts_tb;        // next_pts的单位
+	int     out_width = 0;
+	int     out_height = 0;
 }FFDecoder;
 
 // 用于缓存解码后的数据

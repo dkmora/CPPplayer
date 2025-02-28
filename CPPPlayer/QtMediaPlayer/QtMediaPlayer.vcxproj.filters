@@ -70,6 +70,9 @@
     <ClCompile Include="QtMediaPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AnalyzeManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="VideoScaleWidget.ui">
@@ -107,6 +110,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gQGlobal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnalyzeManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

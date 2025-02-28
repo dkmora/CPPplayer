@@ -8,11 +8,11 @@
 #include <queue>
 #include <iostream>
 
-class QTFFPLAY_EXPORT AnalyzeFrame
+class QTFFPLAY_EXPORT AnalyzeFrameEngine
 {
 public:
-    AnalyzeFrame();
-    ~AnalyzeFrame();
+    AnalyzeFrameEngine();
+    ~AnalyzeFrameEngine();
 
     /*
      * @brief 开始解析视频
@@ -25,16 +25,6 @@ public:
     void clearFrame();
 
     /*
-     * 开始剪辑
-     */
-    int64_t startMontage(int64_t startTime, int64_t endTime);
-
-    /*
-     * 导出视频
-     */
-    //int ExportVideo();
-
-    /*
      * @brief 获取文件的总时长
      */
     int64_t get_file_duration() { if (m_avformat_context == nullptr) return 0; else return m_avformat_context->duration; }
@@ -45,10 +35,14 @@ public:
     std::string get_file_name();
 
     /*
+     * @brief 开始解码
+     */
+    void startDecode(int width, int height);
+
+    /*
      * @brief 获取I帧
      */
     std::list<AVFrame*> getIFrameList()  { return m_IFrame; };
-
 
     /*
      * @brief 获取宽高帧率
@@ -57,7 +51,9 @@ public:
     int get_video_height() { return m_avformat_context->streams[m_video_stream]->codecpar->height; };
     int get_video_fps() { return av_q2d(m_avformat_context->streams[m_video_stream]->r_frame_rate); };
 
-
+    /*
+     * @brief 获取一帧音视频解码后的数据
+     */
     AVFrame* getVidioDecode();
     AVFrame* getAudioDecode();
 

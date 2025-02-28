@@ -40,8 +40,10 @@ AVDecoder::AVDecoder(FFDecoder* ffmpegdecoder, AVPacketQueue* avpacketQueue, AVC
 	}
 	else if (m_codec_type == AVMEDIA_TYPE_VIDEO) {
 		m_avframe_yuv420 = av_frame_alloc();
-		m_avframe_yuv420->width = m_decoder->codec_context->width;
-		m_avframe_yuv420->height = m_decoder->codec_context->height;
+		//m_avframe_yuv420->width = m_decoder->codec_context->width;
+		//m_avframe_yuv420->height = m_decoder->codec_context->height;
+		m_avframe_yuv420->width = m_decoder->out_width;
+		m_avframe_yuv420->height = m_decoder->out_height;
 		m_avframe_yuv420->format = AV_PIX_FMT_YUV420P;
 
 		//转换器上下文  转换方法需要

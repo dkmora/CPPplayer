@@ -1,23 +1,21 @@
 #include "AnalyzeFrame.h"
 
-AnalyzeFrame::AnalyzeFrame()
+AnalyzeFrameEngine::AnalyzeFrameEngine()
 {
 	init_logger("Analyze_Frame.log", S_INFO);
 }
 
-AnalyzeFrame::~AnalyzeFrame()
+AnalyzeFrameEngine::~AnalyzeFrameEngine()
 {
 
 }
 
-
-int AnalyzeFrame::startAnalyze(std::string file_name)
+int AnalyzeFrameEngine::startAnalyze(std::string file_name)
 {
-
 	int ret;
 	m_file_name = file_name;
 
-	getPicture();
+	ret = getPicture();
 
 	m_avformat_context = avformat_alloc_context();
 
@@ -50,66 +48,19 @@ int AnalyzeFrame::startAnalyze(std::string file_name)
 		}
 	}
 
-
-	// 队列初始化
-	m_avpacket_queue.frame_queue_init(m_avpacket_queue.get_frame_video_queue(), m_avpacket_queue.get_video_packet_point(), VIDEO_PICTURE_QUEUE_SIZE, 1);
-	m_avpacket_queue.frame_queue_init(m_avpacket_queue.get_frame_audio_queue(), m_avpacket_queue.get_audio_packet_point(), SAMPLE_QUEUE_SIZE, 1);
-	m_avpacket_queue.packet_vidio_queue_init();
-	m_avpacket_queue.packet_audio_queue_init();
-
-	// 获取视频参数
-	if (m_video_stream != -1) { // streams[m_video_stream]->r_frame_rate
-		// 获取帧率
-		m_fps = m_avformat_context->streams[m_video_stream]->r_frame_rate.num /
-			m_avformat_context->streams[m_video_stream]->r_frame_rate.den;
-
-		m_avpacket_queue.packet_video_queue_start();
-		allocation_decoder(&m_video_decoder, m_video_stream);
-		// 创建视频解码线程
-		m_video_decode_thread = new cvpublish::AVDecoder(&m_video_decoder, &m_avpacket_queue, &m_av_clock);
-		m_video_decode_thread->Start();
-	}
-
-	// 获取音频参数
-	if (m_audio_stream != -1) {
-		m_avpacket_queue.packet_audio_queue_start();
-		allocation_decoder(&m_audio_decoder, m_audio_stream);
-		// 创建音频解码线程
-		m_audio_decode_thread = new cvpublish::AVDecoder(&m_audio_decoder, &m_avpacket_queue, &m_av_clock);
-		m_audio_decode_thread->Start();
-	}
-
-	/*
-* 初始化时钟
-* 时钟序列->queue_serial，实际上指向的是is->videoq.serial
-*/
-	m_av_clock.init_clock(&m_av_clock.vidclk, &m_avpacket_queue.get_video_packet_point()->serial);
-	m_av_clock.init_clock(&m_av_clock.audclk, &m_avpacket_queue.get_audio_packet_point()->serial);
-	m_av_clock.init_clock(&m_av_clock.extclk, &m_av_clock.extclk.serial);
-
-	m_av_clock.max_frame_duration = (m_avformat_context->flags & AVFMT_TS_DISCONT) ? 10.0 : 3600.0;
-
 	// 获取视频参数
 	if (m_video_stream != -1) {
 		m_fps = m_avformat_context->streams[m_video_stream]->r_frame_rate.num / m_avformat_context->streams[m_video_stream]->r_frame_rate.den;
 	}
-
-	// new packet
-	m_avpacket = (AVPacket*)av_malloc(sizeof(AVPacket));
-	av_init_packet(m_avpacket);
-
-	// 开始解码
-	m_isDone = true;
-	m_read_thread = new std::thread(&AnalyzeFrame::read_thread, this);
 	return RET_OK;
 }
 
-void AnalyzeFrame::clearFrame()
+void AnalyzeFrameEngine::clearFrame()
 {
 
 }
 
-RET_CODE AnalyzeFrame::allocation_decoder(FFDecoder* coder, int stream) {
+RET_CODE AnalyzeFrameEngine::allocation_decoder(FFDecoder* coder, int stream) {
 	int ret;
 
 	AVCodecParameters* pavcodec_parameters = m_avformat_context->streams[stream]->codecpar;
@@ -149,7 +100,7 @@ RET_CODE AnalyzeFrame::allocation_decoder(FFDecoder* coder, int stream) {
 	return RET_OK;
 }
 
-RET_CODE AnalyzeFrame::release_decoder(FFDecoder* coder) {
+RET_CODE AnalyzeFrameEngine::release_decoder(FFDecoder* coder) {
 	if (coder->codec_context != nullptr && coder->codec_context->codec_type == AVMEDIA_TYPE_AUDIO) {
 		m_avpacket_queue.packet_audio_queue_about();
 		m_avpacket_queue.frame_audio_queue_signal();
@@ -174,12 +125,58 @@ RET_CODE AnalyzeFrame::release_decoder(FFDecoder* coder) {
 	return RET_OK;
 }
 
-int64_t AnalyzeFrame::startMontage(int64_t startTime, int64_t endTime)
+void AnalyzeFrameEngine::startDecode(int width, int height)
 {
-	return 0;
+	// 队列初始化
+	m_avpacket_queue.frame_queue_init(m_avpacket_queue.get_frame_video_queue(), m_avpacket_queue.get_video_packet_point(), VIDEO_PICTURE_QUEUE_SIZE, 1);
+	m_avpacket_queue.frame_queue_init(m_avpacket_queue.get_frame_audio_queue(), m_avpacket_queue.get_audio_packet_point(), SAMPLE_QUEUE_SIZE, 1);
+	m_avpacket_queue.packet_vidio_queue_init();
+	m_avpacket_queue.packet_audio_queue_init();
+
+	// 获取视频参数
+	if (m_video_stream != -1) { // streams[m_video_stream]->r_frame_rate
+		// 获取帧率
+		m_fps = m_avformat_context->streams[m_video_stream]->r_frame_rate.num /
+			m_avformat_context->streams[m_video_stream]->r_frame_rate.den;
+
+		m_avpacket_queue.packet_video_queue_start();
+		allocation_decoder(&m_video_decoder, m_video_stream);
+		// 创建视频解码线程
+		m_video_decoder.out_width = width;
+		m_video_decoder.out_height = height;
+		m_video_decode_thread = new cvpublish::AVDecoder(&m_video_decoder, &m_avpacket_queue, &m_av_clock);
+		m_video_decode_thread->Start();
+	}
+
+	// 获取音频参数
+	if (m_audio_stream != -1) {
+		m_avpacket_queue.packet_audio_queue_start();
+		allocation_decoder(&m_audio_decoder, m_audio_stream);
+		// 创建音频解码线程
+		m_audio_decode_thread = new cvpublish::AVDecoder(&m_audio_decoder, &m_avpacket_queue, &m_av_clock);
+		m_audio_decode_thread->Start();
+	}
+
+	/*
+* 初始化时钟
+* 时钟序列->queue_serial，实际上指向的是is->videoq.serial
+*/
+	m_av_clock.init_clock(&m_av_clock.vidclk, &m_avpacket_queue.get_video_packet_point()->serial);
+	m_av_clock.init_clock(&m_av_clock.audclk, &m_avpacket_queue.get_audio_packet_point()->serial);
+	m_av_clock.init_clock(&m_av_clock.extclk, &m_av_clock.extclk.serial);
+
+	m_av_clock.max_frame_duration = (m_avformat_context->flags & AVFMT_TS_DISCONT) ? 10.0 : 3600.0;
+
+	// new packet
+	m_avpacket = (AVPacket*)av_malloc(sizeof(AVPacket));
+	av_init_packet(m_avpacket);
+
+	// 开始解码
+	m_isDone = true;
+	m_read_thread = new std::thread(&AnalyzeFrameEngine::read_thread, this);
 }
 
-std::string AnalyzeFrame::get_file_name()
+std::string AnalyzeFrameEngine::get_file_name()
 { 
 	std::string input = m_avformat_context->filename;
 
@@ -194,17 +191,17 @@ std::string AnalyzeFrame::get_file_name()
 	return input.substr(pos + 1);
 }
 
-AVFrame* AnalyzeFrame::getVidioDecode()
+AVFrame* AnalyzeFrameEngine::getVidioDecode()
 {
 	return m_video_decode_thread->getVideoAVFrame();
 }
 
-AVFrame* AnalyzeFrame::getAudioDecode()
+AVFrame* AnalyzeFrameEngine::getAudioDecode()
 {
 	return m_audio_decode_thread->getAudioAVFrame();
 }
 
-RET_CODE AnalyzeFrame::getPicture()
+RET_CODE AnalyzeFrameEngine::getPicture()
 {
 	const char* inputFile = m_file_name.c_str();
 	AVFormatContext* formatContext = nullptr;
@@ -334,7 +331,7 @@ RET_CODE AnalyzeFrame::getPicture()
 
 
 // 初始化视频流
-AVStream* AnalyzeFrame::add_video_stream(AVFormatContext* fmt_ctx, AVCodecID codec_id, int width, int height, int fps) {
+AVStream* AnalyzeFrameEngine::add_video_stream(AVFormatContext* fmt_ctx, AVCodecID codec_id, int width, int height, int fps) {
 	AVCodec* codec = avcodec_find_encoder(codec_id);
 	if (!codec) {
 		std::cerr << "Video codec not found\n";
@@ -387,7 +384,7 @@ AVStream* AnalyzeFrame::add_video_stream(AVFormatContext* fmt_ctx, AVCodecID cod
 }
 
 // 初始化音频流
-AVStream* AnalyzeFrame::add_audio_stream(AVFormatContext* fmt_ctx, AVCodecID codec_id, int sample_rate, int channels) {
+AVStream* AnalyzeFrameEngine::add_audio_stream(AVFormatContext* fmt_ctx, AVCodecID codec_id, int sample_rate, int channels) {
 	AVCodec* codec = avcodec_find_encoder(codec_id);
 	if (!codec) {
 		std::cerr << "Audio codec not found\n";
@@ -439,7 +436,7 @@ AVStream* AnalyzeFrame::add_audio_stream(AVFormatContext* fmt_ctx, AVCodecID cod
 	return stream;
 }
 
-void AnalyzeFrame::read_thread() {
+void AnalyzeFrameEngine::read_thread() {
 	while (m_isDone) {
 		int ret;
 		// 读取媒体数据

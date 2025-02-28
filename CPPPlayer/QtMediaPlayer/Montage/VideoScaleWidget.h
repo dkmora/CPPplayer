@@ -15,5 +15,4 @@ public:
 private:
     Ui::VideoScaleWidget ui;
     QList<VideoListWidget*> m_video_list;
-    MuxerVideo   m_muxer_video;
 };
