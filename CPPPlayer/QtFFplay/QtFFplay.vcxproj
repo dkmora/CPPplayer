@@ -111,6 +111,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Filter\CFFilter.cpp" />
     <ClCompile Include="Montage\AnalyzeFrame.cpp" />
     <ClCompile Include="Montage\MuxerVideo.cpp" />
     <ClCompile Include="OpenGlWidget.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="commonlooper.h" />
     <ClInclude Include="dlog.h" />
     <ClInclude Include="ffmpegbase.h" />
+    <ClInclude Include="Filter\CFFilter.h" />
     <ClInclude Include="mediabase.h" />
     <ClInclude Include="MediaPlayerEvent.h" />
     <ClInclude Include="Montage\AnalyzeFrame.h" />

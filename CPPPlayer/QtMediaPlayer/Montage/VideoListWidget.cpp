@@ -2,39 +2,40 @@
 #include <QImage>
 #include "gQGlobal.h"
 
-VideoListWidget::VideoListWidget(QString filename, QWidget* parent /*= nullptr*/) : QWidget(parent)
+VideoListWidget::VideoListWidget(QString fileName, QWidget* parent /*= nullptr*/) : DragItemWidget(parent)
 {
     ui.setupUi(this);
+    //setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    std::weak_ptr<AnalyzeFrameEngine> ptr_af = vAnalyzeManager->getAnalyzeEngine(fileName);
+    if(ptr_af.expired()){
+        auto ptr = std::make_shared<AnalyzeFrameEngine>();
+        int engine_size = vAnalyzeManager->getEngineSize();
+        ptr->setMuxerIndex(engine_size);
+        vAnalyzeManager->addAnalyzeEngine(fileName, ptr);
+        ptr->startAnalyze(fileName.toStdString());
+        ptr_af = ptr;
+    }
 
-    AnalyzeFrameEngine* analyzeframe = new AnalyzeFrameEngine;
-    analyzeframe->startAnalyze(filename.toStdString());
-    ui.labfilename->setText(analyzeframe->get_file_name().c_str());
+    AFMsg afMsg;
+    afMsg.fileName = fileName;
+    setDropData(afMsg);
 
-    // 微秒转换为秒
-    qint64 totalSeconds = analyzeframe->get_file_duration() / 1000000;
-
-    // 计算分钟和秒
+    //文件名
+    ui.labfilename->setText(ptr_af.lock()->get_file_name().c_str());
+    //时长
+    qint64 totalSeconds = ptr_af.lock()->get_file_duration() / 1000000;
     qint64 minutes = totalSeconds / 60;
     qint64 seconds = totalSeconds % 60;
-
-    // 格式化成 "mm:ss" 格式
-    QString file_duration = QString("%1:%2")
-        .arg(minutes, 2, 10, QChar('0'))  // 分钟部分，保证两位
-        .arg(seconds, 2, 10, QChar('0')); // 秒部分，保证两位
-
+    QString file_duration = QString("%1:%2").arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
     ui.labduration->setText(file_duration);
-
-    auto list = analyzeframe->getIFrameList();
-
+    //关键帧
+    auto list = ptr_af.lock()->getIFrameList();
     QHBoxLayout* vly = new QHBoxLayout(ui.scrollAreaWidget);
     for (auto value : list) {
         QLabel* label = new QLabel;
         label->setFixedSize(50, 40);
         QImage temp = QImage(value->data[0], value->width, value->height, value->width * 4, QImage::Format_RGB32);
-        if (temp.isNull()) {
-            continue;
-        }
-
+        if (temp.isNull()) { continue; }
         QPixmap pixmap = QPixmap::fromImage(temp);
         pixmap = pixmap.scaled(label->size());
         label->setPixmap(pixmap);
@@ -42,9 +43,6 @@ VideoListWidget::VideoListWidget(QString filename, QWidget* parent /*= nullptr*/
     }
     vly->setMargin(0);
     vly->setSpacing(0);
-
-    // add analyze List
-    vAnalyzeManager->addAnalyzeEngine(analyzeframe);
 }
 
 VideoListWidget::~VideoListWidget()

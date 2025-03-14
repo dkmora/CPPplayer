@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     AnalyzeManager::getInstance();
 
     QtMediaPlayer w;
-    EnableDrag(w);
+    //EnableDrag(w);
     g_MediaPlayer = &w;
     w.show();
     return a.exec();

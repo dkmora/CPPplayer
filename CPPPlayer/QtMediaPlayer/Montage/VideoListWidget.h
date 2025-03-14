@@ -2,16 +2,17 @@
 
 #include "ui_VideoListWidget.h"
 #include "Montage/AnalyzeFrame.h"
+#include "Common/DragListWidget.h"
 
 #include <QDragEnterEvent>
 #include <QMimeData>
 #include <QTextStream>
 
-class VideoListWidget : public QWidget
+class VideoListWidget : public DragItemWidget
 {
     Q_OBJECT
 public:
-    VideoListWidget(QString filename, QWidget* parent = nullptr);
+    VideoListWidget(QString fileName, QWidget* parent = nullptr);
     ~VideoListWidget();
 
     //AnalyzeFrameEngine* getAnalyzeFrameEngine() { return &m_analyzeframe; }

@@ -1,4 +1,5 @@
 #include "AnalyzeFrame.h"
+#include <QDebug>
 
 AnalyzeFrameEngine::AnalyzeFrameEngine()
 {
@@ -7,7 +8,7 @@ AnalyzeFrameEngine::AnalyzeFrameEngine()
 
 AnalyzeFrameEngine::~AnalyzeFrameEngine()
 {
-
+	qDebug() << "AnalyzeFrameEngine::~AnalyzeFrameEngine";
 }
 
 int AnalyzeFrameEngine::startAnalyze(std::string file_name)

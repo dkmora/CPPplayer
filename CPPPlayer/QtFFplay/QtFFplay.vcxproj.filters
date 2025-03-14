@@ -20,6 +20,9 @@
     <Filter Include="Montage">
       <UniqueIdentifier>{d9a72d51-f720-4248-9427-86b6e05827a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Filter">
+      <UniqueIdentifier>{2619d53c-ea6d-4adf-97a8-f5b8a0615b55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qtffplay_global.h">
@@ -76,6 +79,9 @@
     <ClInclude Include="Montage\AnalyzeFrame.h">
       <Filter>Montage</Filter>
     </ClInclude>
+    <ClInclude Include="Filter\CFFilter.h">
+      <Filter>Filter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioSource.cpp">
@@ -128,6 +134,9 @@
     </ClCompile>
     <ClCompile Include="Montage\AnalyzeFrame.cpp">
       <Filter>Montage</Filter>
+    </ClCompile>
+    <ClCompile Include="Filter\CFFilter.cpp">
+      <Filter>Filter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

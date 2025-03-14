@@ -196,10 +196,10 @@ void MuxerVideo::write_video_frames(AVFormatContext* fmt_ctx, AVStream* video_st
         }
 
         pts = av_rescale_q(pts, AVRational{ 1, (int)1000000 }, video_codec_ctx->time_base);
-        dst_frame->pts = pts;
+        frame->pts = pts;
 
         // ·¢ËÍÖ¡µ½±àÂëÆ÷
-        int ret = avcodec_send_frame(video_codec_ctx, dst_frame);
+        int ret = avcodec_send_frame(video_codec_ctx, frame);
         if (ret < 0) {
             std::cerr << "Error sending video frame for encoding\n";
             continue;
@@ -236,10 +236,12 @@ void MuxerVideo::write_video_frames(AVFormatContext* fmt_ctx, AVStream* video_st
 
             av_interleaved_write_frame(fmt_ctx, packet);
             av_packet_unref(packet);
-            printf("h264 pts:%lld\n", packet->pts);
+            //printf("h264 pts:%lld\n", packet->pts);
+            printf("put h264\n");
         }
     }
     av_frame_free(&dst_frame);
+    //av_frame_unref(frame);
 }
 
 void MuxerVideo::write_audio_frames(AVFormatContext* fmt_ctx, AVStream* audio_stream, AVCodecContext* audio_codec_ctx, AVFrame* frame, int sample_count, double pts) {

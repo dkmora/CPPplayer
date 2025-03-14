@@ -45,7 +45,7 @@ ExportVideoWidget::ExportVideoWidget(QWidget* parent/* = nullptr*/) : QWidget(pa
     ui.comboxFPS->setItemData(1, Qt::AlignCenter, Qt::TextAlignmentRole);
     ui.comboxFPS->setItemData(2, Qt::AlignCenter, Qt::TextAlignmentRole);
     ui.comboxFPS->setItemData(3, Qt::AlignCenter, Qt::TextAlignmentRole);
-    ui.comboxFPS->setCurrentIndex(0);
+    ui.comboxFPS->setCurrentIndex(1);
 
     //音频导出格式
     ui.comboxAudioFormat->addItem("MP3");
@@ -83,7 +83,8 @@ void ExportVideoWidget::ExportVideo()
     QString _export_path = ui.editExportPath->text();
     QString _file_name = ui.editTitle->text();
     QString _file_format = ui.comboxFileFormat->currentText();
-    int _fps = ui.comboxFPS->itemData(ui.comboxFPS->currentIndex()).toInt();
+    //int _fps = ui.comboxFPS->itemData(ui.comboxFPS->currentIndex()).toInt();
+    int _fps = 25; // 暂时只支持25fps视频编辑
 
     int _width, _height = 0;
     if (ui.comboxResolution->currentText() == "480P") {
@@ -96,7 +97,7 @@ void ExportVideoWidget::ExportVideo()
         _width = 1920; _height = 1080;
     }
 
-    // start mutex..
+    // start mutex...
     int64_t audio_time_base = AUDIO_TIME_BASE;
     int64_t video_time_base = VIDEO_TIME_BASE;
     double audio_pts = 0;
@@ -106,24 +107,59 @@ void ExportVideoWidget::ExportVideo()
 
     QString fill_name = QString("%1\\%2.%3").arg(_export_path).arg(_file_name).arg(_file_format);
 
-    m_muxer_video.startMuxer(fill_name.toStdString(), _width, _height, _fps);
-    for (int i = 0; i < vAnalyzeManager->getAnalyzeSize(); i++) {
-        auto analyze_frame_Engine = vAnalyzeManager->getAnalyzeEngine(i);
+    //// TODO:滤镜
+    //AVRational time_base = { 1, 25 };
+    //AVRational sample_aspect_ratio = { 1, 1 };
+    //CFFilter fpsfilter;
+    //fpsfilter.initFilter(/*_width, _height*/720, 576, AV_PIX_FMT_YUV420P, time_base, sample_aspect_ratio);
+
+    m_muxer_video.startMuxer(fill_name.toStdString() ,_width, _height, _fps);
+    for (const auto& key : vAnalyzeManager->getAFMap()) {
+        auto analyze_frame_Engine = key;
+
         // 开始解码
         analyze_frame_Engine->startDecode(_width, _height);
-
-        std::this_thread::sleep_for(std::chrono::seconds(3));  // 休眠 5 秒
+        // TODO:改为非阻塞等待
+        std::this_thread::sleep_for(std::chrono::seconds(3));  // 休眠 3 秒
 
         bool _push_video_finish = false;
         bool _push_audio_finish = false;
+        //bool _push_video_frame = true;
         while (1) {
             if (_push_video_finish && _push_audio_finish)
                 break;
 
-            printf("apts:%0.0lf vpts:%0.0lf\n", audio_pts / 1000, video_pts / 1000);
-
             // 重新编码
             if (audio_pts > video_pts && !_push_video_finish) {
+                //int ret = 0; AVFrame* vframe = NULL;
+                //if (_push_video_frame)
+                //{
+                //    vframe = analyze_frame_Engine->getVidioDecode();
+                //    if (vframe != NULL) {
+                //        int ret = fpsfilter.sendFrame(vframe);
+                //        if (ret < 0) {
+                //            continue;
+                //        }
+                //    }
+                //}
+                // 
+                //push:
+                //AVFrame* filger_frame = fpsfilter.receiveFrame(ret);
+                //if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+                //{
+                //    if (vframe == NULL)
+                //    {
+                //        _push_video_frame = true;
+                //    }
+                //    continue;
+                //}
+                //if (filger_frame != NULL && ret == 0) {
+                //    m_muxer_video.pushYUV(filger_frame, video_pts);
+                //    video_pts += video_frame_duration;
+                //    _push_video_frame = false;
+                //    printf("pushYUV vpts:%0.0lf\n", video_pts / 1000);
+                //    continue;
+                //}
                 auto vframe = analyze_frame_Engine->getVidioDecode();
                 if (vframe != NULL) {
                     m_muxer_video.pushYUV(vframe, video_pts);
@@ -132,6 +168,8 @@ void ExportVideoWidget::ExportVideo()
                     _push_video_finish = true;
                 }
                 video_pts += video_frame_duration;
+                printf("pushYUV vpts:%0.0lf\n", video_pts / 1000);
+
             }
             else {
                 auto aframe = analyze_frame_Engine->getAudioDecode();
@@ -142,10 +180,10 @@ void ExportVideoWidget::ExportVideo()
                     _push_audio_finish = true;
                 }
                 audio_pts += audio_frame_duration;
+                printf("pushPCM apts:%0.0lf\n", audio_pts / 1000);
             }
         }
     }
     m_muxer_video.endMuxer();
-
     close();
 }

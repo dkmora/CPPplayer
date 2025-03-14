@@ -1,6 +1,7 @@
 #pragma once
 #include "ui_ExportVideoWidget.h"
 #include "Montage/MuxerVideo.h"
+#include "Filter/CFFilter.h"
 
 class ExportVideoWidget : public QWidget
 {

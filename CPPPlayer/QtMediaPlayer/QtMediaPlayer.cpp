@@ -40,6 +40,8 @@ QtMediaPlayer::QtMediaPlayer(QWidget* parent)
 			m_export_video_widget = new ExportVideoWidget(this);
 		}
 
+		ui.main_seek_widget->getAFMuxerMsg();
+
 		auto region = m_export_video_widget->rect();
 		region.moveCenter(this->rect().center());
 		auto posX = region.x();
@@ -165,7 +167,7 @@ bool QtMediaPlayer::nativeEvent(const QByteArray& eventType, void* message, long
 				const QString currentfile = QString::fromWCharArray(szFilePathName);
 				// currentfile 为当前拖拽文件
 				// OnDragFinished(currentfile);
-				emit sigDragFileEvent(currentfile);
+				emit sigDragFileEvent(currentfile); 
 			}
 			DragFinish(hDropInfo);
 		}

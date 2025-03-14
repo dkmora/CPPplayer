@@ -138,6 +138,11 @@ RET_CODE AVPlayer::startPlay() {
 
 		m_avpacket_queue.packet_video_queue_start();
 		allocation_decoder(&m_video_decoder, m_video_stream);
+
+		// 默认720P
+		m_video_decoder.out_width = 1280;
+		m_video_decoder.out_height = 720;
+
 		// 创建视频解码线程
 		m_video_decode_thread = new cvpublish::AVDecoder(&m_video_decoder, &m_avpacket_queue, &m_av_clock);
 		m_video_decode_thread->Start();

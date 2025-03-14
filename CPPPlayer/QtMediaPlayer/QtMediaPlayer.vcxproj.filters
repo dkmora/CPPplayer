@@ -73,6 +73,9 @@
     <ClCompile Include="AnalyzeManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Common\DragListWidget.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="VideoScaleWidget.ui">
@@ -101,11 +104,14 @@
     <QtMoc Include="Montage\VideoListWidget.h">
       <Filter>Montage</Filter>
     </QtMoc>
-    <QtMoc Include="Montage\VideoScaleWidget.h">
-      <Filter>Montage</Filter>
-    </QtMoc>
     <QtMoc Include="QtMediaPlayer.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Montage\VideoScaleWidget.h">
+      <Filter>Resource Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Common\DragListWidget.h">
+      <Filter>Common</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

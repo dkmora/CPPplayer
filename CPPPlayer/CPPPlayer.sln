@@ -7,20 +7,36 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtFFplay", "QtFFplay\QtFFpl
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtMediaPlayer", "QtMediaPlayer\QtMediaPlayer.vcxproj", "{EE7731E7-EAFE-40EB-A454-1FE505300453}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFmpegUnitTest", "FFmpegUnitTest\FFmpegUnitTest.vcxproj", "{207D6D23-C72F-44CF-9518-0B224E4FDAD3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A040F53C-0DB5-4716-B5FF-B1BDEC524E98}.Debug|x64.ActiveCfg = Debug|Win32
 		{A040F53C-0DB5-4716-B5FF-B1BDEC524E98}.Debug|x86.ActiveCfg = Debug|Win32
 		{A040F53C-0DB5-4716-B5FF-B1BDEC524E98}.Debug|x86.Build.0 = Debug|Win32
+		{A040F53C-0DB5-4716-B5FF-B1BDEC524E98}.Release|x64.ActiveCfg = Release|Win32
 		{A040F53C-0DB5-4716-B5FF-B1BDEC524E98}.Release|x86.ActiveCfg = Release|Win32
 		{A040F53C-0DB5-4716-B5FF-B1BDEC524E98}.Release|x86.Build.0 = Release|Win32
+		{EE7731E7-EAFE-40EB-A454-1FE505300453}.Debug|x64.ActiveCfg = Debug|Win32
 		{EE7731E7-EAFE-40EB-A454-1FE505300453}.Debug|x86.ActiveCfg = Debug|Win32
 		{EE7731E7-EAFE-40EB-A454-1FE505300453}.Debug|x86.Build.0 = Debug|Win32
+		{EE7731E7-EAFE-40EB-A454-1FE505300453}.Release|x64.ActiveCfg = Release|Win32
 		{EE7731E7-EAFE-40EB-A454-1FE505300453}.Release|x86.ActiveCfg = Release|Win32
 		{EE7731E7-EAFE-40EB-A454-1FE505300453}.Release|x86.Build.0 = Release|Win32
+		{207D6D23-C72F-44CF-9518-0B224E4FDAD3}.Debug|x64.ActiveCfg = Debug|x64
+		{207D6D23-C72F-44CF-9518-0B224E4FDAD3}.Debug|x64.Build.0 = Debug|x64
+		{207D6D23-C72F-44CF-9518-0B224E4FDAD3}.Debug|x86.ActiveCfg = Debug|Win32
+		{207D6D23-C72F-44CF-9518-0B224E4FDAD3}.Debug|x86.Build.0 = Debug|Win32
+		{207D6D23-C72F-44CF-9518-0B224E4FDAD3}.Release|x64.ActiveCfg = Release|x64
+		{207D6D23-C72F-44CF-9518-0B224E4FDAD3}.Release|x64.Build.0 = Release|x64
+		{207D6D23-C72F-44CF-9518-0B224E4FDAD3}.Release|x86.ActiveCfg = Release|Win32
+		{207D6D23-C72F-44CF-9518-0B224E4FDAD3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

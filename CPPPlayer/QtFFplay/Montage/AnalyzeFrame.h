@@ -59,6 +59,8 @@ public:
 
     bool getIsPlay() { return m_isDone; }
 
+    void setMuxerIndex(int index) { m_muxer_index = index; }
+
 private:
     void read_thread();
 
@@ -98,4 +100,6 @@ private:
 
     bool m_isDone = false;
     std::thread* m_read_thread = nullptr;  // 读取数据线程
+
+    int m_muxer_index = 0; //视频合并排序索引
 };

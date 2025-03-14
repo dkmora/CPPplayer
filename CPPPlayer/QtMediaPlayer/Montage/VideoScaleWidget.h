@@ -12,6 +12,8 @@ public:
     VideoScaleWidget(QWidget* parent = nullptr);
     ~VideoScaleWidget();
 
+    QList<AFMsg> getAFMuxerMsg() { return ui.m_draglistwidget->GetItemDataList(); }
+
 private:
     Ui::VideoScaleWidget ui;
     QList<VideoListWidget*> m_video_list;

@@ -30,22 +30,27 @@ void AnalyzeManager::release()
     }
 }
 
-void AnalyzeManager::addAnalyzeEngine(AnalyzeFrameEngine* engine)
+void AnalyzeManager::addAnalyzeEngine(QString fileName, std::shared_ptr<AnalyzeFrameEngine> engine)
 {
-    m_analyze_frame_list.push_back(engine);
+    m_analyze_frame_map.insert(fileName, engine);
 }
 
-void AnalyzeManager::remoteAnalyzeEngine(AnalyzeFrameEngine* engine)
+void AnalyzeManager::remoteAnalyzeEngine(QString fileName)
 {
-    m_analyze_frame_list.removeOne(engine);
+    m_analyze_frame_map.remove(fileName);
 }
 
-int AnalyzeManager::getAnalyzeSize()
+int AnalyzeManager::getEngineSize()
 {
-    return m_analyze_frame_list.size();
+    return m_analyze_frame_map.size();
 }
 
-AnalyzeFrameEngine* AnalyzeManager::getAnalyzeEngine(int _index)
+std::shared_ptr<AnalyzeFrameEngine> AnalyzeManager::getAnalyzeEngine(QString fileName)
 {
-    return  m_analyze_frame_list.at(_index);
+    auto ptr = m_analyze_frame_map.find(fileName);
+    if (ptr == m_analyze_frame_map.end())
+    {
+        return nullptr;
+    }
+    return  m_analyze_frame_map.find(fileName).value();
 }

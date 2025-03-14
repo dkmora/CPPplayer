@@ -123,22 +123,6 @@ QLabel{color:white;}</string>
             </item>
            </layout>
           </widget>
-          <widget class="QPushButton" name="btnExportVideo">
-           <property name="geometry">
-            <rect>
-             <x>586</x>
-             <y>-1</y>
-             <width>75</width>
-             <height>23</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">color:white;</string>
-           </property>
-           <property name="text">
-            <string>导出</string>
-           </property>
-          </widget>
          </widget>
         </item>
         <item>
