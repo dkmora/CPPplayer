@@ -17,6 +17,7 @@
 #include <QDragMoveEvent>
 #include <QPainterPath>
 #include <QList>
+#include <QScrollBar>
 #include "gStruct.h"
 
 class DragItemWidget : public QWidget, public QListWidgetItem {
@@ -31,8 +32,6 @@ public:
 	//QByteArray getDropData();
 	AFMsg getDropData() { return m_afMsg; };
 	void setDropData(const AFMsg& afMsg);
-	void setData();
-
 	bool getIsDrop() { return m_isdrop; }
 	void setDrop(bool isDrop) { m_isdrop = isDrop; }
 
@@ -43,7 +42,6 @@ private:
 	virtual void paintEvent(QPaintEvent*);
 	void mousePressEvent(QMouseEvent* event) override;
 	void mouseReleaseEvent(QMouseEvent* event) override;
-
 
 signals:
 	void sigModifyPrank(/*PrankData prankdata*/);

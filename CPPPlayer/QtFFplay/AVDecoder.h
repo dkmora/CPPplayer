@@ -122,6 +122,8 @@ private:
 	uint8_t*     m_audio_buffer1 = nullptr;
 	unsigned int m_audio_buf1_size = 0;
 
+	uint64_t m_start_time = 0;
+	uint64_t m_end_time = 0;
 };
 
 }

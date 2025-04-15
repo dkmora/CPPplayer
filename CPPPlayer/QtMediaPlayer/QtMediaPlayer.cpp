@@ -40,7 +40,8 @@ QtMediaPlayer::QtMediaPlayer(QWidget* parent)
 			m_export_video_widget = new ExportVideoWidget(this);
 		}
 
-		ui.main_seek_widget->getAFMuxerMsg();
+		// 开始导出 获取视频拼接的顺序
+		ui.main_seek_widget->saveAFMuxerMsg();
 
 		auto region = m_export_video_widget->rect();
 		region.moveCenter(this->rect().center());

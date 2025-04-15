@@ -30,14 +30,14 @@ void AnalyzeManager::release()
     }
 }
 
-void AnalyzeManager::addAnalyzeEngine(QString fileName, std::shared_ptr<AnalyzeFrameEngine> engine)
+void AnalyzeManager::addAnalyzeEngine(QString afId, std::shared_ptr<AnalyzeFrameEngine> engine)
 {
-    m_analyze_frame_map.insert(fileName, engine);
+    m_analyze_frame_map.insert(afId, engine);
 }
 
-void AnalyzeManager::remoteAnalyzeEngine(QString fileName)
+void AnalyzeManager::remoteAnalyzeEngine(QString afId)
 {
-    m_analyze_frame_map.remove(fileName);
+    m_analyze_frame_map.remove(afId);
 }
 
 int AnalyzeManager::getEngineSize()
@@ -45,12 +45,27 @@ int AnalyzeManager::getEngineSize()
     return m_analyze_frame_map.size();
 }
 
-std::shared_ptr<AnalyzeFrameEngine> AnalyzeManager::getAnalyzeEngine(QString fileName)
+std::shared_ptr<AnalyzeFrameEngine> AnalyzeManager::getAnalyzeEngine(QString afId)
 {
-    auto ptr = m_analyze_frame_map.find(fileName);
+    auto ptr = m_analyze_frame_map.find(afId);
     if (ptr == m_analyze_frame_map.end())
     {
         return nullptr;
     }
-    return  m_analyze_frame_map.find(fileName).value();
+    return  m_analyze_frame_map.find(afId).value();
+}
+
+void AnalyzeManager::addExportSeq(const AFMsg& afMsg)
+{
+    for (const auto& item : m_aflist) {
+        if (item.afId == afMsg.afId){
+            return;
+        }
+    }
+    m_aflist.append(afMsg);
+}
+
+void AnalyzeManager::setExportSeq(const QList<AFMsg>& list)
+{
+    m_aflist = list;
 }

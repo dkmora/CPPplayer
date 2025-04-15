@@ -17,6 +17,8 @@ public:
 
     void endMuxer();
 
+    void flush_encoder(AVCodecContext* enc_ctx, AVFormatContext* fmt_ctx, AVStream* stream);
+
 private:
     AVStream* add_video_stream(AVFormatContext* fmt_ctx, AVCodecID codec_id, int width, int height, int fps);
     AVStream* add_audio_stream(AVFormatContext* fmt_ctx, AVCodecID codec_id, int sample_rate, int channels);

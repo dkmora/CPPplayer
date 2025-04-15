@@ -3,7 +3,8 @@
 #include "ui_VideoScaleWidget.h"
 #include "VideoListWidget.h"
 #include "Common/FrameLess.h"
-#include <QList>
+#include <QMap>
+#include <QSharedPointer>
 
 class VideoScaleWidget : public QWidget
 {
@@ -12,9 +13,13 @@ public:
     VideoScaleWidget(QWidget* parent = nullptr);
     ~VideoScaleWidget();
 
-    QList<AFMsg> getAFMuxerMsg() { return ui.m_draglistwidget->GetItemDataList(); }
+    void saveAFMuxerMsg();
+
+
+    void sloFrameLessWidth(int _width, int _index);
 
 private:
     Ui::VideoScaleWidget ui;
-    QList<VideoListWidget*> m_video_list;
+    QMap<QString, QSharedPointer<FrameLess>> m_frameless_map;
+
 };

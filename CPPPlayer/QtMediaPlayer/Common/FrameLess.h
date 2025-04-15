@@ -10,6 +10,7 @@
 #include <QtGui/QHoverEvent>
 #include <QtGui/QMouseEvent>
 #include "DragShadow.h"
+#include "AnalyzeManager.h"
 
 class FrameLess : public QObject
 {
@@ -30,8 +31,10 @@ public:
     Q_ENUM(Edge);
     Q_DECLARE_FLAGS(Edges, Edge);
 
-    FrameLess(QWidget* target);
+    FrameLess(int index, QWidget* target);
     ~FrameLess();
+    void setIndex(int index) { _index = index; }
+
 protected:
     bool eventFilter(QObject* o, QEvent* e) override;
     void mouseHover(QHoverEvent*);
@@ -41,6 +44,9 @@ protected:
     void mouseMove(QMouseEvent*);
     void updateCursorShape(const QPoint&);
     void calculateCursorPosition(const QPoint&, const QRect&, Edges&);
+
+signals:
+    void sigFrameLessWidth(int width, int index);
 
 private:
     QWidget* _target = nullptr;
@@ -52,6 +58,7 @@ private:
     int _borderWidth;
     int maximizeWidth;
     QRect _originRect;
+    int _index = 0;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(FrameLess::Edges);

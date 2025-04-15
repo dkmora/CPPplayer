@@ -144,6 +144,7 @@
     <QtMoc Include="Export\ExportVideoWidget.h" />
     <ClInclude Include="AnalyzeManager.h" />
     <QtMoc Include="Common\DragListWidget.h" />
+    <ClInclude Include="Common\gStruct.h" />
     <ClInclude Include="gQGlobal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

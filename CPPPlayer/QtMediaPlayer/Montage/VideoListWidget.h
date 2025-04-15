@@ -12,12 +12,18 @@ class VideoListWidget : public DragItemWidget
 {
     Q_OBJECT
 public:
-    VideoListWidget(QString fileName, QWidget* parent = nullptr);
+    VideoListWidget(AFMsg afMsg, QWidget* parent = nullptr);
     ~VideoListWidget();
 
-    //AnalyzeFrameEngine* getAnalyzeFrameEngine() { return &m_analyzeframe; }
+    void setDuration(int64_t duration);
+
+    void LoadKeyFrame(const std::list<AVFrame*> framelist);
+
+private:
+    void Init();
 
 private:
     Ui::VideoListWidget ui;
+    AFMsg m_afMsg;
     int m_timeline = 0;
 };

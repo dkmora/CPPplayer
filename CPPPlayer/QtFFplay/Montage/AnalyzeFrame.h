@@ -25,7 +25,7 @@ public:
     void clearFrame();
 
     /*
-     * @brief 获取文件的总时长
+     * @brief 获取文件的总时长 单位微妙
      */
     int64_t get_file_duration() { if (m_avformat_context == nullptr) return 0; else return m_avformat_context->duration; }
 
@@ -56,6 +56,13 @@ public:
      */
     AVFrame* getVidioDecode();
     AVFrame* getAudioDecode();
+
+    /*
+     * @brief 设置裁剪结束时间
+     */
+    void setEndTime(int64_t endtime) { m_end_time = endtime; }
+    int64_t getEndTime() { return m_end_time; }
+
 
     bool getIsPlay() { return m_isDone; }
 
@@ -102,4 +109,12 @@ private:
     std::thread* m_read_thread = nullptr;  // 读取数据线程
 
     int m_muxer_index = 0; //视频合并排序索引
+
+    // 裁剪视频起始结束位置-单位毫秒
+    uint64_t m_start_time = 0;
+    uint64_t m_end_time = 0; 
+
+    // 累计时长
+    uint64_t m_video_total_time = 0;
+    uint64_t m_audio_total_time = 0;
 };

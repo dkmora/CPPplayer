@@ -121,5 +121,8 @@
     <ClInclude Include="AnalyzeManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Common\gStruct.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

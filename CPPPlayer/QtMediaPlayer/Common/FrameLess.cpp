@@ -1,10 +1,11 @@
 #include "frameLess.h"
 
-FrameLess::FrameLess(QWidget* target) :
+FrameLess::FrameLess(int index, QWidget* target) :
     _target(target),
     _cursorchanged(false),
     _leftButtonPressed(false),
-    _borderWidth(5)
+    _borderWidth(5),
+    _index(index)
 {
     _target->setAttribute(Qt::WA_Hover);
     //auto childList = _target->findChildren<QWidget*>();
@@ -86,7 +87,7 @@ void FrameLess::mousePress(QMouseEvent* e)
 void FrameLess::mouseRealese(QMouseEvent* e)
 {
     if (e->button() & Qt::LeftButton) {
-        _target->move(0, 0);
+        //_target->move(0, 0);
         _leftButtonPressed = false;
         //if (_rubberband && _rubberband->isVisible()) {
         //    _rubberband->hide();
@@ -98,6 +99,12 @@ void FrameLess::mouseRealese(QMouseEvent* e)
 void FrameLess::mouseMove(QMouseEvent* e)
 {
     if (_leftButtonPressed) {
+        int _offset = 0;
+        int _x = 0;
+        if (_index != 0) {
+            _offset = _target->width();
+        }
+
         if (!_mousePress.testFlag(Edge::None) /*&& !_target->ismaximized()*/) { //_target prevent resizing if it is maximized
             QRect newRect = _originRect;
             switch (_mousePress) {
@@ -109,15 +116,31 @@ void FrameLess::mouseMove(QMouseEvent* e)
                 }
                 break;
             case Edge::Right:
-                newRect.setRight(e->pos().x());
+                _x = e->pos().x();
+                qDebug() << "_x = " << _x;
+                newRect.setRight(_offset + e->pos().x());
                 if (newRect.width() < _target->minimumWidth()) {
-                    newRect.setRight(_originRect.left() + _target->minimumWidth());
+                    //newRect.setRight(_originRect.left() + _target->minimumWidth());
                 }
                 break;
             default:
                 return;
             }
-            _target->setGeometry(newRect);
+            //qDebug() << "ffwidth = " << newRect.width();
+
+            int _width = newRect.width();
+            if (_index != 0)
+            {
+                _width = _x;
+            }
+            else
+            {
+                //_width = _x;
+            }
+
+            emit sigFrameLessWidth(_width, _index);
+            //_target->setGeometry(newRect);
+            //_target->setMaximumSize(newRect.width(), newRect.height());
             _target->show();
         }
     } else {
@@ -134,7 +157,9 @@ void FrameLess::updateCursorShape(const QPoint& pos)
         return;
     }
     if (!_leftButtonPressed) {
-        calculateCursorPosition(pos, _target->frameGeometry(), _mouseMove);
+        auto framerect = _target->frameGeometry();
+        //framerect.setX(0);
+        calculateCursorPosition(pos, framerect, _mouseMove);
         _cursorchanged = true;
         if (_mouseMove.testFlag(Edge::Top) || _mouseMove.testFlag(Edge::Bottom)) {
             //_target->setCursor(Qt::SizeVerCursor);
@@ -153,11 +178,20 @@ void FrameLess::updateCursorShape(const QPoint& pos)
 
 void FrameLess::calculateCursorPosition(const QPoint& pos, const QRect& framerect, Edges& _edge)
 {
-    bool onLeft = pos.x() >= framerect.x() - _borderWidth && pos.x() <= framerect.x() + _borderWidth &&
-                  pos.y() <= framerect.y() + framerect.height() - _borderWidth && pos.y() >= framerect.y() + _borderWidth;
+    int _offset = 0;
+    int _x = 0;
+    if (_index != 0)
+    {
+        _offset = framerect.width();
+        _x = 0;
+    }
+    else
+    {
+        _x = framerect.x();
+    }
 
-    bool onRight = pos.x() >= framerect.x() + framerect.width() - _borderWidth && pos.x() <= framerect.x() + framerect.width() &&
-                   pos.y() >= framerect.y() + _borderWidth && pos.y() <= framerect.y() + framerect.height() - _borderWidth;
+    bool onLeft = pos.x() >= framerect.x() - _borderWidth + _offset && pos.x() <= framerect.x() + _borderWidth;
+    bool onRight = pos.x() >= _x + framerect.width() - _borderWidth && pos.x() <= _x + framerect.width();
 
     if (onLeft) {
         _edge = Left;

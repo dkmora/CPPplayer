@@ -15,36 +15,37 @@ bool MuxerVideo::startMuxer(std::string _file_name, int _width, int _height, int
     m_fmt_ctx = nullptr;
     if (avformat_alloc_output_context2(&m_fmt_ctx, nullptr, "mp4", _file_name.c_str()) < 0) {
         std::cerr << "Could not create output context\n";
-        return -1;
+        return false;
     }
 
     // 添加视频流
     m_video_stream = add_video_stream(m_fmt_ctx, AV_CODEC_ID_H264, _width, _height, _fps);
     if (!m_video_stream) {
         std::cerr << "Failed to create video stream\n";
-        return -1;
+        return false;
     }
 
     // 添加音频流
     m_audio_stream = add_audio_stream(m_fmt_ctx, AV_CODEC_ID_AAC, _sample_rate, _channels);
     if (!m_audio_stream) {
         std::cerr << "Failed to create audio stream\n";
-        return -1;
+        return false;
     }
 
     // 打开输出文件
     if (!(m_fmt_ctx->flags & AVFMT_NOFILE)) {
         if (avio_open(&m_fmt_ctx->pb, _file_name.c_str(), AVIO_FLAG_WRITE) < 0) {
             std::cerr << "Could not open output file\n";
-            return -1;
+            return false;
         }
     }
 
     // 写文件头
     if (avformat_write_header(m_fmt_ctx, nullptr) < 0) {
         std::cerr << "Error occurred when writing header\n";
-        return -1;
+        return false;
     }
+    return true;
 }
 
 void MuxerVideo::pushYUV(AVFrame* frame, double pts)
@@ -59,6 +60,12 @@ void MuxerVideo::pushPCM(AVFrame* frame, double pts)
 
 void MuxerVideo::endMuxer()
 {   
+    // flush
+    // 所有 avcodec_send_frame() 都完成，
+    // 并且没有更多帧要送入编码器之后，立即执行。
+    flush_encoder(m_video_stream->codec, m_fmt_ctx, m_video_stream);
+    flush_encoder(m_audio_stream->codec, m_fmt_ctx, m_audio_stream);
+
 	// 写文件尾部
 	av_write_trailer(m_fmt_ctx);
 
@@ -68,6 +75,20 @@ void MuxerVideo::endMuxer()
 	}
 	avformat_free_context(m_fmt_ctx);
 	return;
+}
+
+void MuxerVideo::flush_encoder(AVCodecContext* enc_ctx, AVFormatContext* fmt_ctx, AVStream* stream) {
+    avcodec_send_frame(enc_ctx, NULL);
+    AVPacket pkt;
+    av_init_packet(&pkt);
+    pkt.data = nullptr;
+    pkt.size = 0;
+    while (avcodec_receive_packet(enc_ctx, &pkt) == 0) {
+        av_packet_rescale_ts(&pkt, enc_ctx->time_base, stream->time_base);
+        pkt.stream_index = stream->index;
+        av_interleaved_write_frame(fmt_ctx, &pkt);
+        av_packet_unref(&pkt);
+    }
 }
 
 // 初始化视频流
@@ -237,7 +258,7 @@ void MuxerVideo::write_video_frames(AVFormatContext* fmt_ctx, AVStream* video_st
             av_interleaved_write_frame(fmt_ctx, packet);
             av_packet_unref(packet);
             //printf("h264 pts:%lld\n", packet->pts);
-            printf("put h264\n");
+            //printf("put h264\n");
         }
     }
     av_frame_free(&dst_frame);
@@ -283,6 +304,8 @@ void MuxerVideo::write_audio_frames(AVFormatContext* fmt_ctx, AVStream* audio_st
             packet->pts = av_rescale_q(packet->pts, src_time_base, dst_time_base);
             packet->dts = av_rescale_q(packet->dts, src_time_base, dst_time_base);
             packet->duration = av_rescale_q(packet->duration, src_time_base, dst_time_base);
+
+            //printf("frame pts: %ld, packet pts: %ld,duration: %ld\n", frame->pts, packet->pts, packet->duration);
 
             av_interleaved_write_frame(fmt_ctx, packet);
             av_packet_unref(packet);

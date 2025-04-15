@@ -194,12 +194,30 @@ std::string AnalyzeFrameEngine::get_file_name()
 
 AVFrame* AnalyzeFrameEngine::getVidioDecode()
 {
-	return m_video_decode_thread->getVideoAVFrame();
+	AVFrame* frame = m_video_decode_thread->getVideoAVFrame();
+	if (frame == NULL) return NULL;
+
+	//double video_frame_duration = 1.0 / av_q2d(m_avformat_context->streams[m_video_stream]->r_frame_rate);
+	//m_video_total_time += video_frame_duration * 1000;
+	//printf("Video frame duration: %lld seconds\n", m_video_total_time);
+	//if (m_video_total_time > m_end_time) {
+	//	return NULL;
+	//}
+	return frame;
 }
 
 AVFrame* AnalyzeFrameEngine::getAudioDecode()
 {
-	return m_audio_decode_thread->getAudioAVFrame();
+	AVFrame* frame = m_audio_decode_thread->getAudioAVFrame();
+	if (frame == NULL) return NULL;
+
+	//double audio_frame_duration = (double)frame->nb_samples / frame->sample_rate;
+	//m_audio_total_time += audio_frame_duration * 1000;
+	//printf("Audio frame total duration: %lld seconds\n", m_audio_total_time);
+	//if (m_audio_total_time >= m_end_time) {
+	//	return NULL;
+	//}
+	return frame;
 }
 
 RET_CODE AnalyzeFrameEngine::getPicture()

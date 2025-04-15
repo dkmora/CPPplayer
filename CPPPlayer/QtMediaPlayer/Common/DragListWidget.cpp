@@ -21,9 +21,6 @@ void DragItemWidget::setDropData(const AFMsg& afMsg)
 	m_afMsg = afMsg;
 }
 
-void DragItemWidget::setData() {
-}
-
 void DragItemWidget::SetVisible(bool isShow) {
 	//m_btn_Drop->setVisible(isShow);
 }
@@ -65,6 +62,14 @@ DragListWidget::DragListWidget(QWidget* parent) :
 	//setDropIndicatorShown(false); 
 	//setDefaultDropAction(Qt::MoveAction);  
 
+	//this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	//this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	this->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel); // 更精细的像素滚动
+	QScrollBar* hScrollBar = this->horizontalScrollBar();
+	hScrollBar->setSingleStep(2);  // 滚动更细腻
+	hScrollBar->setPageStep(80);   // 一页的滚动范围
+
 	// 使用线程是为了配合定时器，使定时器更加精确
 	MyTimer* timer_scrollbar = new MyTimer;
 	//scrollBarTimer->setInterval(10);
@@ -102,8 +107,8 @@ QList<AFMsg> DragListWidget::GetItemDataList()
 {
 	QList<AFMsg> list;
 	for (int i = 0; i < this->count(); ++i) {
-		DragItemWidget* dragitem = static_cast<DragItemWidget*>(this->item(i));
-		list.append(dragitem->getDropData());
+		DragItemWidget* _time = static_cast<DragItemWidget*>(this->itemWidget(this->item(i)));
+		list.append(_time->getDropData());
 	}
 	return list;
 }
@@ -131,10 +136,11 @@ void DragListWidget::mouseMoveEvent(QMouseEvent* event)
 		//	return;
 
 		auto listmap = mapToGlobal(this->pos());
+		auto posx = this->pos().x();
 		auto posy = this->pos().y();
 
 		// 鼠标点击窗口的相对坐标
-		int x = event->globalPos().x() - listmap.x();
+		int x = event->globalPos().x() - listmap.x() + posx;
 		int y = event->globalPos().y() - listmap.y() + posy;
 
 		//qDebug() << "press x:" << x;
@@ -177,8 +183,11 @@ void DragListWidget::mouseMoveEvent(QMouseEvent* event)
 		//设置缩略图
 		drag->setPixmap(pixmap);
 		//设置鼠标在缩略图上的位置
-		drag->setHotSpot(QPoint(btnpos.x() + dragitem->getDropButton()->width() / 2, pixmap.height() / 2));
+		drag->setHotSpot(QPoint(/*btnpos.x() + */dragitem->getDropButton()->width() / 2, pixmap.height() / 2));
 		dragitem->SetVisible(false);
+
+        //qDebug() << "press x:" << btnpos.x();
+        //qDebug() << "getDropButton width:" << dragitem->getDropButton()->width();
 
 		//拖拽开始
 		if (drag->exec(Qt::MoveAction) == Qt::MoveAction) {
