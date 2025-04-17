@@ -177,6 +177,30 @@ void AnalyzeFrameEngine::startDecode(int width, int height)
 	m_read_thread = new std::thread(&AnalyzeFrameEngine::read_thread, this);
 }
 
+void AnalyzeFrameEngine::Seek(int64_t pos, int64_t rel, int seek_by_bytes) {
+	//if (!m_isDone)
+	//	return;
+
+    m_seek_pos = pos;
+    m_seek_rel = rel;
+    m_seek_flags &= ~AVSEEK_FLAG_BYTE; // 不按字节的方式去seek
+    if (seek_by_bytes)
+        m_seek_flags |= AVSEEK_FLAG_BYTE; // 强制按字节的方式去seek
+    m_seek_req = 1;  // 请求seek， 在read_thread线程seek成功才将其置为0
+    //m_cond_t_read_thread->notify_all(); // 唤醒
+
+	int64_t seek_target = m_seek_pos;
+	int64_t seek_min = m_seek_rel > 0 ? seek_target - m_seek_rel + 2 : INT64_MIN;
+	int64_t seek_max = m_seek_rel < 0 ? seek_target = m_seek_rel - 2 : INT64_MAX;
+
+	av_log(NULL, AV_LOG_INFO, "seek_target: %lld\n", seek_target);
+
+	int ret = avformat_seek_file(m_avformat_context, -1, seek_min, seek_target, seek_max, m_seek_flags);
+	if (ret < 0) {
+		av_log(NULL, AV_LOG_ERROR, "%s: error while seeking\n", m_avformat_context->url);
+	}
+}
+
 std::string AnalyzeFrameEngine::get_file_name()
 { 
 	std::string input = m_avformat_context->filename;
@@ -302,33 +326,34 @@ RET_CODE AnalyzeFrameEngine::getPicture()
 	uint8_t* rgbBuffer = (uint8_t*)av_malloc(rgbBufferSize);
 	av_image_fill_arrays(rgbFrame->data, rgbFrame->linesize, rgbBuffer, AV_PIX_FMT_RGB32, codecContext->width, codecContext->height, 1);
 
+
 	// 读取数据包
 	while (av_read_frame(formatContext, packet) >= 0) {
 		if (packet->stream_index == videoStreamIndex) {
 			// 判断是否为 I 帧
-			if (packet->flags & AV_PKT_FLAG_KEY) {
+			if (/*packet->flags & AV_PKT_FLAG_KEY*/1) {
 				if (avcodec_send_packet(codecContext, packet) == 0) {
 					while (avcodec_receive_frame(codecContext, frame) == 0) {
-						int ret = sws_scale(swsContext, frame->data, frame->linesize, 0, codecContext->height, rgbFrame->data, rgbFrame->linesize);
-						//std::cout << "Saving RGB frame " << frameNumber << " (PTS: " << frame->pts << ")" << std::endl;
+                        if (frameNumber % 90 == 0) {
+                            int ret = sws_scale(swsContext, frame->data, frame->linesize, 0, codecContext->height, rgbFrame->data, rgbFrame->linesize);
+                            //std::cout << "Saving RGB frame " << frameNumber << " (PTS: " << frame->pts << ")" << std::endl;
+                            AVFrame* dstFrame = av_frame_alloc();
+                            dstFrame->format = AV_PIX_FMT_RGB32;
+                            dstFrame->width = rgbFrame->width;
+                            dstFrame->height = rgbFrame->height;
+                            dstFrame->linesize[0] = rgbFrame->linesize[0];
 
-						AVFrame* dstFrame = av_frame_alloc();
-						dstFrame->format = AV_PIX_FMT_RGB32;
-						dstFrame->width = rgbFrame->width;
-						dstFrame->height = rgbFrame->height;
-						dstFrame->linesize[0] = rgbFrame->linesize[0];
+                            if (av_frame_get_buffer(dstFrame, 0) < 0) {
+                                av_frame_free(&dstFrame);
+                                continue;
+                            }
 
-						if (av_frame_get_buffer(dstFrame, 0) < 0) {
-							av_frame_free(&dstFrame);
-							continue;
-						}
-
-						if (av_frame_copy(dstFrame, rgbFrame) < 0) {
-							av_frame_free(&dstFrame);
-							continue;
-						}
-
-						m_IFrame.push_back(dstFrame);
+                            if (av_frame_copy(dstFrame, rgbFrame) < 0) {
+                                av_frame_free(&dstFrame);
+                                continue;
+                            }
+                            m_IFrame.push_back(dstFrame);
+                        }
 						frameNumber++;
 					}
 				}

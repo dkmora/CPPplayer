@@ -117,7 +117,7 @@ void FrameLess::mouseMove(QMouseEvent* e)
                 break;
             case Edge::Right:
                 _x = e->pos().x();
-                qDebug() << "_x = " << _x;
+                //qDebug() << "_x = " << _x;
                 newRect.setRight(_offset + e->pos().x());
                 if (newRect.width() < _target->minimumWidth()) {
                     //newRect.setRight(_originRect.left() + _target->minimumWidth());

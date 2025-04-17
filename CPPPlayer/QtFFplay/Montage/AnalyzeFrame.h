@@ -39,6 +39,14 @@ public:
      */
     void startDecode(int width, int height);
 
+    /**
+     * @brief seek in the stream
+     * @param pos  具体seek到的位置
+     * @param rel  增量情况
+     * @param seek_by_bytes
+     */
+    void Seek(int64_t pos, int64_t rel, int seek_by_bytes);
+
     /*
      * @brief 获取I帧
      */
@@ -58,7 +66,13 @@ public:
     AVFrame* getAudioDecode();
 
     /*
-     * @brief 设置裁剪结束时间
+     * @brief 设置裁剪开始时间 单位秒
+     */
+    void setStartTime(int64_t startTime) { m_start_time = startTime; }
+    int64_t getStartTime() { return m_start_time; }
+
+    /*
+     * @brief 设置裁剪结束时间 单位秒
      */
     void setEndTime(int64_t endtime) { m_end_time = endtime; }
     int64_t getEndTime() { return m_end_time; }
@@ -87,6 +101,12 @@ private:
     int m_fps = 0;
     int m_video_index = 0;
     int  m_eof = 0;        // 是否读取结束
+
+    // seek
+    int	    m_seek_req = 0;    // 标识一次seek请求
+    int	    m_seek_flags = AVSEEK_FLAG_BYTE;  // seek标志，诸如AVSEEK_FLAG_BYTE等
+    int64_t	m_seek_pos = 0;    // 请求seek的目标位置(当前位置+增量)
+    int64_t	m_seek_rel = 0;    // 本次seek的位置增量
 
     // av_read_frame 获取的avpacket
     AVPacket* m_avpacket = nullptr;

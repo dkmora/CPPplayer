@@ -24,16 +24,17 @@ VideoScaleWidget::VideoScaleWidget(QWidget* parent/* = nullptr*/) : QWidget(pare
     //});
 
     //ui.m_draglistwidget->setViewMode(QListView::IconMode);  // 设置为图标模式
-
+    
+    //sound_in_sync_test
     AFMsg afMsg;
-    afMsg.fileName = "D:\\sound_in_sync_test.mp4";
-    afMsg.afId = generateUniqueID("D:\\sound_in_sync_test.mp4");
+    afMsg.fileName = "D:\\jingluo.mp4";
+    afMsg.afId = generateUniqueID("D:\\jingluo.mp4");
     VideoListWidget* item1 = new VideoListWidget(afMsg);
     QSharedPointer<FrameLess> fremeLess_1 =  QSharedPointer<FrameLess>(new FrameLess(0, item1));
     m_frameless_map.insert(afMsg.afId, fremeLess_1);
     connect(m_frameless_map[afMsg.afId].data(), &FrameLess::sigFrameLessWidth, this, &VideoScaleWidget::sloFrameLessWidth);
 
-    afMsg.fileName = "D:\\jingluo.mp4";
+   /* afMsg.fileName = "D:\\jingluo.mp4";
     afMsg.afId = generateUniqueID("D:\\jingluo.mp4");
     VideoListWidget* item2 = new VideoListWidget(afMsg);
     QSharedPointer<FrameLess> fremeLess_2 = QSharedPointer<FrameLess>(new FrameLess(1, item2));
@@ -45,11 +46,11 @@ VideoScaleWidget::VideoScaleWidget(QWidget* parent/* = nullptr*/) : QWidget(pare
     VideoListWidget* item3 = new VideoListWidget(afMsg);
     QSharedPointer<FrameLess> fremeLess_3 = QSharedPointer<FrameLess>(new FrameLess(2, item3));
     m_frameless_map.insert(afMsg.afId, fremeLess_3);
-    connect(m_frameless_map[afMsg.afId].data(), &FrameLess::sigFrameLessWidth, this, &VideoScaleWidget::sloFrameLessWidth);
+    connect(m_frameless_map[afMsg.afId].data(), &FrameLess::sigFrameLessWidth, this, &VideoScaleWidget::sloFrameLessWidth);*/
 
     ui.m_draglistwidget->AddWidgetItem(item1);
-    ui.m_draglistwidget->AddWidgetItem(item2);
-    ui.m_draglistwidget->AddWidgetItem(item3);
+    //ui.m_draglistwidget->AddWidgetItem(item2);
+    //ui.m_draglistwidget->AddWidgetItem(item3);
 
     connect(ui.m_draglistwidget, &DragListWidget::sigInsertDragItem, this, [=] (AFMsg afMsg){
         disconnect(m_frameless_map[afMsg.afId].data(), &FrameLess::sigFrameLessWidth, this, &VideoScaleWidget::sloFrameLessWidth);
@@ -87,17 +88,18 @@ void VideoScaleWidget::sloFrameLessWidth(int _width, int _index)
     int max_width = _drag_item->maximumWidth();
     if (max_width < _width)
         return;
-
     QListWidgetItem* item = ui.m_draglistwidget->item(_index);
     item->setSizeHint(QSize(_width, 55));
 
-    int _duration = _width / 10;
-    _drag_item->setDuration((int64_t)_duration * 1000000);
+    int _mod_duration = _drag_item->getFileDuration() / 1000000 * (double)_width / max_width;
+    _drag_item->modDuration((int64_t)_mod_duration * 1000000);
 
     auto afmsg = _drag_item->getDropData();
     afmsg.itemWidth = _width;
     _drag_item->setDropData(afmsg);
 
     auto engine = vAnalyzeManager->getAnalyzeEngine(afmsg.afId);
-    engine->setEndTime(_duration);
+    engine->setEndTime(_mod_duration);
+
+    qDebug() << "endTime:" << engine->getEndTime();
 }

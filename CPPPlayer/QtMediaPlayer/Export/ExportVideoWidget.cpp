@@ -118,7 +118,9 @@ void ExportVideoWidget::ExportVideo()
 
     for (const auto& item : vAnalyzeManager->getExportSeq()) {
         auto engine = vAnalyzeManager->getAnalyzeEngine(item.afId);
-        uint64_t end_time = engine->getEndTime() * 1000000;
+        // 单位 微妙
+        uint64_t start_time = 0;
+        uint64_t end_time   = engine->getEndTime()   * 1000000;
 
         // 开始解码
         engine->startDecode(_width, _height);
@@ -129,15 +131,19 @@ void ExportVideoWidget::ExportVideo()
         bool _push_audio_finish = false;
         //bool _push_video_frame = true;
 
-        uint64_t _video_pts_end = 0;
-        uint64_t _autio_pts_end = 0;
+
+        double _video_pts_start = 0;
+        double _audio_pts_start = 0;
+
+        double _video_pts_end = 0;
+        double _audio_pts_end = 0;
 
         while (1) {
             if (_push_video_finish && _push_audio_finish)
                 break;
 
             // 重新编码
-            if (audio_pts > video_pts && !_push_video_finish) {
+            if (_audio_pts_start > _video_pts_start && !_push_video_finish) {
                 //int ret = 0; AVFrame* vframe = NULL;
                 //if (_push_video_frame)
                 //{
@@ -168,29 +174,45 @@ void ExportVideoWidget::ExportVideo()
                 //    continue;
                 //}
                 auto vframe = engine->getVidioDecode();
-                if (vframe != NULL && _video_pts_end <= end_time) {
-                    m_muxer_video.pushYUV(vframe, video_pts);
+
+                if (_video_pts_start >= start_time)
+                {
+                    if (vframe != NULL && (_video_pts_end <= end_time)) {
+                        m_muxer_video.pushYUV(vframe, video_pts);
+                        printf("Video frame duration: %lf seconds\n", video_pts);
+                        video_pts += video_frame_duration;
+                    }
+                    else {
+                        printf("Video frame duration: %lf seconds\n", video_pts);
+                        video_pts += video_frame_duration;
+                        _push_video_finish = true;
+                    }
                 }
-                else {
-                    _push_video_finish = true;
-                }
-                printf("Video frame duration: %lf seconds\n", video_pts);
-                video_pts += video_frame_duration;
+
+                _video_pts_start += video_frame_duration;
                 _video_pts_end += video_frame_duration;
                 //printf("pushYUV vpts:%0.0lf\n", video_pts / 1000);
             }
             else {
                 auto aframe = engine->getAudioDecode();
-                if (aframe != NULL && _autio_pts_end <= end_time) {
-                    m_muxer_video.pushPCM(aframe, audio_pts);
+
+                if (_audio_pts_start >= start_time)
+                {
+                    if (aframe != NULL && (_audio_pts_end <= end_time)) {
+                        m_muxer_video.pushPCM(aframe, audio_pts);
+                        printf("Audio frame total duration: %lf seconds\n", audio_pts);
+                        audio_pts += audio_frame_duration;
+                    }
+                    else {
+                        printf("Audio frame total duration: %lf seconds\n", audio_pts);
+                        audio_pts += audio_frame_duration;
+                        _push_audio_finish = true;
+                    }
                 }
-                else {
-                    _push_audio_finish = true;
-                }
-                printf("Audio frame total duration: %lf seconds\n", audio_pts);
-                audio_pts += audio_frame_duration;
-                _autio_pts_end += audio_frame_duration;
-                //printf("pushPCM apts:%0.0lf\n", audio_pts / 1000);
+
+                _audio_pts_start += audio_frame_duration;
+                _audio_pts_end += audio_frame_duration;
+                printf("_audio_pts_start:%lf\n", _audio_pts_start);
             }
         }
     }
