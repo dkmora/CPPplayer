@@ -5,7 +5,7 @@
 #include "QtFFplay.h"
 #include "MediaPlayerEvent.h"
 #include "./Export/ExportVideoWidget.h"
-
+#include "./Montage/EnginePlayer.h"
 #include <QDebug>
 #include <QHBoxLayout>
 
@@ -51,7 +51,8 @@ signals:
 
 private:
     Ui::QPublishStreamClass ui;
-	QtFFplay* m_ffplay;
+	QtFFplay* m_ffplay = nullptr;
+	EnginePlayer m_engine_player;
 	std::unique_ptr<MediaPlayerEventHandler> m_MediaEventHandler;
 
 	ExportVideoWidget* m_export_video_widget = nullptr;

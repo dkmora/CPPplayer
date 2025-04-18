@@ -138,6 +138,9 @@
     <ClCompile Include="Filter\CFFilter.cpp">
       <Filter>Filter</Filter>
     </ClCompile>
+    <ClCompile Include="Montage\EnginePlayer.cpp">
+      <Filter>Montage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="PlayAudio.h">
@@ -148,6 +151,9 @@
     </QtMoc>
     <QtMoc Include="QtFFplay.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Montage\EnginePlayer.h">
+      <Filter>Montage</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

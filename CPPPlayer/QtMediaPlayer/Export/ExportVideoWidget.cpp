@@ -120,17 +120,17 @@ void ExportVideoWidget::ExportVideo()
         auto engine = vAnalyzeManager->getAnalyzeEngine(item.afId);
         // 单位 微妙
         uint64_t start_time = 0;
-        uint64_t end_time   = engine->getEndTime()   * 1000000;
+        uint64_t end_time   = engine->getEndTime() * 1000000;
 
         // 开始解码
         engine->startDecode(_width, _height);
+
         // TODO:改为非阻塞等待
         std::this_thread::sleep_for(std::chrono::seconds(3));  // 休眠 3 秒
 
         bool _push_video_finish = false;
         bool _push_audio_finish = false;
         //bool _push_video_frame = true;
-
 
         double _video_pts_start = 0;
         double _audio_pts_start = 0;
@@ -173,7 +173,7 @@ void ExportVideoWidget::ExportVideo()
                 //    printf("pushYUV vpts:%0.0lf\n", video_pts / 1000);
                 //    continue;
                 //}
-                auto vframe = engine->getVidioDecode();
+                auto vframe = engine->getVideoDecodeFrame();
 
                 if (_video_pts_start >= start_time)
                 {
@@ -194,7 +194,7 @@ void ExportVideoWidget::ExportVideo()
                 //printf("pushYUV vpts:%0.0lf\n", video_pts / 1000);
             }
             else {
-                auto aframe = engine->getAudioDecode();
+                auto aframe = engine->getAudioDecodeFrame();
 
                 if (_audio_pts_start >= start_time)
                 {

@@ -7,6 +7,9 @@
 #include <list>
 #include <queue>
 #include <iostream>
+#include <future>
+
+typedef std::function<void(void)> StartplayCallBack;
 
 class QTFFPLAY_EXPORT AnalyzeFrameEngine
 {
@@ -37,7 +40,12 @@ public:
     /*
      * @brief 开始解码
      */
-    void startDecode(int width, int height);
+    void startDecode(int width = 0, int height = 0);
+
+    /*
+     * @brief 播放
+     */
+    void play(StartplayCallBack cb);
 
     /**
      * @brief seek in the stream
@@ -62,8 +70,24 @@ public:
     /*
      * @brief 获取一帧音视频解码后的数据
      */
-    AVFrame* getVidioDecode();
-    AVFrame* getAudioDecode();
+    AVFrame* getVideoDecodeFrame();
+    AVFrame* getAudioDecodeFrame();
+
+    /*
+     * @beief 获取视频解码器
+    */
+    FFDecoder* getVideoDecoder() { return &m_video_decoder; }
+
+    /*
+    * @beief 获取音频解码器
+    */
+    FFDecoder* getAudioDecoder() { return &m_audio_decoder; }
+
+    /*
+     * @brief 获取音视频解码线程
+     */
+    cvpublish::AVDecoder* getVidioDecode();
+    cvpublish::AVDecoder* getAudioDecode();
 
     /*
      * @brief 设置裁剪开始时间 单位秒
@@ -96,6 +120,8 @@ private:
 private:
     std::string m_file_name;
 
+    StartplayCallBack m_startplay_callback = nullptr;
+
     int m_audio_stream = -1;
     int m_video_stream = -1;
     int m_fps = 0;
@@ -108,8 +134,7 @@ private:
     int64_t	m_seek_pos = 0;    // 请求seek的目标位置(当前位置+增量)
     int64_t	m_seek_rel = 0;    // 本次seek的位置增量
 
-    // av_read_frame 获取的avpacket
-    AVPacket* m_avpacket = nullptr;
+    AVPacket* m_avpacket = nullptr; // av_read_frame 获取的avpacket
 
     AVFormatContext* m_avformat_context = nullptr;
 
@@ -125,8 +150,17 @@ private:
 
     std::list<AVFrame*> m_IFrame;
 
-    bool m_isDone = false;
+    std::thread* m_async_thread = nullptr; // 异步操作线程
     std::thread* m_read_thread = nullptr;  // 读取数据线程
+    std::mutex* m_wait_mutex = nullptr;    // 读取数据锁
+    std::condition_variable* m_cond_t_read_thread = nullptr; // 唤醒读取数据线程条件变量
+
+    bool m_isDone = false;
+    bool m_paused = false; // 暂停
+
+    bool m_bReadFrame = true; // 打断堵塞，例如av_read_frame堵塞
+    int m_timeoutReadFrame = 0; // 打断堵塞，例如av_read_frame堵塞
+    uint64_t m_readframe_callback_time = 0;
 
     int m_muxer_index = 0; //视频合并排序索引
 

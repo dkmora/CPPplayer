@@ -128,6 +128,15 @@ RET_CODE AnalyzeFrameEngine::release_decoder(FFDecoder* coder) {
 
 void AnalyzeFrameEngine::startDecode(int width, int height)
 {
+	if (m_isDone)
+		return;
+
+	if (width == 0 && height == 0)
+	{
+		width  = 1280;
+		height = 720;
+	}
+
 	// 队列初始化
 	m_avpacket_queue.frame_queue_init(m_avpacket_queue.get_frame_video_queue(), m_avpacket_queue.get_video_packet_point(), VIDEO_PICTURE_QUEUE_SIZE, 1);
 	m_avpacket_queue.frame_queue_init(m_avpacket_queue.get_frame_audio_queue(), m_avpacket_queue.get_audio_packet_point(), SAMPLE_QUEUE_SIZE, 1);
@@ -168,13 +177,27 @@ void AnalyzeFrameEngine::startDecode(int width, int height)
 
 	m_av_clock.max_frame_duration = (m_avformat_context->flags & AVFMT_TS_DISCONT) ? 10.0 : 3600.0;
 
+	m_wait_mutex = new std::mutex;
+	m_cond_t_read_thread = new std::condition_variable;
+
 	// new packet
 	m_avpacket = (AVPacket*)av_malloc(sizeof(AVPacket));
 	av_init_packet(m_avpacket);
 
+	if (m_startplay_callback != nullptr) {
+		m_startplay_callback();
+	}
+
 	// 开始解码
 	m_isDone = true;
 	m_read_thread = new std::thread(&AnalyzeFrameEngine::read_thread, this);
+}
+
+void AnalyzeFrameEngine::play(StartplayCallBack cb)
+{
+	m_startplay_callback = cb;
+
+	startDecode();
 }
 
 void AnalyzeFrameEngine::Seek(int64_t pos, int64_t rel, int seek_by_bytes) {
@@ -216,7 +239,7 @@ std::string AnalyzeFrameEngine::get_file_name()
 	return input.substr(pos + 1);
 }
 
-AVFrame* AnalyzeFrameEngine::getVidioDecode()
+AVFrame* AnalyzeFrameEngine::getVideoDecodeFrame()
 {
 	AVFrame* frame = m_video_decode_thread->getVideoAVFrame();
 	if (frame == NULL) return NULL;
@@ -230,7 +253,23 @@ AVFrame* AnalyzeFrameEngine::getVidioDecode()
 	return frame;
 }
 
-AVFrame* AnalyzeFrameEngine::getAudioDecode()
+cvpublish::AVDecoder* AnalyzeFrameEngine::getVidioDecode()
+{
+	if (m_isDone) {
+		return m_video_decode_thread;
+	}
+	return nullptr;
+}
+
+cvpublish::AVDecoder* AnalyzeFrameEngine::getAudioDecode()
+{
+	if (m_isDone) {
+		return m_audio_decode_thread;
+	}
+	return nullptr;
+}
+
+AVFrame* AnalyzeFrameEngine::getAudioDecodeFrame()
 {
 	AVFrame* frame = m_audio_decode_thread->getAudioAVFrame();
 	if (frame == NULL) return NULL;
@@ -483,6 +522,49 @@ AVStream* AnalyzeFrameEngine::add_audio_stream(AVFormatContext* fmt_ctx, AVCodec
 void AnalyzeFrameEngine::read_thread() {
 	while (m_isDone) {
 		int ret;
+		//if (m_seek_req) { // 是否有seek请求
+		//	int64_t seek_target = m_seek_pos;
+		//	int64_t seek_min = m_seek_rel > 0 ? seek_target - m_seek_rel + 2 : INT64_MIN;
+		//	int64_t seek_max = m_seek_rel < 0 ? seek_target = m_seek_rel - 2 : INT64_MAX;
+
+		//	ret = avformat_seek_file(m_avformat_context, -1, seek_min, seek_target, seek_max, m_seek_flags);
+		//	if (ret < 0) {
+		//		av_log(NULL, AV_LOG_ERROR, "%s: error while seeking\n", m_avformat_context->url);
+		//	}
+		//	else {
+		//		/* seek的时候，要把原先的数据清空，并重启解码器，
+		//		 * put flush_pkt的目的是告知解码线程需要reset decoder
+		//		 */
+		//		if (m_audio_stream >= 0) {  // 如果有音频流
+		//			m_avpacket_queue.packet_audio_queue_flash();
+		//			m_avpacket_queue.audio_queue_put_flash();
+		//		}
+		//		if (m_video_stream >= 0) { // 如果有视频流
+		//			m_avpacket_queue.packet_video_queue_flash();
+		//			m_avpacket_queue.video_queue_put_flash();
+		//		}
+		//		m_seek_req = 0;
+		//		//queue_attachments_req = 1; // 封面
+		//		m_eof = 0;
+		//	}
+		//}
+
+		// 判断队列最大值,此处判断队列是否有足够的数据，进行休眠
+		if (m_paused || m_avpacket_queue.get_video_packet_size() + m_avpacket_queue.get_audio_packet_size() > MAX_QUEUE_SIZE) {
+			// wait 10 ms
+			// seek 操作时会被唤醒
+			std::unique_lock<std::mutex> lock(*m_wait_mutex);
+			m_cond_t_read_thread->wait_for(lock, std::chrono::milliseconds(10));
+			continue;		// 继续循环
+		}
+
+		// 检测码流是否已经播放结束
+		//if(!m_paused && )
+
+		//m_bReadFrame = true; // 打断堵塞，例如av_read_frame堵塞
+		m_timeoutReadFrame = 0; // 打断堵塞，例如av_read_frame堵塞
+		m_readframe_callback_time = av_gettime_relative();
+
 		// 读取媒体数据
 		ret = av_read_frame(m_avformat_context, m_avpacket); // 每一次 av_read_frame 都需要 av_packet_unref 释放内存
 
@@ -501,12 +583,18 @@ void AnalyzeFrameEngine::read_thread() {
 			}
 			if (m_avformat_context->pb && m_avformat_context->pb->error) {
 				LogInfo("av_read_frame pb & error. errorcode: %d", m_avformat_context->pb->error);
-				m_isDone = false;
+				if (m_bReadFrame) { // 超时
+					//ONPLAYERSTATECHANGED_EVENT(PLAYER_STATE_FAILED, PLAYER_ERROR_READFRAME_TIMEOUT);
+				}
+				else { // 被打断阻塞 强制结束播放
+					//ONPLAYERSTATECHANGED_EVENT(PLAYER_STATE_PLAYBACK_COMPLETED, PLAYER_ERROR_NONE);
+				}
+				//m_isDone = false;
 				break; // thread end
 			}
 
-			//std::unique_lock<std::mutex> lock(*m_wait_mutex);
-			//m_cond_t_read_thread->wait_for(lock, std::chrono::milliseconds(10));
+			std::unique_lock<std::mutex> lock(*m_wait_mutex);
+			m_cond_t_read_thread->wait_for(lock, std::chrono::milliseconds(10));
 			continue; // 继续循环
 		}
 		//m_bReadFrame = false;

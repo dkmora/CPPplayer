@@ -113,6 +113,7 @@
   <ItemGroup>
     <ClCompile Include="Filter\CFFilter.cpp" />
     <ClCompile Include="Montage\AnalyzeFrame.cpp" />
+    <ClCompile Include="Montage\EnginePlayer.cpp" />
     <ClCompile Include="Montage\MuxerVideo.cpp" />
     <ClCompile Include="OpenGlWidget.cpp" />
     <ClCompile Include="PlayVideo.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="mediabase.h" />
     <ClInclude Include="MediaPlayerEvent.h" />
     <ClInclude Include="Montage\AnalyzeFrame.h" />
+    <QtMoc Include="Montage\EnginePlayer.h" />
     <ClInclude Include="Montage\MuxerVideo.h" />
     <ClInclude Include="MyAudioResample.h" />
     <ClInclude Include="MyDevice.h" />
