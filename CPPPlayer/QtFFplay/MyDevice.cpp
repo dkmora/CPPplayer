@@ -7,7 +7,7 @@
 
 MyDevice::MyDevice(cvpublish::AVDecoder* audio_decoder, QByteArray pcm) : data_pcm(pcm), m_audio_decoder(audio_decoder)
 {
-	this->open(QIODevice::WriteOnly); // ÎªÁË½â¾öQIODevice::read (QIODevice): device not open.
+	this->open(QIODevice::WriteOnly); // ä¸ºäº†è§£å†³QIODevice::read (QIODevice): device not open.
 	len_written = 0;
 
 	pcm_file = new QFile("test_44100_s16_c2.pcm");
@@ -22,7 +22,7 @@ MyDevice::~MyDevice()
 }
 
 
-// dataÎªÉù¿¨µÄÊı¾İ»º³åÇøµØÖ·£¬ maxlenÎªÉù¿¨»º³åÇø×î´óÄÜ´æ·ÅµÄ×Ö½ÚÊı.
+// dataä¸ºå£°å¡çš„æ•°æ®ç¼“å†²åŒºåœ°å€ï¼Œ maxlenä¸ºå£°å¡ç¼“å†²åŒºæœ€å¤§èƒ½å­˜æ”¾çš„å­—èŠ‚æ•°.
 qint64 MyDevice::readData(char *data, qint64 maxlen)
 {
 	return 0;
@@ -42,22 +42,22 @@ qint64 MyDevice::readData(char *data, qint64 maxlen)
 
 	if (data_pcm && size_pcm) {
 		//pcm_file->write((const char*)data_pcm, size_pcm);
-		memcpy(data, data_pcm, size_pcm); //°ÑÒª²¥·ÅµÄpcmÊı¾İ´æÈëÉù¿¨»º³åÇøÀï.
-		len_written += size_pcm; //¸üĞÂÒÑ²¥·ÅµÄÊı¾İ³¤¶È.
+		memcpy(data, data_pcm, size_pcm); //æŠŠè¦æ’­æ”¾çš„pcmæ•°æ®å­˜å…¥å£°å¡ç¼“å†²åŒºé‡Œ.
+		len_written += size_pcm; //æ›´æ–°å·²æ’­æ”¾çš„æ•°æ®é•¿åº¦.
 		return size_pcm;
 	}
 	return size_pcm;
 
-	// ²âÊÔ´úÂë
+	// æµ‹è¯•ä»£ç 
 	//if (len_written >= data_pcm.size())
 	//	return 0;
 	//int len;
 
-	////¼ÆËãÎ´²¥·ÅµÄÊı¾İµÄ³¤¶È.
+	////è®¡ç®—æœªæ’­æ”¾çš„æ•°æ®çš„é•¿åº¦.
 	//len = (len_written + maxlen) > data_pcm.size() ? (data_pcm.size() - len_written) : maxlen;
 
-	//memcpy(data, data_pcm.data() + len_written, len); //°ÑÒª²¥·ÅµÄpcmÊı¾İ´æÈëÉù¿¨»º³åÇøÀï.
-	//len_written += len; //¸üĞÂÒÑ²¥·ÅµÄÊı¾İ³¤¶È.
+	//memcpy(data, data_pcm.data() + len_written, len); //æŠŠè¦æ’­æ”¾çš„pcmæ•°æ®å­˜å…¥å£°å¡ç¼“å†²åŒºé‡Œ.
+	//len_written += len; //æ›´æ–°å·²æ’­æ”¾çš„æ•°æ®é•¿åº¦.
 
 	//return len;
 }

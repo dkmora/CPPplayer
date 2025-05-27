@@ -37,7 +37,7 @@ RET_CODE VideoSource::Init(const Properties& properties) {
 			ret = RET_FAIL;
 		}*/
 	}
-	else { // ²É¼¯×ÀÃæ
+	else { // é‡‡é›†æ¡Œé¢
 
 	}
 

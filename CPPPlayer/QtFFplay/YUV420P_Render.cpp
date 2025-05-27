@@ -6,8 +6,8 @@
 #define ATTRIB_VERTEX 0
 #define ATTRIB_TEXTURE 1
 
-//´«µİ¶¥µãºÍÎÆÀí×ø±ê
-//¶¥µã
+//ä¼ é€’é¡¶ç‚¹å’Œçº¹ç†åæ ‡
+//é¡¶ç‚¹
 static const GLfloat ver[] = {
 	-1.0f,-1.0f,
 	-1.0f,+1.0f,
@@ -18,7 +18,7 @@ static const GLfloat ver[] = {
 	//        -1.0f, 1.0f,
 	//        0.9f,1.0f
 };
-//ÎÆÀí
+//çº¹ç†
 static const GLfloat tex[] = {
 	0.0f, 1.0f,
 	0.0f, 0.0f,
@@ -33,15 +33,15 @@ YUV420P_Render::YUV420P_Render(QWidget* parent) {
 YUV420P_Render::~YUV420P_Render(){
 }
 
-//³õÊ¼»¯gl
+//åˆå§‹åŒ–gl
 void YUV420P_Render::initialize()
 {
 	qDebug() << "initializeGL";
 
-	//³õÊ¼»¯opengl £¨QOpenGLFunctions¼Ì³Ğ£©º¯Êı
+	//åˆå§‹åŒ–opengl ï¼ˆQOpenGLFunctionsç»§æ‰¿ï¼‰å‡½æ•°
 	initializeOpenGLFunctions();
 
-	//GPU¶¥µã×ÅÉ«Æ÷
+	//GPUé¡¶ç‚¹ç€è‰²å™¨
 	constexpr char vsrc[] =
 		"attribute vec4 vertex;\n"
 		"attribute vec2 texCoord;\n"
@@ -51,7 +51,7 @@ void YUV420P_Render::initialize()
 		"    gl_Position = vertex;\n"
 		"    textureOut = texCoord;\n"
 		"}\n";
-	//GPUÆ¬Ôª×ÅÉ«Æ÷
+	//GPUç‰‡å…ƒç€è‰²å™¨
 	constexpr char fsrc[] =
 		"varying vec2 textureOut; \
 uniform sampler2D tex_y; \
@@ -70,22 +70,22 @@ yuv.z = texture2D(tex_v, textureOut).r - 0.5; \
 gl_FragColor = vec4(rgb, 1); \
 }";
 
-	//m_program¼ÓÔØshader£¨¶¥µãºÍÆ¬Ôª£©½Å±¾
-	//Æ¬Ôª£¨ÏñËØ£©
+	//m_programåŠ è½½shaderï¼ˆé¡¶ç‚¹å’Œç‰‡å…ƒï¼‰è„šæœ¬
+	//ç‰‡å…ƒï¼ˆåƒç´ ï¼‰
 	qDebug() << m_program.addShaderFromSourceCode(QOpenGLShader::Fragment, fsrc);
-	//¶¥µãshader
+	//é¡¶ç‚¹shader
 	qDebug() << m_program.addShaderFromSourceCode(QOpenGLShader::Vertex, vsrc);
 
-	//ÉèÖÃ¶¥µãÎ»ÖÃ
+	//è®¾ç½®é¡¶ç‚¹ä½ç½®
 	m_program.bindAttributeLocation("vertexPosition", ATTRIB_VERTEX);
-	//ÉèÖÃÎÆÀíÎ»ÖÃ
+	//è®¾ç½®çº¹ç†ä½ç½®
 	m_program.bindAttributeLocation("textureCoordinate", ATTRIB_TEXTURE);
 
-	//±àÒëshader
+	//ç¼–è¯‘shader
 	qDebug() << "m_program.link() = " << m_program.link();
 	qDebug() << "m_program.bind() = " << m_program.bind();
 
-	//´Óshader»ñÈ¡µØÖ·
+	//ä»shaderè·å–åœ°å€
 	m_vertexAttr = m_program.attributeLocation("vertex");
 	m_textureAttr = m_program.attributeLocation("texCoord");
 	m_textureUniformY = m_program.uniformLocation("tex_y");
@@ -101,7 +101,7 @@ gl_FragColor = vec4(rgb, 1); \
 	m_vbo.write(sizeof(ver), tex, sizeof(tex));
 	m_vbo.release();
 
-	//ÉèÖÃ¶¥µã,ÎÆÀíÊı×é²¢ÆôÓÃ
+	//è®¾ç½®é¡¶ç‚¹,çº¹ç†æ•°ç»„å¹¶å¯ç”¨
 	//glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, ver);
 	//glEnableVertexAttribArray(ATTRIB_VERTEX);
 	//glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, 0, tex);
@@ -110,7 +110,7 @@ gl_FragColor = vec4(rgb, 1); \
 	//glDisableVertexAttribArray(ATTRIB_VERTEX);
 	//glDisableVertexAttribArray(ATTRIB_TEXTURE);
 
-	//´´½¨ÎÆÀí
+	//åˆ›å»ºçº¹ç†
 	glGenTextures(1, &m_idy);
 	glBindTexture(GL_TEXTURE_2D, m_idy);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -136,25 +136,25 @@ gl_FragColor = vec4(rgb, 1); \
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-//Ë¢ĞÂÏÔÊ¾
+//åˆ·æ–°æ˜¾ç¤º
 void YUV420P_Render::render(uchar* py, uchar* pu, uchar* pv, int width, int height)
 {
 	if (py == Q_NULLPTR || pu == Q_NULLPTR || pv == Q_NULLPTR) {
 		return;
 	}
-	//ÊÓÆµ¸ß¶ÈÊ¼ÖÕÓë´°¿Ú¸ß¶ÈÏàµÈ
+	//è§†é¢‘é«˜åº¦å§‹ç»ˆä¸çª—å£é«˜åº¦ç›¸ç­‰
 	if (height == 0) {
 		return;
 	}
 
-	if (width >= height) { // ºáÆÁÊÊÓ¦
+	if (width >= height) { // æ¨ªå±é€‚åº”
 		auto radio = (float)width / height;
 		auto realH = m_parent->rect().height();
 		auto realW = radio * realH;
 		auto posX = (m_parent->rect().width() - realW) / 2;
 		glViewport(posX, 0, realW, realH);
 	}
-	else { // ÊúÆÁÌî³ä
+	else { // ç«–å±å¡«å……
 		auto radio = (float)height / width;
 		auto realW = m_parent->rect().width();
 		auto realH = radio * realW;
@@ -171,11 +171,11 @@ void YUV420P_Render::render(uchar* py, uchar* pu, uchar* pv, int width, int heig
 
 	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//glClear(GL_COLOR_BUFFER_BIT);
-    //¿ªÊ¼
+    //å¼€å§‹
 	m_program.bind();
 	m_program.enableAttributeArray(m_vertexAttr);
 	m_program.enableAttributeArray(m_textureAttr);
-	//Ö¸¶¨buffer
+	//æŒ‡å®šbuffer
 	m_vbo.bind();
 	m_program.setAttributeBuffer(m_vertexAttr, GL_FLOAT, 0, 2);
 	m_program.setAttributeBuffer(m_textureAttr, GL_FLOAT, sizeof(ver), 2);
@@ -184,30 +184,30 @@ void YUV420P_Render::render(uchar* py, uchar* pu, uchar* pv, int width, int heig
 	// Y
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_idy);
-	//ĞŞ¸ÄÎÆÀíÄÚÈİ(¸´ÖÆÄÚ´æÄÚÈİ)
+	//ä¿®æ”¹çº¹ç†å†…å®¹(å¤åˆ¶å†…å­˜å†…å®¹)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, py);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, m_pBuf);
-	//Óëshader ¹ØÁª
+	//ä¸shader å…³è”
 	//glUniform1i(m_textureUniformY, 0);
 	m_program.setUniformValue(m_textureUniformY, 0);
 
 	// U
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, m_idu);
-	//ĞŞ¸ÄÎÆÀíÄÚÈİ(¸´ÖÆÄÚ´æÄÚÈİ)
+	//ä¿®æ”¹çº¹ç†å†…å®¹(å¤åˆ¶å†…å­˜å†…å®¹)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width / 2, height / 2, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pu);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, m_pBuf + width * height);
-	//Óëshader ¹ØÁª
+	//ä¸shader å…³è”
     //glUniform1i(m_textureUniformU, 1);
 	m_program.setUniformValue(m_textureUniformU, 1);
 
 	// V
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, m_idv);
-	//ĞŞ¸ÄÎÆÀíÄÚÈİ(¸´ÖÆÄÚ´æÄÚÈİ)
+	//ä¿®æ”¹çº¹ç†å†…å®¹(å¤åˆ¶å†…å­˜å†…å®¹)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width / 2, height / 2, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pv);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, m_pBuf + width * height * 5 / 4);
-	//Óëshader ¹ØÁª
+	//ä¸shader å…³è”
 	//glUniform1i(m_textureUniformV, 2);
 	m_program.setUniformValue(m_textureUniformV, 2);
 
@@ -226,19 +226,19 @@ void YUV420P_Render::render(uchar* ptr, int width, int height)
 	if (ptr == Q_NULLPTR) {
 		return;
 	}
-	//ÊÓÆµ¸ß¶ÈÊ¼ÖÕÓë´°¿Ú¸ß¶ÈÏàµÈ
+	//è§†é¢‘é«˜åº¦å§‹ç»ˆä¸çª—å£é«˜åº¦ç›¸ç­‰
 	if (height == 0) {
 		return;
 	}
 
-	if (width >= height) { // ºáÆÁÊÊÓ¦
+	if (width >= height) { // æ¨ªå±é€‚åº”
 		auto radio = (float)width / height;
 		auto realH = m_parent->rect().height();
 		auto realW = radio * realH;
 		auto posX = (m_parent->rect().width() - realW) / 2;
 		glViewport(posX, 0, realW, realH);
 	}
-	else { // ÊúÆÁÌî³ä
+	else { // ç«–å±å¡«å……
 		auto radio = (float)height / width;
 		auto realW = m_parent->rect().width();
 		auto realH = radio * realW;
@@ -246,11 +246,11 @@ void YUV420P_Render::render(uchar* ptr, int width, int height)
 		glViewport(0, posX, realW, realH);
 	}
 
-	//¿ªÊ¼
+	//å¼€å§‹
 	m_program.bind();
 	m_program.enableAttributeArray(m_vertexAttr);
 	m_program.enableAttributeArray(m_textureAttr);
-	//Ö¸¶¨buffer
+	//æŒ‡å®šbuffer
 	m_vbo.bind();
 	m_program.setAttributeBuffer(m_vertexAttr, GL_FLOAT, 0, 2);
 	m_program.setAttributeBuffer(m_textureAttr, GL_FLOAT, sizeof(ver), 2);
@@ -259,27 +259,27 @@ void YUV420P_Render::render(uchar* ptr, int width, int height)
 	// Y
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_idy);
-	//ĞŞ¸ÄÎÆÀíÄÚÈİ(¸´ÖÆÄÚ´æÄÚÈİ)
+	//ä¿®æ”¹çº¹ç†å†…å®¹(å¤åˆ¶å†…å­˜å†…å®¹)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, ptr);
-	//Óëshader ¹ØÁª
+	//ä¸shader å…³è”
 	//glUniform1i(m_textureUniformY, 0);
 	m_program.setUniformValue(m_textureUniformY, 0);
 
 	// U
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, m_idu);
-	//ĞŞ¸ÄÎÆÀíÄÚÈİ(¸´ÖÆÄÚ´æÄÚÈİ)
+	//ä¿®æ”¹çº¹ç†å†…å®¹(å¤åˆ¶å†…å­˜å†…å®¹)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, ptr + width * height);
-	//Óëshader ¹ØÁª
+	//ä¸shader å…³è”
 	//glUniform1i(m_textureUniformU, 1);
 	m_program.setUniformValue(m_textureUniformU, 1);
 
 	// V
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, m_idv);
-	//ĞŞ¸ÄÎÆÀíÄÚÈİ(¸´ÖÆÄÚ´æÄÚÈİ)
+	//ä¿®æ”¹çº¹ç†å†…å®¹(å¤åˆ¶å†…å­˜å†…å®¹)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width / 2, height / 2, 0, GL_RED, GL_UNSIGNED_BYTE, ptr + width * height * 5 / 4);
-	//Óëshader ¹ØÁª
+	//ä¸shader å…³è”
 	//glUniform1i(m_textureUniformV, 2);
 	m_program.setUniformValue(m_textureUniformV, 2);
 

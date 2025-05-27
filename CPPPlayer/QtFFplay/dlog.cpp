@@ -1,4 +1,4 @@
-﻿#include "dlog.h"
+#include "dlog.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,8 +1,8 @@
 #include "ffmpegbase.h"
 
 AVPacketQueue::AVPacketQueue() {
-	av_init_packet(&m_flush_pkt);				// ³õÊ¼»¯flush_packet
-	m_flush_pkt.data = (uint8_t *)&m_flush_pkt; // ³õÊ¼»¯ÎªÊı¾İÖ¸Ïò×Ô¼º±¾Éí
+	av_init_packet(&m_flush_pkt);				// åˆå§‹åŒ–flush_packet
+	m_flush_pkt.data = (uint8_t *)&m_flush_pkt; // åˆå§‹åŒ–ä¸ºæ•°æ®æŒ‡å‘è‡ªå·±æœ¬èº«
 }
 
 AVPacketQueue::~AVPacketQueue() {
@@ -93,7 +93,7 @@ int AVPacketQueue::packet_queue_get(PacketQueue *q, AVPacket *pkt, int block, in
 	MyAVPacketList *pkt1;
 	int ret;
 
-	std::unique_lock<std::mutex> lock(*q->mutex_t);   // ¼ÓËø
+	std::unique_lock<std::mutex> lock(*q->mutex_t);   // åŠ é”
 
 	for (;;) {
 		if (q->abort_request) {
@@ -101,33 +101,33 @@ int AVPacketQueue::packet_queue_get(PacketQueue *q, AVPacket *pkt, int block, in
 			break;
 		}
 
-		pkt1 = q->first_pkt;    //MyAVPacketList *pkt1; ´Ó¶ÓÍ·ÄÃÊı¾İ
-		if (pkt1) {     //¶ÓÁĞÖĞÓĞÊı¾İ
-			q->first_pkt = pkt1->next;  //¶ÓÍ·ÒÆµ½µÚ¶ş¸ö½Úµã
+		pkt1 = q->first_pkt;    //MyAVPacketList *pkt1; ä»é˜Ÿå¤´æ‹¿æ•°æ®
+		if (pkt1) {     //é˜Ÿåˆ—ä¸­æœ‰æ•°æ®
+			q->first_pkt = pkt1->next;  //é˜Ÿå¤´ç§»åˆ°ç¬¬äºŒä¸ªèŠ‚ç‚¹
 			if (!q->first_pkt)
 				q->last_pkt = NULL;
-			q->nb_packets--;    //½ÚµãÊı¼õ1
-			q->size -= pkt1->pkt.size + sizeof(*pkt1);  //cache´óĞ¡¿Û³ıÒ»¸ö½Úµã
-			q->duration -= pkt1->pkt.duration;  //×ÜÊ±³¤¿Û³ıÒ»¸ö½Úµã
-			//·µ»ØAVPacket£¬ÕâÀï·¢ÉúÒ»´ÎAVPacket½á¹¹Ìå¿½±´£¬AVPacketµÄdataÖ»¿½±´ÁËÖ¸Õë
+			q->nb_packets--;    //èŠ‚ç‚¹æ•°å‡1
+			q->size -= pkt1->pkt.size + sizeof(*pkt1);  //cacheå¤§å°æ‰£é™¤ä¸€ä¸ªèŠ‚ç‚¹
+			q->duration -= pkt1->pkt.duration;  //æ€»æ—¶é•¿æ‰£é™¤ä¸€ä¸ªèŠ‚ç‚¹
+			//è¿”å›AVPacketï¼Œè¿™é‡Œå‘ç”Ÿä¸€æ¬¡AVPacketç»“æ„ä½“æ‹·è´ï¼ŒAVPacketçš„dataåªæ‹·è´äº†æŒ‡é’ˆ
 			*pkt = pkt1->pkt;
-			if (serial) //Èç¹ûĞèÒªÊä³öserial£¬°ÑserialÊä³ö
+			if (serial) //å¦‚æœéœ€è¦è¾“å‡ºserialï¼ŒæŠŠserialè¾“å‡º
 				*serial = pkt1->serial;
-			av_free(pkt1);      //ÊÍ·Å½ÚµãÄÚ´æ,Ö»ÊÇÊÍ·Å½Úµã£¬¶ø²»ÊÇÊÍ·ÅAVPacket
+			av_free(pkt1);      //é‡Šæ”¾èŠ‚ç‚¹å†…å­˜,åªæ˜¯é‡Šæ”¾èŠ‚ç‚¹ï¼Œè€Œä¸æ˜¯é‡Šæ”¾AVPacket
 			ret = 1;
 			break;
 		}
-		else if (!block) {    //¶ÓÁĞÖĞÃ»ÓĞÊı¾İ£¬ÇÒ·Ç×èÈûµ÷ÓÃ
+		else if (!block) {    //é˜Ÿåˆ—ä¸­æ²¡æœ‰æ•°æ®ï¼Œä¸”éé˜»å¡è°ƒç”¨
 			ret = 0;
 			break;
 		}
 		else {
-			//¶ÓÁĞÖĞÃ»ÓĞÊı¾İ£¬ÇÒ×èÈûµ÷ÓÃ
-			//ÕâÀïÃ»ÓĞbreak¡£forÑ­»·µÄÁíÒ»¸ö×÷ÓÃÊÇÔÚÌõ¼ş±äÁ¿Âú×ãºóÖØ¸´ÉÏÊö´úÂëÈ¡³ö½Úµã
+			//é˜Ÿåˆ—ä¸­æ²¡æœ‰æ•°æ®ï¼Œä¸”é˜»å¡è°ƒç”¨
+			//è¿™é‡Œæ²¡æœ‰breakã€‚forå¾ªç¯çš„å¦ä¸€ä¸ªä½œç”¨æ˜¯åœ¨æ¡ä»¶å˜é‡æ»¡è¶³åé‡å¤ä¸Šè¿°ä»£ç å–å‡ºèŠ‚ç‚¹
 			q->cond_t->wait(lock);
 		}
 	}
-	//q->mutex_t->unlock();  // ÊÍ·ÅËø
+	//q->mutex_t->unlock();  // é‡Šæ”¾é”
 	return ret;
 }
 
@@ -135,16 +135,16 @@ int AVPacketQueue::packet_queue_put(PacketQueue *q, AVPacket *pkt) {
 	int ret;
 
 	std::unique_lock<std::mutex> lock(*q->mutex_t);
-	ret = packet_queue_put_private(q, pkt);//Ö÷ÒªÊµÏÖ
+	ret = packet_queue_put_private(q, pkt);//ä¸»è¦å®ç°
 	//q->mutex_t->unlock();
 
 	if (pkt != &m_flush_pkt && ret < 0)
-		av_packet_unref(pkt);       //·ÅÈëÊ§°Ü£¬ÊÍ·ÅAVPacket
+		av_packet_unref(pkt);       //æ”¾å…¥å¤±è´¥ï¼Œé‡Šæ”¾AVPacket
 
 	return ret;
 }
 
-// Çå¿Õ¶ÓÁĞ
+// æ¸…ç©ºé˜Ÿåˆ—
 void AVPacketQueue::packet_queue_flush(PacketQueue *q)
 {
 	MyAVPacketList *pkt, *pkt1;
@@ -165,12 +165,12 @@ void AVPacketQueue::packet_queue_flush(PacketQueue *q)
 	//q->mutex_t->unlock();
 }
 
-// ÆôÓÃ¶ÓÁĞ
+// å¯ç”¨é˜Ÿåˆ—
 void AVPacketQueue::packet_queue_start(PacketQueue *q)
 {
 	std::unique_lock<std::mutex> lock(*q->mutex_t);
 	q->abort_request = 0;
-	packet_queue_put_private(q, &m_flush_pkt); //ÕâÀï·ÅÈëÁËÒ»¸öflush_pkt
+	packet_queue_put_private(q, &m_flush_pkt); //è¿™é‡Œæ”¾å…¥äº†ä¸€ä¸ªflush_pkt
 	//q->mutex_t->unlock();
 }
 
@@ -178,23 +178,23 @@ int AVPacketQueue::packet_queue_put_private(PacketQueue *q, AVPacket *pkt)
 {
 	MyAVPacketList *pkt1;
 
-	if (q->abort_request)   //Èç¹ûÒÑÖĞÖ¹£¬Ôò·ÅÈëÊ§°Ü
+	if (q->abort_request)   //å¦‚æœå·²ä¸­æ­¢ï¼Œåˆ™æ”¾å…¥å¤±è´¥
 		return -1;
 
-	pkt1 = (MyAVPacketList*)av_malloc(sizeof(MyAVPacketList));   //·ÖÅä½ÚµãÄÚ´æ
-	if (!pkt1)  //ÄÚ´æ²»×ã£¬Ôò·ÅÈëÊ§°Ü
+	pkt1 = (MyAVPacketList*)av_malloc(sizeof(MyAVPacketList));   //åˆ†é…èŠ‚ç‚¹å†…å­˜
+	if (!pkt1)  //å†…å­˜ä¸è¶³ï¼Œåˆ™æ”¾å…¥å¤±è´¥
 		return -1;
-	// Ã»ÓĞ×öÒıÓÃ¼ÆÊı£¬ÄÇÕâÀïÒ²ËµÃ÷av_read_frame²»»áÊÍ·ÅÌæÓÃ»§ÊÍ·Åbuffer¡£
-	pkt1->pkt = *pkt; //¿½±´AVPacket(Ç³¿½±´£¬AVPacket.dataµÈÄÚ´æ²¢Ã»ÓĞ¿½±´)
+	// æ²¡æœ‰åšå¼•ç”¨è®¡æ•°ï¼Œé‚£è¿™é‡Œä¹Ÿè¯´æ˜av_read_frameä¸ä¼šé‡Šæ”¾æ›¿ç”¨æˆ·é‡Šæ”¾bufferã€‚
+	pkt1->pkt = *pkt; //æ‹·è´AVPacket(æµ…æ‹·è´ï¼ŒAVPacket.dataç­‰å†…å­˜å¹¶æ²¡æœ‰æ‹·è´)
 	pkt1->next = NULL;
-	if (pkt == &m_flush_pkt)//Èç¹û·ÅÈëµÄÊÇflush_pkt£¬ĞèÒªÔö¼Ó¶ÓÁĞµÄ²¥·ÅĞòÁĞºÅ£¬ÒÔÇø·Ö²»Á¬ĞøµÄÁ½¶ÎÊı¾İ
+	if (pkt == &m_flush_pkt)//å¦‚æœæ”¾å…¥çš„æ˜¯flush_pktï¼Œéœ€è¦å¢åŠ é˜Ÿåˆ—çš„æ’­æ”¾åºåˆ—å·ï¼Œä»¥åŒºåˆ†ä¸è¿ç»­çš„ä¸¤æ®µæ•°æ®
 	{
 		q->serial++;
 		printf("q->serial = %d\n", q->serial);
 	}
-	pkt1->serial = q->serial;   //ÓÃ¶ÓÁĞĞòÁĞºÅ±ê¼Ç½Úµã
-	/* ¶ÓÁĞ²Ù×÷£ºÈç¹ûlast_pktÎª¿Õ£¬ËµÃ÷¶ÓÁĞÊÇ¿ÕµÄ£¬ĞÂÔö½ÚµãÎª¶ÓÍ·£»
-	 * ·ñÔò£¬¶ÓÁĞÓĞÊı¾İ£¬ÔòÈÃÔ­¶ÓÎ²µÄnextÎªĞÂÔö½Úµã¡£ ×îºó½«¶ÓÎ²Ö¸ÏòĞÂÔö½Úµã
+	pkt1->serial = q->serial;   //ç”¨é˜Ÿåˆ—åºåˆ—å·æ ‡è®°èŠ‚ç‚¹
+	/* é˜Ÿåˆ—æ“ä½œï¼šå¦‚æœlast_pktä¸ºç©ºï¼Œè¯´æ˜é˜Ÿåˆ—æ˜¯ç©ºçš„ï¼Œæ–°å¢èŠ‚ç‚¹ä¸ºé˜Ÿå¤´ï¼›
+	 * å¦åˆ™ï¼Œé˜Ÿåˆ—æœ‰æ•°æ®ï¼Œåˆ™è®©åŸé˜Ÿå°¾çš„nextä¸ºæ–°å¢èŠ‚ç‚¹ã€‚ æœ€åå°†é˜Ÿå°¾æŒ‡å‘æ–°å¢èŠ‚ç‚¹
 	 */
 	if (!q->last_pkt)
 		q->first_pkt = pkt1;
@@ -202,13 +202,13 @@ int AVPacketQueue::packet_queue_put_private(PacketQueue *q, AVPacket *pkt)
 		q->last_pkt->next = pkt1;
 	q->last_pkt = pkt1;
 
-	//¶ÓÁĞÊôĞÔ²Ù×÷£ºÔö¼Ó½ÚµãÊı¡¢cache´óĞ¡¡¢cache×ÜÊ±³¤, ÓÃÀ´¿ØÖÆ¶ÓÁĞµÄ´óĞ¡
+	//é˜Ÿåˆ—å±æ€§æ“ä½œï¼šå¢åŠ èŠ‚ç‚¹æ•°ã€cacheå¤§å°ã€cacheæ€»æ—¶é•¿, ç”¨æ¥æ§åˆ¶é˜Ÿåˆ—çš„å¤§å°
 	q->nb_packets++;
 	q->size += pkt1->pkt.size + sizeof(*pkt1);
 	q->duration += pkt1->pkt.duration;
 
 	/* XXX: should duplicate packet data in DV case */
-	//·¢³öĞÅºÅ£¬±íÃ÷µ±Ç°¶ÓÁĞÖĞÓĞÊı¾İÁË£¬Í¨ÖªµÈ´ıÖĞµÄ¶ÁÏß³Ì¿ÉÒÔÈ¡Êı¾İÁË
+	//å‘å‡ºä¿¡å·ï¼Œè¡¨æ˜å½“å‰é˜Ÿåˆ—ä¸­æœ‰æ•°æ®äº†ï¼Œé€šçŸ¥ç­‰å¾…ä¸­çš„è¯»çº¿ç¨‹å¯ä»¥å–æ•°æ®äº†
 	q->cond_t->notify_one();
 	return 0;
 }
@@ -219,10 +219,10 @@ Frame* AVPacketQueue::frame_queue_peek_writable(FrameQueue *f)
 	std::unique_lock<std::mutex> lock(*f->mutex_t);
 
 	while (f->size >= f->max_size &&
-		!f->pktq->abort_request) {	/* ¼ì²éÊÇ·ñĞèÒªÍË³ö */
+		!f->pktq->abort_request) {	/* æ£€æŸ¥æ˜¯å¦éœ€è¦é€€å‡º */
 		f->cond->wait(lock);
 	}
-	if (f->pktq->abort_request)			 /* ¼ì²éÊÇ²»ÊÇÒªÍË³ö */
+	if (f->pktq->abort_request)			 /* æ£€æŸ¥æ˜¯ä¸æ˜¯è¦é€€å‡º */
 		return NULL;
 
 	return &f->queue[f->windex];
@@ -235,7 +235,7 @@ void AVPacketQueue::frame_queue_push(FrameQueue *f)
 	std::unique_lock<std::mutex> lock(*f->mutex_t);
 
 	f->size++;
-	f->cond->notify_one();    // µ±_readableÔÚµÈ´ıÊ±Ôò¿ÉÒÔ»½ĞÑ
+	f->cond->notify_one();    // å½“_readableåœ¨ç­‰å¾…æ—¶åˆ™å¯ä»¥å”¤é†’
 }
 
 Frame* AVPacketQueue::frame_queue_peek_readable(FrameQueue *f)
@@ -255,16 +255,16 @@ Frame* AVPacketQueue::frame_queue_peek_readable(FrameQueue *f)
 
 void AVPacketQueue::frame_queue_unref_item(Frame *vp)
 {
-	av_frame_unref(vp->frame);	/* ÊÍ·ÅÊı¾İ */
+	av_frame_unref(vp->frame);	/* é‡Šæ”¾æ•°æ® */
 	avsubtitle_free(&vp->sub);
 }
 
-/* ÊÍ·Åµ±Ç°frame£¬²¢¸üĞÂ¶ÁË÷Òırindex£¬
-* µ±keep_lastÎª1, rindex_showÎª0Ê±²»È¥¸üĞÂrindex,Ò²²»ÊÍ·Åµ±Ç°frame */
+/* é‡Šæ”¾å½“å‰frameï¼Œå¹¶æ›´æ–°è¯»ç´¢å¼•rindexï¼Œ
+* å½“keep_lastä¸º1, rindex_showä¸º0æ—¶ä¸å»æ›´æ–°rindex,ä¹Ÿä¸é‡Šæ”¾å½“å‰frame */
 void AVPacketQueue::frame_queue_next(FrameQueue *f)
 {
 	if (f->keep_last && !f->rindex_shown) {
-		f->rindex_shown = 1; // µÚÒ»´Î½øÀ´Ã»ÓĞ¸üĞÂ£¬¶ÔÓ¦µÄframe¾ÍÃ»ÓĞÊÍ·Å
+		f->rindex_shown = 1; // ç¬¬ä¸€æ¬¡è¿›æ¥æ²¡æœ‰æ›´æ–°ï¼Œå¯¹åº”çš„frameå°±æ²¡æœ‰é‡Šæ”¾
 		return;
 	}
 	frame_queue_unref_item(&f->queue[f->rindex]);
@@ -276,24 +276,24 @@ void AVPacketQueue::frame_queue_next(FrameQueue *f)
 }
 
 Frame* AVPacketQueue::frame_queue_peek_last(FrameQueue *f) {
-	return &f->queue[f->rindex];    // ÕâÊ±ºò²ÅÓĞÒâÒå
+	return &f->queue[f->rindex];    // è¿™æ—¶å€™æ‰æœ‰æ„ä¹‰
 }
 
-/* »ñÈ¡¶ÓÁĞµ±Ç°Frame, ÔÚµ÷ÓÃ¸Ãº¯ÊıÇ°ÏÈµ÷ÓÃframe_queue_nb_remainingÈ·±£ÓĞframe¿É¶Á */
+/* è·å–é˜Ÿåˆ—å½“å‰Frame, åœ¨è°ƒç”¨è¯¥å‡½æ•°å‰å…ˆè°ƒç”¨frame_queue_nb_remainingç¡®ä¿æœ‰frameå¯è¯» */
 Frame* AVPacketQueue::frame_queue_peek(FrameQueue *f) {
 	return &f->queue[(f->rindex + f->rindex_shown) % f->max_size];
 }
 
-/* »ñÈ¡µ±Ç°FrameµÄÏÂÒ»Frame, ´ËÊ±ÒªÈ·±£queueÀïÃæÖÁÉÙÓĞ2¸öFrame */
-// ²»¹ÜÄãÊ²Ã´Ê±ºòµ÷ÓÃ£¬·µ»ØÀ´¿Ï¶¨²»ÊÇ NULL
+/* è·å–å½“å‰Frameçš„ä¸‹ä¸€Frame, æ­¤æ—¶è¦ç¡®ä¿queueé‡Œé¢è‡³å°‘æœ‰2ä¸ªFrame */
+// ä¸ç®¡ä½ ä»€ä¹ˆæ—¶å€™è°ƒç”¨ï¼Œè¿”å›æ¥è‚¯å®šä¸æ˜¯ NULL
 Frame* AVPacketQueue::frame_queue_peek_next(FrameQueue *f) {
 	return &f->queue[(f->rindex + f->rindex_shown + 1) % f->max_size];
 }
 
 void AVPacketQueue::packet_queue_about(PacketQueue *q) {
 	std::unique_lock<std::mutex> lock(*q->mutex_t);
-	q->abort_request = 1;       // ÇëÇóÍË³ö
-	q->cond_t->notify_one();    //ÊÍ·ÅÒ»¸öÌõ¼şĞÅºÅ
+	q->abort_request = 1;       // è¯·æ±‚é€€å‡º
+	q->cond_t->notify_one();    //é‡Šæ”¾ä¸€ä¸ªæ¡ä»¶ä¿¡å·
 }
 
 void AVPacketQueue::frame_queue_signal(FrameQueue *f)
@@ -310,9 +310,9 @@ void AVPacketQueue::frame_queue_destory(FrameQueue *f)
 	int i;
 	for (i = 0; i < f->max_size; i++) {
 		Frame *vp = &f->queue[i];
-		// ÊÍ·Å¶Ôvp->frameÖĞµÄÊı¾İ»º³åÇøµÄÒıÓÃ£¬×¢Òâ²»ÊÇÊÍ·Åframe¶ÔÏó±¾Éí
+		// é‡Šæ”¾å¯¹vp->frameä¸­çš„æ•°æ®ç¼“å†²åŒºçš„å¼•ç”¨ï¼Œæ³¨æ„ä¸æ˜¯é‡Šæ”¾frameå¯¹è±¡æœ¬èº«
 		frame_queue_unref_item(vp);
-		// ÊÍ·Åvp->frame¶ÔÏó
+		// é‡Šæ”¾vp->frameå¯¹è±¡
 		av_frame_free(&vp->frame);
 	}
 	std::unique_lock<std::mutex> lock(*f->mutex_t);
@@ -321,7 +321,7 @@ void AVPacketQueue::frame_queue_destory(FrameQueue *f)
 
 int AVPacketQueue::frame_queue_nb_remaining(FrameQueue *f)
 {
-	return f->size - f->rindex_shown;	// ×¢ÒâÕâÀïÎªÊ²Ã´Òª¼õÈ¥f->rindex_shown
+	return f->size - f->rindex_shown;	// æ³¨æ„è¿™é‡Œä¸ºä»€ä¹ˆè¦å‡å»f->rindex_shown
 }
 
 int AVPacketQueue::frame_queue_init(FrameQueue *f, PacketQueue *pktq, int max_size, int keep_last) {
@@ -339,7 +339,7 @@ int AVPacketQueue::frame_queue_init(FrameQueue *f, PacketQueue *pktq, int max_si
 	f->max_size = FFMIN(max_size, FRAME_QUEUE_SIZE);
 	f->keep_last = !!keep_last;
 	for (i = 0; i < f->max_size; i++)
-		if (!(f->queue[i].frame = av_frame_alloc())) // ·ÖÅäAVFrame½á¹¹Ìå
+		if (!(f->queue[i].frame = av_frame_alloc())) // åˆ†é…AVFrameç»“æ„ä½“
 			return AVERROR(ENOMEM);
 	return 0;
 }
@@ -350,7 +350,7 @@ int AVPacketQueue::frame_video_frame_put(AVFrame* src_frame, double pts, double 
 	if (!(vp = frame_queue_peek_writable(&m_video_frame_queue)))
 		return -1;
 
-	// Ö´ĞĞµ½Õâ²½ËµÒÑ¾­»ñÈ¡µ½ÁË¿ÉĞ´ÈëµÄFrame
+	// æ‰§è¡Œåˆ°è¿™æ­¥è¯´å·²ç»è·å–åˆ°äº†å¯å†™å…¥çš„Frame
 	vp->sar = src_frame->sample_aspect_ratio;
 	vp->uploaded = 0;
 
@@ -365,19 +365,19 @@ int AVPacketQueue::frame_video_frame_put(AVFrame* src_frame, double pts, double 
 
 	//set_default_window_size(vp->width, vp->height, vp->sar);
 
-	av_frame_move_ref(vp->frame, src_frame); // ½«srcÖĞËùÓĞÊı¾İ×ªÒÆµ½dstÖĞ£¬²¢¸´Î»src¡£
-	frame_queue_push(&m_video_frame_queue);   // ¸üĞÂĞ´Ë÷ÒıÎ»ÖÃ
+	av_frame_move_ref(vp->frame, src_frame); // å°†srcä¸­æ‰€æœ‰æ•°æ®è½¬ç§»åˆ°dstä¸­ï¼Œå¹¶å¤ä½srcã€‚
+	frame_queue_push(&m_video_frame_queue);   // æ›´æ–°å†™ç´¢å¼•ä½ç½®
 	return 0;
 }
 
 int AVPacketQueue::frame_audio_frame_put(AVFrame* src_frame, double pts, double duration, int64_t pos, int serial) {
 	Frame *af;
 
-	// »ñÈ¡¿ÉĞ´frame
+	// è·å–å¯å†™frame
 	if (!(af = frame_queue_peek_writable(&m_audio_frame_queue)))
 		return -1;
 
-	// 3. ÉèÖÃFrame²¢·ÅÈëFrameQueue
+	// 3. è®¾ç½®Frameå¹¶æ”¾å…¥FrameQueue
 	af->pts = pts;
 	af->pos = pos;
 	af->serial = serial;
@@ -397,9 +397,9 @@ AVClock::~AVClock() {
 
 void AVClock::set_clock_at(Clock *c, double pts, int serial, double time)
 {
-	c->pts = pts;                      /* µ±Ç°Ö¡µÄpts */
-	c->last_updated = time;            /* ×îºó¸üĞÂµÄÊ±¼ä£¬Êµ¼ÊÉÏÊÇµ±Ç°µÄÒ»¸öÏµÍ³Ê±¼ä */
-	c->pts_drift = c->pts - time;      /* µ±Ç°Ö¡ptsºÍÏµÍ³Ê±¼äµÄ²îÖµ£¬Õı³£²¥·ÅÇé¿öÏÂÁ½ÕßµÄ²îÖµÓ¦¸ÃÊÇ±È½Ï¹Ì¶¨µÄ£¬ÒòÎªÁ½Õß¶¼ÊÇÒÔÊ±¼äÎª»ù×¼½øĞĞÏßĞÔÔö³¤ */
+	c->pts = pts;                      /* å½“å‰å¸§çš„pts */
+	c->last_updated = time;            /* æœ€åæ›´æ–°çš„æ—¶é—´ï¼Œå®é™…ä¸Šæ˜¯å½“å‰çš„ä¸€ä¸ªç³»ç»Ÿæ—¶é—´ */
+	c->pts_drift = c->pts - time;      /* å½“å‰å¸§ptså’Œç³»ç»Ÿæ—¶é—´çš„å·®å€¼ï¼Œæ­£å¸¸æ’­æ”¾æƒ…å†µä¸‹ä¸¤è€…çš„å·®å€¼åº”è¯¥æ˜¯æ¯”è¾ƒå›ºå®šçš„ï¼Œå› ä¸ºä¸¤è€…éƒ½æ˜¯ä»¥æ—¶é—´ä¸ºåŸºå‡†è¿›è¡Œçº¿æ€§å¢é•¿ */
 	c->serial = serial;
 }
 void AVClock::set_clock(Clock *c, double pts, int serial)

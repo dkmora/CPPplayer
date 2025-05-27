@@ -14,22 +14,22 @@ CFFilter::~CFFilter()
 RET_CODE CFFilter::initFilter(int width, int height, AVPixelFormat pix_fmt, AVRational time_base, AVRational sample_aspect_ratio)
 {
     // ----------------------
-    // ÉèÖÃ¹ýÂËÆ÷Í¼£ºbuffer -> minterpolate -> buffersink
+    // è®¾ç½®è¿‡æ»¤å™¨å›¾ï¼šbuffer -> minterpolate -> buffersink
     // ----------------------
 
     int ret = 0;
     m_filter_graph = avfilter_graph_alloc();
     if (!m_filter_graph) {
-        //std::cerr << "ÎÞ·¨´´½¨¹ýÂËÆ÷Í¼" << std::endl;
+        //std::cerr << "æ— æ³•åˆ›å»ºè¿‡æ»¤å™¨å›¾" << std::endl;
         return RET_FAIL;
     }
 
-    // »ñÈ¡ filter£ºbuffer£¨ÊäÈë£©ºÍ buffersink£¨Êä³ö£©
+    // èŽ·å– filterï¼šbufferï¼ˆè¾“å…¥ï¼‰å’Œ buffersinkï¼ˆè¾“å‡ºï¼‰
     const AVFilter* buffersrc = avfilter_get_by_name("buffer");
     const AVFilter* buffersink = avfilter_get_by_name("buffersink");
 
     char args[512];
-    // ¹¹Ôì buffer ²ÎÊý£¬×¢Òâ time_base ºÍÏñËØ¸ñÊ½
+    // æž„é€  buffer å‚æ•°ï¼Œæ³¨æ„ time_base å’Œåƒç´ æ ¼å¼
     snprintf(args, sizeof(args), "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
          width, height, pix_fmt, time_base.num,  time_base.den,  sample_aspect_ratio.num, sample_aspect_ratio.den);
 
@@ -38,26 +38,26 @@ RET_CODE CFFilter::initFilter(int width, int height, AVPixelFormat pix_fmt, AVRa
 
     ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in", args, NULL, m_filter_graph);
     if (ret < 0) {
-        //print_error("ÎÞ·¨´´½¨ buffer Ô´¹ýÂËÆ÷", ret);
+        //print_error("æ— æ³•åˆ›å»º buffer æºè¿‡æ»¤å™¨", ret);
         return RET_FAIL;
     }
 
     ret = avfilter_graph_create_filter(&buffersink_ctx, buffersink, "out", NULL, NULL, m_filter_graph);
     if (ret < 0) {
-        //print_error("ÎÞ·¨´´½¨ buffersink ¹ýÂËÆ÷", ret);
+        //print_error("æ— æ³•åˆ›å»º buffersink è¿‡æ»¤å™¨", ret);
         return RET_FAIL;
     }
 
-    // ÉèÖÃ buffersink Êä³öÏñËØ¸ñÊ½
+    // è®¾ç½® buffersink è¾“å‡ºåƒç´ æ ¼å¼
     enum AVPixelFormat pix_fmts[] = {  pix_fmt, AV_PIX_FMT_NONE };
     ret = av_opt_set_int_list(buffersink_ctx, "pix_fmts", pix_fmts, AV_PIX_FMT_NONE, AV_OPT_SEARCH_CHILDREN);
     if (ret < 0) {
-        //print_error("ÉèÖÃ buffersink Êä³öÏñËØ¸ñÊ½Ê§°Ü", ret);
+        //print_error("è®¾ç½® buffersink è¾“å‡ºåƒç´ æ ¼å¼å¤±è´¥", ret);
         return RET_FAIL;
     }
 
-    // ¹¹Ôì¹ýÂËÆ÷Á´ÃèÊö£ºÊ¹ÓÃ minterpolate ²åÖ¡µ½ 60fps
-    // ²ÎÊý½âÊÍ£ºfps=60; mi_mode=mci Ê¹ÓÃÔË¶¯²åÖµ£»mc_mode=aobmc ÆôÓÃ×ÔÊÊÓ¦Ë«ÏòÔË¶¯²¹³¥£»vsbmc=1 ÆôÓÃ´¹Ö±±ßÔµ²¹³¥
+    // æž„é€ è¿‡æ»¤å™¨é“¾æè¿°ï¼šä½¿ç”¨ minterpolate æ’å¸§åˆ° 60fps
+    // å‚æ•°è§£é‡Šï¼šfps=60; mi_mode=mci ä½¿ç”¨è¿åŠ¨æ’å€¼ï¼›mc_mode=aobmc å¯ç”¨è‡ªé€‚åº”åŒå‘è¿åŠ¨è¡¥å¿ï¼›vsbmc=1 å¯ç”¨åž‚ç›´è¾¹ç¼˜è¡¥å¿
     const char* filter_desc = "minterpolate=fps=30:mi_mode=mci:mc_mode=aobmc:me_mode=bilat";
 
     outputs = avfilter_inout_alloc();
@@ -75,13 +75,13 @@ RET_CODE CFFilter::initFilter(int width, int height, AVPixelFormat pix_fmt, AVRa
 
     ret = avfilter_graph_parse_ptr(m_filter_graph, filter_desc, &inputs, &outputs, NULL);
     if (ret < 0) {
-        //print_error("½âÎö¹ýÂËÆ÷Í¼ÃèÊöÊ§°Ü", ret);
+        //print_error("è§£æžè¿‡æ»¤å™¨å›¾æè¿°å¤±è´¥", ret);
         return RET_FAIL;
     }
 
     ret = avfilter_graph_config(m_filter_graph, NULL);
     if (ret < 0) {
-        //print_error("ÅäÖÃ¹ýÂËÆ÷Í¼Ê§°Ü", ret);
+        //print_error("é…ç½®è¿‡æ»¤å™¨å›¾å¤±è´¥", ret);
         return RET_FAIL;
     }
 
@@ -89,13 +89,13 @@ RET_CODE CFFilter::initFilter(int width, int height, AVPixelFormat pix_fmt, AVRa
     avfilter_inout_free(&outputs);
 
     // ----------------------
-    // ¿ªÊ¼¶ÁÈ¡¡¢½âÂë¡¢¹ýÂË£¨²åÖ¡£©ÊÓÆµÖ¡
+    // å¼€å§‹è¯»å–ã€è§£ç ã€è¿‡æ»¤ï¼ˆæ’å¸§ï¼‰è§†é¢‘å¸§
     // ----------------------
     //AVPacket packet;
     //AVFrame* frame = av_frame_alloc();
     filt_frame = av_frame_alloc();
     if (!filt_frame) {
-        //std::cerr << "ÎÞ·¨·ÖÅäÖ¡" << std::endl;
+        //std::cerr << "æ— æ³•åˆ†é…å¸§" << std::endl;
         return RET_FAIL;
     }
     return RET_OK;

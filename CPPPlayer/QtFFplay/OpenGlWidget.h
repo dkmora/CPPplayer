@@ -25,7 +25,7 @@ private:
 	uint yuvType = 0;
 	uchar* idY = nullptr;
 	uchar* idU = nullptr;
-	uchar* idV = nullptr; //×Ô¼º´´½¨µÄÎÆÀí¶ÔÏóID£¬´´½¨´íÎó·µ»Ø0
+	uchar* idV = nullptr; //è‡ªå·±åˆ›å»ºçš„çº¹ç†å¯¹è±¡IDï¼Œåˆ›å»ºé”™è¯¯è¿”å›0
 	uint videoW, videoH;
 	uchar *yuvPtr = nullptr;
 	YUV420P_Render* m_yuv420Render;

@@ -8,7 +8,7 @@ PlayAudio::PlayAudio(AVPlayer* avplayer, QObject *parent) :
 {
 
 	if (m_avplayer != NULL) {
-		// ÖØ²ÉÑù²ÎÊı Êä³ö²ÎÊı
+		// é‡é‡‡æ ·å‚æ•° è¾“å‡ºå‚æ•°
 		auto audio_decoder = m_avplayer->getAudioDecoder();
 
 		SDL_AudioSpec wanted_spec, spec;
@@ -18,12 +18,12 @@ PlayAudio::PlayAudio(AVPlayer* avplayer, QObject *parent) :
 		int next_sample_rate_idx = FF_ARRAY_ELEMS(next_sample_rates) - 1;
 
 		int64_t wanted_channel_layout = AV_CH_LAYOUT_STEREO;                        // 
-		int wanted_nb_channels        = 2;                                          // Ë«Í¨µÀ
-		int wanted_sample_rate        = audio_decoder->codec_context->sample_rate;  // ²ÉÑùÂÊ
-		int wanted_samples            = audio_decoder->codec_context->frame_size;   // Ñù±¾Êı
+		int wanted_nb_channels        = 2;                                          // åŒé€šé“
+		int wanted_sample_rate        = audio_decoder->codec_context->sample_rate;  // é‡‡æ ·ç‡
+		int wanted_samples            = audio_decoder->codec_context->frame_size;   // æ ·æœ¬æ•°
 
 		env = SDL_getenv("SDL_AUDIO_CHANNELS");
-		if (env) {  // Èô»·¾³±äÁ¿ÓĞÉèÖÃ£¬ÓÅÏÈ´Ó»·¾³±äÁ¿È¡µÃÉùµÀÊıºÍÉùµÀ²¼¾Ö
+		if (env) {  // è‹¥ç¯å¢ƒå˜é‡æœ‰è®¾ç½®ï¼Œä¼˜å…ˆä»ç¯å¢ƒå˜é‡å–å¾—å£°é“æ•°å’Œå£°é“å¸ƒå±€
 			wanted_nb_channels = atoi(env);
 			wanted_channel_layout = av_get_default_channel_layout(wanted_nb_channels);
 		}
@@ -31,7 +31,7 @@ PlayAudio::PlayAudio(AVPlayer* avplayer, QObject *parent) :
 			wanted_channel_layout = av_get_default_channel_layout(wanted_nb_channels);
 			wanted_channel_layout &= ~AV_CH_LAYOUT_STEREO_DOWNMIX;
 		}
-		// ¸ù¾İchannel_layout»ñÈ¡nb_channels£¬µ±´«Èë²ÎÊıwanted_nb_channels²»Æ¥ÅäÊ±£¬´Ë´¦»á×÷ĞŞÕı
+		// æ ¹æ®channel_layoutè·å–nb_channelsï¼Œå½“ä¼ å…¥å‚æ•°wanted_nb_channelsä¸åŒ¹é…æ—¶ï¼Œæ­¤å¤„ä¼šä½œä¿®æ­£
 		wanted_nb_channels = av_get_channel_layout_nb_channels(wanted_channel_layout);
 		wanted_spec.channels = wanted_nb_channels;
 		wanted_spec.freq = wanted_sample_rate;
@@ -40,31 +40,31 @@ PlayAudio::PlayAudio(AVPlayer* avplayer, QObject *parent) :
 			return;
 		}
 		while (next_sample_rate_idx && next_sample_rates[next_sample_rate_idx] >= wanted_spec.freq)
-			next_sample_rate_idx--;  // ´Ó²ÉÑùÂÊÊı×éÖĞÕÒµ½µÚÒ»¸ö²»´óÓÚ´«Èë²ÎÊıwanted_sample_rateµÄÖµ
-		// ÒôÆµ²ÉÑù¸ñÊ½ÓĞÁ½´óÀàĞÍ£ºplanarºÍpacked£¬¼ÙÉèÒ»¸öË«ÉùµÀÒôÆµÎÄ¼ş£¬Ò»¸ö×óÉùµÀ²ÉÑùµã¼Ç×÷L£¬Ò»¸öÓÒÉùµÀ²ÉÑùµã¼Ç×÷R£¬Ôò£º
-		// planar´æ´¢¸ñÊ½£º(plane1)LLLLLLLL...LLLL (plane2)RRRRRRRR...RRRR
-		// packed´æ´¢¸ñÊ½£º(plane1)LRLRLRLR...........................LRLR
-		// ÔÚÕâÁ½ÖÖ²ÉÑùÀàĞÍÏÂ£¬ÓÖÏ¸·Ö¶àÖÖ²ÉÑù¸ñÊ½£¬ÈçAV_SAMPLE_FMT_S16¡¢AV_SAMPLE_FMT_S16PµÈ£¬
-		// ×¢ÒâSDL2.0Ä¿Ç°²»Ö§³Öplanar¸ñÊ½
-		// channel_layoutÊÇint64_tÀàĞÍ£¬±íÊ¾ÒôÆµÉùµÀ²¼¾Ö£¬Ã¿bit´ú±íÒ»¸öÌØ¶¨µÄÉùµÀ£¬²Î¿¼channel_layout.hÖĞµÄ¶¨Òå£¬Ò»Ä¿ÁËÈ»
-		// Êı¾İÁ¿(bits/Ãë) = ²ÉÑùÂÊ(Hz) * ²ÉÑùÉî¶È(bit) * ÉùµÀÊı
+			next_sample_rate_idx--;  // ä»é‡‡æ ·ç‡æ•°ç»„ä¸­æ‰¾åˆ°ç¬¬ä¸€ä¸ªä¸å¤§äºä¼ å…¥å‚æ•°wanted_sample_rateçš„å€¼
+		// éŸ³é¢‘é‡‡æ ·æ ¼å¼æœ‰ä¸¤å¤§ç±»å‹ï¼šplanarå’Œpackedï¼Œå‡è®¾ä¸€ä¸ªåŒå£°é“éŸ³é¢‘æ–‡ä»¶ï¼Œä¸€ä¸ªå·¦å£°é“é‡‡æ ·ç‚¹è®°ä½œLï¼Œä¸€ä¸ªå³å£°é“é‡‡æ ·ç‚¹è®°ä½œRï¼Œåˆ™ï¼š
+		// planarå­˜å‚¨æ ¼å¼ï¼š(plane1)LLLLLLLL...LLLL (plane2)RRRRRRRR...RRRR
+		// packedå­˜å‚¨æ ¼å¼ï¼š(plane1)LRLRLRLR...........................LRLR
+		// åœ¨è¿™ä¸¤ç§é‡‡æ ·ç±»å‹ä¸‹ï¼Œåˆç»†åˆ†å¤šç§é‡‡æ ·æ ¼å¼ï¼Œå¦‚AV_SAMPLE_FMT_S16ã€AV_SAMPLE_FMT_S16Pç­‰ï¼Œ
+		// æ³¨æ„SDL2.0ç›®å‰ä¸æ”¯æŒplanaræ ¼å¼
+		// channel_layoutæ˜¯int64_tç±»å‹ï¼Œè¡¨ç¤ºéŸ³é¢‘å£°é“å¸ƒå±€ï¼Œæ¯bitä»£è¡¨ä¸€ä¸ªç‰¹å®šçš„å£°é“ï¼Œå‚è€ƒchannel_layout.hä¸­çš„å®šä¹‰ï¼Œä¸€ç›®äº†ç„¶
+		// æ•°æ®é‡(bits/ç§’) = é‡‡æ ·ç‡(Hz) * é‡‡æ ·æ·±åº¦(bit) * å£°é“æ•°
 		wanted_spec.format = AUDIO_S16SYS;
 		wanted_spec.silence = 0;
 		/*
-		 * Ò»´Î¶ÁÈ¡¶à³¤µÄÊı¾İ
-		 * SDL_AUDIO_MAX_CALLBACKS_PER_SECÒ»Ãë×î¶à»Øµ÷´ÎÊı£¬±ÜÃâÆµ·±µÄ»Øµ÷
+		 * ä¸€æ¬¡è¯»å–å¤šé•¿çš„æ•°æ®
+		 * SDL_AUDIO_MAX_CALLBACKS_PER_SECä¸€ç§’æœ€å¤šå›è°ƒæ¬¡æ•°ï¼Œé¿å…é¢‘ç¹çš„å›è°ƒ
 		 *  Audio buffer size in samples (power of 2)
 		 */
 		//wanted_spec.samples = FFMAX(SDL_AUDIO_MIN_BUFFER_SIZE, 2 << av_log2(wanted_spec.freq / SDL_AUDIO_MAX_CALLBACKS_PER_SEC));
-		wanted_spec.samples  = wanted_samples;     // Ñù±¾Êı ĞèÒª·ÖÎöÊÓÆµÔ´ºóµÃµ½
-		wanted_spec.callback = sdl_audio_callback; // ÒôÆµPullÄ£Ê½»Øµ÷
+		wanted_spec.samples  = wanted_samples;     // æ ·æœ¬æ•° éœ€è¦åˆ†æè§†é¢‘æºåå¾—åˆ°
+		wanted_spec.callback = sdl_audio_callback; // éŸ³é¢‘Pullæ¨¡å¼å›è°ƒ
 		wanted_spec.userdata = this;
-		// ´ò¿ªÒôÆµÉè±¸²¢´´½¨ÒôÆµ´¦ÀíÏß³Ì¡£ÆÚÍûµÄ²ÎÊıÊÇwanted_spec£¬Êµ¼ÊµÃµ½µÄÓ²¼ş²ÎÊıÊÇspec
-	// 1) SDLÌá¹©Á½ÖÖÊ¹ÒôÆµÉè±¸È¡µÃÒôÆµÊı¾İ·½·¨£º
-	//    a. push£¬SDLÒÔÌØ¶¨µÄÆµÂÊµ÷ÓÃ»Øµ÷º¯Êı£¬ÔÚ»Øµ÷º¯ÊıÖĞÈ¡µÃÒôÆµÊı¾İ
-	//    b. pull£¬ÓÃ»§³ÌĞòÒÔÌØ¶¨µÄÆµÂÊµ÷ÓÃSDL_QueueAudio()£¬ÏòÒôÆµÉè±¸Ìá¹©Êı¾İ¡£´ËÖÖÇé¿öwanted_spec.callback=NULL
-	// 2) ÒôÆµÉè±¸´ò¿ªºó²¥·Å¾²Òô£¬²»Æô¶¯»Øµ÷£¬µ÷ÓÃSDL_PauseAudio(0)ºóÆô¶¯»Øµ÷£¬¿ªÊ¼Õı³£²¥·ÅÒôÆµ
-	// SDL_OpenAudioDevice()µÚÒ»¸ö²ÎÊıÎªNULLÊ±£¬µÈ¼ÛÓÚSDL_OpenAudio()
+		// æ‰“å¼€éŸ³é¢‘è®¾å¤‡å¹¶åˆ›å»ºéŸ³é¢‘å¤„ç†çº¿ç¨‹ã€‚æœŸæœ›çš„å‚æ•°æ˜¯wanted_specï¼Œå®é™…å¾—åˆ°çš„ç¡¬ä»¶å‚æ•°æ˜¯spec
+	// 1) SDLæä¾›ä¸¤ç§ä½¿éŸ³é¢‘è®¾å¤‡å–å¾—éŸ³é¢‘æ•°æ®æ–¹æ³•ï¼š
+	//    a. pushï¼ŒSDLä»¥ç‰¹å®šçš„é¢‘ç‡è°ƒç”¨å›è°ƒå‡½æ•°ï¼Œåœ¨å›è°ƒå‡½æ•°ä¸­å–å¾—éŸ³é¢‘æ•°æ®
+	//    b. pullï¼Œç”¨æˆ·ç¨‹åºä»¥ç‰¹å®šçš„é¢‘ç‡è°ƒç”¨SDL_QueueAudio()ï¼Œå‘éŸ³é¢‘è®¾å¤‡æä¾›æ•°æ®ã€‚æ­¤ç§æƒ…å†µwanted_spec.callback=NULL
+	// 2) éŸ³é¢‘è®¾å¤‡æ‰“å¼€åæ’­æ”¾é™éŸ³ï¼Œä¸å¯åŠ¨å›è°ƒï¼Œè°ƒç”¨SDL_PauseAudio(0)åå¯åŠ¨å›è°ƒï¼Œå¼€å§‹æ­£å¸¸æ’­æ”¾éŸ³é¢‘
+	// SDL_OpenAudioDevice()ç¬¬ä¸€ä¸ªå‚æ•°ä¸ºNULLæ—¶ï¼Œç­‰ä»·äºSDL_OpenAudio()
 		while (SDL_OpenAudio(&wanted_spec, &spec) < 0) {
 			av_log(NULL, AV_LOG_WARNING, "SDL_OpenAudio (%d channels, %d Hz): %s\n",
 				wanted_spec.channels, wanted_spec.freq, SDL_GetError());
@@ -80,12 +80,12 @@ PlayAudio::PlayAudio(AVPlayer* avplayer, QObject *parent) :
 			wanted_channel_layout = av_get_default_channel_layout(wanted_spec.channels);
 		}
 
-		// ¼ì²é´ò¿ªÒôÆµÉè±¸µÄÊµ¼Ê²ÎÊı£º²ÉÑù¸ñÊ½
+		// æ£€æŸ¥æ‰“å¼€éŸ³é¢‘è®¾å¤‡çš„å®é™…å‚æ•°ï¼šé‡‡æ ·æ ¼å¼
 		if (spec.format != AUDIO_S16SYS) {
 			LogInfo("SDL advised audio format %d is not supported!\n", spec.format);
 			return;
 		}
-		// ¼ì²é´ò¿ªÒôÆµÉè±¸µÄÊµ¼Ê²ÎÊı£ºÉùµÀÊı
+		// æ£€æŸ¥æ‰“å¼€éŸ³é¢‘è®¾å¤‡çš„å®é™…å‚æ•°ï¼šå£°é“æ•°
 		if (spec.channels != wanted_spec.channels) {
 			wanted_channel_layout = av_get_default_channel_layout(spec.channels);
 			if (!wanted_channel_layout) {
@@ -93,14 +93,14 @@ PlayAudio::PlayAudio(AVPlayer* avplayer, QObject *parent) :
 				return;
 			}
 		}
-		// wanted_specÊÇÆÚÍûµÄ²ÎÊı£¬specÊÇÊµ¼ÊµÄ²ÎÊı£¬wanted_specºÍspec¶¼ÊÇSDLÖĞµÄ½á¹¹¡£
-		// ´Ë´¦audio_hw_paramsÊÇFFmpegÖĞµÄ²ÎÊı£¬Êä³ö²ÎÊı¹©ÉÏ¼¶º¯ÊıÊ¹ÓÃ
-		// audio_hw_params±£´æµÄ²ÎÊı£¬¾ÍÊÇÔÚ×öÖØ²ÉÑùµÄÊ±ºòÒª×ª³ÉµÄ¸ñÊ½¡£
+		// wanted_specæ˜¯æœŸæœ›çš„å‚æ•°ï¼Œspecæ˜¯å®é™…çš„å‚æ•°ï¼Œwanted_specå’Œspecéƒ½æ˜¯SDLä¸­çš„ç»“æ„ã€‚
+		// æ­¤å¤„audio_hw_paramsæ˜¯FFmpegä¸­çš„å‚æ•°ï¼Œè¾“å‡ºå‚æ•°ä¾›ä¸Šçº§å‡½æ•°ä½¿ç”¨
+		// audio_hw_paramsä¿å­˜çš„å‚æ•°ï¼Œå°±æ˜¯åœ¨åšé‡é‡‡æ ·çš„æ—¶å€™è¦è½¬æˆçš„æ ¼å¼ã€‚
 		audio_hw_params.fmt = AV_SAMPLE_FMT_S16;
 		audio_hw_params.freq = spec.freq;
 		audio_hw_params.channel_layout = wanted_channel_layout;
 		audio_hw_params.channels = spec.channels;
-		/* audio_hw_params->frame_sizeÕâÀïÖ»ÊÇ¼ÆËãÒ»¸ö²ÉÑùµãÕ¼ÓÃµÄ×Ö½ÚÊı */
+		/* audio_hw_params->frame_sizeè¿™é‡Œåªæ˜¯è®¡ç®—ä¸€ä¸ªé‡‡æ ·ç‚¹å ç”¨çš„å­—èŠ‚æ•° */
 		audio_hw_params.frame_size = av_samples_get_buffer_size(NULL, audio_hw_params.channels,
 			1, audio_hw_params.fmt, 1);
 		audio_hw_params.bytes_per_sec = av_samples_get_buffer_size(NULL, audio_hw_params.channels,
@@ -111,7 +111,7 @@ PlayAudio::PlayAudio(AVPlayer* avplayer, QObject *parent) :
 			return;
 		}
 	}
-	SDL_PauseAudio(0); // ¿ªÊ¼²¥·Å
+	SDL_PauseAudio(0); // å¼€å§‹æ’­æ”¾
 }
 
 PlayAudio::~PlayAudio()
@@ -128,7 +128,7 @@ void PlayAudio::sdl_audio_callback(void *opaque, Uint8 *stream, int len) {
 		time1 = time2;
 	}
 	else {
-		printf("Ê±¼ä²î : %d\n", time2 - time1);
+		printf("æ—¶é—´å·® : %d\n", time2 - time1);
 		time1 = time2;
 	}*/
 

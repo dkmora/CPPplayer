@@ -1,7 +1,7 @@
 #pragma once
 
 /*
-*   FFmpeg ÒôÊÓÆµ½âÂëÆ÷Àà
+*   FFmpeg éŸ³è§†é¢‘è§£ç å™¨ç±»
 */
 
 #include <iostream>
@@ -22,28 +22,28 @@ public:
 	AVDecoder(FFDecoder* ffmpegdecoder, AVPacketQueue* avpacketQueue, AVClock* videostate);
 	virtual ~AVDecoder();
 
-	// ÔİÍ£
+	// æš‚åœ
 	void Pause();
-	// »ñÈ¡Ò»Ö¡yuvÊÓÆµÊı¾İ
+	// è·å–ä¸€å¸§yuvè§†é¢‘æ•°æ®
 	int getVideoYuv420Frame(uint8_t** y, uint8_t** u, uint8_t** v, int& width, int& height);
-	// »ñÈ¡Ò»Ö¡pcmÒôÆµÊı¾İ
+	// è·å–ä¸€å¸§pcméŸ³é¢‘æ•°æ®
 	int getAudioFrame(uint8_t** data, size_t size);
-	// ÉèÖÃÊÇ·ñĞèÒªĞŞ¸Ä±äËÙËÙÂÊ
+	// è®¾ç½®æ˜¯å¦éœ€è¦ä¿®æ”¹å˜é€Ÿé€Ÿç‡
 	void setNeedChangeRate(bool blchange) { m_need_change_rate = blchange; }
-	// ÉèÖÃÊÇ·ñĞŞ¸ÄÒôÁ¿
+	// è®¾ç½®æ˜¯å¦ä¿®æ”¹éŸ³é‡
 	void setNeedChangeVolume(bool blchange) { m_need_change_volume = blchange; }
-	// ÉèÖÃ±äËÙËÙÂÊ
+	// è®¾ç½®å˜é€Ÿé€Ÿç‡
 	void setPlaybackRate(float rate);
-	// ÉèÖÃÒôÁ¿
+	// è®¾ç½®éŸ³é‡
 	void setPlaybackVolume(float volume);
-	// »ñÈ¡ÒôÆµÖØ²ÉÑù²ÎÊı
+	// è·å–éŸ³é¢‘é‡é‡‡æ ·å‚æ•°
 	audio_resampler_params_t* get_resampler_params() { return &m_resampler_params; }
-	// »ñÈ¡ÒôÊÓÆµAVFrame
+	// è·å–éŸ³è§†é¢‘AVFrame
 	AVFrame* getVideoAVFrame();
 	AVFrame* getAudioAVFrame();
-	// ½âÂëºó¶ÓÁĞ
+	// è§£ç åé˜Ÿåˆ—
 	AVPacketQueue* getAVPacketQueue() { return m_avpacketqueue; }
-	//ÉèÖÃ²Ã¼ô½áÊøÊ±¼ä µ¥Î»Ãë
+	//è®¾ç½®è£å‰ªç»“æŸæ—¶é—´ å•ä½ç§’
 	void setEndTime(int64_t endtime) { m_end_time = endtime; }
 	int64_t getEndTime() { return m_end_time; }
 
@@ -52,17 +52,17 @@ private:
 	int  decoder_frame();
 	void Clear();
 
-	// ÉèÖÃÒôÆµÊ±ÖÓ
+	// è®¾ç½®éŸ³é¢‘æ—¶é’Ÿ
 	void video_set_clock_at(int write_buf_size);
-	// »ñÈ¡Ò»Ö¡ÒôÆµ
+	// è·å–ä¸€å¸§éŸ³é¢‘
 	int get_audio_decode_frame();
-	// ¼ÆËãÉÏÒ»Ö¡ĞèÒª³ÖĞøµÄduration£¬ÕâÀïÓĞĞ£ÕıËã·¨
+	// è®¡ç®—ä¸Šä¸€å¸§éœ€è¦æŒç»­çš„durationï¼Œè¿™é‡Œæœ‰æ ¡æ­£ç®—æ³•
 	double vp_duration(double max_frame_duration, Frame *vp, Frame *nextvp);
 	/**
-     * @brief ¼ÆËãÕıÔÚÏÔÊ¾Ö¡ĞèÒª³ÖĞø²¥·ÅµÄÊ±¼ä¡£
-     * @param delay ¸Ã²ÎÊıÊµ¼Ê´«µİµÄÊÇµ±Ç°ÏÔÊ¾Ö¡ºÍ´ı²¥·ÅÖ¡µÄ¼ä¸ô¡£
-	 * @param clk Ê±ÖÓ
-     * @return ·µ»Øµ±Ç°ÏÔÊ¾Ö¡Òª³ÖĞø²¥·ÅµÄÊ±¼ä¡£ÎªÊ²Ã´Òªµ÷Õû·µ»ØµÄdelay£¿ÎªÊ²Ã´²»Ö§³ÖÊ¹ÓÃÏàÁÚ¼ä¸ôÖ¡Ê±¼ä£¿
+     * @brief è®¡ç®—æ­£åœ¨æ˜¾ç¤ºå¸§éœ€è¦æŒç»­æ’­æ”¾çš„æ—¶é—´ã€‚
+     * @param delay è¯¥å‚æ•°å®é™…ä¼ é€’çš„æ˜¯å½“å‰æ˜¾ç¤ºå¸§å’Œå¾…æ’­æ”¾å¸§çš„é—´éš”ã€‚
+	 * @param clk æ—¶é’Ÿ
+     * @return è¿”å›å½“å‰æ˜¾ç¤ºå¸§è¦æŒç»­æ’­æ”¾çš„æ—¶é—´ã€‚ä¸ºä»€ä¹ˆè¦è°ƒæ•´è¿”å›çš„delayï¼Ÿä¸ºä»€ä¹ˆä¸æ”¯æŒä½¿ç”¨ç›¸é‚»é—´éš”å¸§æ—¶é—´ï¼Ÿ
      */
 	double compute_target_delay(double delay, AVClock& avclock);
 
@@ -77,43 +77,43 @@ private:
 	int m_fps = 0;
 	int m_video_index = 0;
 
-	FFDecoder* m_decoder;           // ½âÂëÆ÷
-	AVPacketQueue* m_avpacketqueue; // ÒôÊÓÆµ¶ÓÁĞ
-	AVClock* m_avclock;             // ÒôÊÓÆµÊ±ÖÓ
+	FFDecoder* m_decoder;           // è§£ç å™¨
+	AVPacketQueue* m_avpacketqueue; // éŸ³è§†é¢‘é˜Ÿåˆ—
+	AVClock* m_avclock;             // éŸ³è§†é¢‘æ—¶é’Ÿ
 
-	AVFrame* m_av_frame;            // ÒôÊÓÆµ½âÂëÖ¡
+	AVFrame* m_av_frame;            // éŸ³è§†é¢‘è§£ç å¸§
 
 	// audio
 	int m_audio_stream = -1;
-	int	m_rate;                   // ²ÉÑùÂÊ
-	int m_channels;               // Í¨µÀÊı
-	int64_t	m_channel_layout;     // Í¨µÀ²¼¾Ö£¬±ÈÈç2.1ÉùµÀ£¬5.1ÉùµÀµÈ
-	enum AVSampleFormat	m_fmt;    // ÒôÆµ²ÉÑù¸ñÊ½£¬±ÈÈçAV_SAMPLE_FMT_S16±íÊ¾ÎªÓĞ·ûºÅ16bitÉî¶È£¬½»´íÅÅÁĞÄ£Ê½¡£
-	int	m_frame_size;             // Ò»¸ö²ÉÑùµ¥ÔªÕ¼ÓÃµÄ×Ö½ÚÊı£¨±ÈÈç2Í¨µÀÊ±£¬Ôò×óÓÒÍ¨µÀ¸÷²ÉÑùÒ»´ÎºÏ³ÉÒ»¸ö²ÉÑùµ¥Ôª£©
-	int	m_bytes_per_sec;          // Ò»ÃëÊ±¼äµÄ×Ö½ÚÊı£¬±ÈÈç²ÉÑùÂÊ48Khz£¬2 channel£¬16bit£¬ÔòÒ»Ãë48000*2*16/8=192000
+	int	m_rate;                   // é‡‡æ ·ç‡
+	int m_channels;               // é€šé“æ•°
+	int64_t	m_channel_layout;     // é€šé“å¸ƒå±€ï¼Œæ¯”å¦‚2.1å£°é“ï¼Œ5.1å£°é“ç­‰
+	enum AVSampleFormat	m_fmt;    // éŸ³é¢‘é‡‡æ ·æ ¼å¼ï¼Œæ¯”å¦‚AV_SAMPLE_FMT_S16è¡¨ç¤ºä¸ºæœ‰ç¬¦å·16bitæ·±åº¦ï¼Œäº¤é”™æ’åˆ—æ¨¡å¼ã€‚
+	int	m_frame_size;             // ä¸€ä¸ªé‡‡æ ·å•å…ƒå ç”¨çš„å­—èŠ‚æ•°ï¼ˆæ¯”å¦‚2é€šé“æ—¶ï¼Œåˆ™å·¦å³é€šé“å„é‡‡æ ·ä¸€æ¬¡åˆæˆä¸€ä¸ªé‡‡æ ·å•å…ƒï¼‰
+	int	m_bytes_per_sec;          // ä¸€ç§’æ—¶é—´çš„å­—èŠ‚æ•°ï¼Œæ¯”å¦‚é‡‡æ ·ç‡48Khzï¼Œ2 channelï¼Œ16bitï¼Œåˆ™ä¸€ç§’48000*2*16/8=192000
 	int m_audio_index = 0;
 
-	// ÊÓÆµ¸ñÊ½×ª»»
+	// è§†é¢‘æ ¼å¼è½¬æ¢
 	uint8_t* m_out_buffer = nullptr;
 	AVFrame* m_avframe_yuv420 = nullptr;
 	SwsContext* m_img_convert_ctx = nullptr;  
 
-	// ÒôÆµÖØ²ÉÑù½á¹¹
+	// éŸ³é¢‘é‡é‡‡æ ·ç»“æ„
 	audio_resampler_params_t m_resampler_params;
-	AudioResample m_audioresample; // ÒôÆµÖØ²ÉÑùÆ÷
+	AudioResample m_audioresample; // éŸ³é¢‘é‡é‡‡æ ·å™¨
 	int m_codec_type = 0;
 
-	int m_dst_bufsize = 0;           // ÖØ²ÉÑùºóµÃµ½µÄÒôÆµÊı¾İ
-	int64_t m_audio_callback_time;   // Ã¿´Î»Øµ÷µÄÊ±¼ä
-	double m_frame_timer = 0.0f;     // ¼ÇÂ¼×îºóÒ»Ö¡²¥·ÅµÄÊ±¿Ì
-	double m_frame_drops_late = 0;       // ¶ªÆúÊÓÆµframe¼ÆÊı
-	double m_remaining_time = 0.0;     /* ĞİÃßµÈ´ı£¬remaining_timeµÄ¼ÆËãÔÚvideo_refreshÖĞ */
+	int m_dst_bufsize = 0;           // é‡é‡‡æ ·åå¾—åˆ°çš„éŸ³é¢‘æ•°æ®
+	int64_t m_audio_callback_time;   // æ¯æ¬¡å›è°ƒçš„æ—¶é—´
+	double m_frame_timer = 0.0f;     // è®°å½•æœ€åä¸€å¸§æ’­æ”¾çš„æ—¶åˆ»
+	double m_frame_drops_late = 0;       // ä¸¢å¼ƒè§†é¢‘frameè®¡æ•°
+	double m_remaining_time = 0.0;     /* ä¼‘çœ ç­‰å¾…ï¼Œremaining_timeçš„è®¡ç®—åœ¨video_refreshä¸­ */
 
-	//ĞŞ¸ÄÒôÁ¿
+	//ä¿®æ”¹éŸ³é‡
 	bool m_need_change_volume = false;
 	float m_pf_volume = 1.0f;
 
-	// ±äËÙÏà¹Ø
+	// å˜é€Ÿç›¸å…³
 	bool m_need_change_rate = false;
 	float m_pf_playback_rate = 1;
 	sonicStreamStruct* m_audio_speed_convert = nullptr;

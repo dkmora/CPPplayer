@@ -1,4 +1,4 @@
-﻿/* Sonic library
+/* Sonic library
    Copyright 2010
    Bill Cox
    This file is part of the Sonic Library.

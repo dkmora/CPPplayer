@@ -21,9 +21,9 @@ extern "C"
 #include <condition_variable>
 
 #define MAX_QUEUE_SIZE (15 * 1024 * 1024)
-#define VIDEO_PICTURE_QUEUE_SIZE	3       // Í¼ÏñÖ¡»º´æÊıÁ¿
-#define SUBPICTURE_QUEUE_SIZE		16      // ×ÖÄ»Ö¡»º´æÊıÁ¿
-#define SAMPLE_QUEUE_SIZE           9       // ²ÉÑùÖ¡»º´æÊıÁ¿
+#define VIDEO_PICTURE_QUEUE_SIZE	3       // å›¾åƒå¸§ç¼“å­˜æ•°é‡
+#define SUBPICTURE_QUEUE_SIZE		16      // å­—å¹•å¸§ç¼“å­˜æ•°é‡
+#define SAMPLE_QUEUE_SIZE           9       // é‡‡æ ·å¸§ç¼“å­˜æ•°é‡
 #define FRAME_QUEUE_SIZE FFMAX(SAMPLE_QUEUE_SIZE, FFMAX(VIDEO_PICTURE_QUEUE_SIZE, SUBPICTURE_QUEUE_SIZE))
 /* Minimum SDL audio buffer size, in samples. */
 #define SDL_AUDIO_MIN_BUFFER_SIZE 512
@@ -44,106 +44,106 @@ extern "C"
 /* polls for possible required screen refresh at least this often, should be less than 1/fps */
 #define REFRESH_RATE 0.01
 /**
- *ÒôÊÓÆµÍ¬²½·½Ê½£¬È±Ê¡ÒÔÒôÆµÎª»ù×¼
+ *éŸ³è§†é¢‘åŒæ­¥æ–¹å¼ï¼Œç¼ºçœä»¥éŸ³é¢‘ä¸ºåŸºå‡†
  */
 enum {
-	AV_SYNC_AUDIO_MASTER,                   // ÒÔÒôÆµÎª»ù×¼
-	AV_SYNC_VIDEO_MASTER,                   // ÒÔÊÓÆµÎª»ù×¼
-	AV_SYNC_EXTERNAL_CLOCK,                 // ÒÔÍâ²¿Ê±ÖÓÎª»ù×¼£¬synchronize to an external clock */
+	AV_SYNC_AUDIO_MASTER,                   // ä»¥éŸ³é¢‘ä¸ºåŸºå‡†
+	AV_SYNC_VIDEO_MASTER,                   // ä»¥è§†é¢‘ä¸ºåŸºå‡†
+	AV_SYNC_EXTERNAL_CLOCK,                 // ä»¥å¤–éƒ¨æ—¶é’Ÿä¸ºåŸºå‡†ï¼Œsynchronize to an external clock */
 };
 
-// AVPacket¶ÓÁĞ
+// AVPacketé˜Ÿåˆ—
 typedef struct MyAVPacketList {
-	AVPacket		pkt;    //½â·â×°ºóµÄÊı¾İ,av_read_frame»ñÈ¡µÄAVPacket×öÇ³¿½±´
-	struct MyAVPacketList	*next;  //ÏÂÒ»¸ö½Úµã
-	int			serial = 0;     //²¥·ÅĞòÁĞ
+	AVPacket		pkt;    //è§£å°è£…åçš„æ•°æ®,av_read_frameè·å–çš„AVPacketåšæµ…æ‹·è´
+	struct MyAVPacketList	*next;  //ä¸‹ä¸€ä¸ªèŠ‚ç‚¹
+	int			serial = 0;     //æ’­æ”¾åºåˆ—
 } MyAVPacketList;
 
 typedef struct PacketQueue {
-	MyAVPacketList	*first_pkt = nullptr, *last_pkt = nullptr;  // ¶ÓÊ×£¬¶ÓÎ²Ö¸Õë
-	int		nb_packets = 0;      // °üÊıÁ¿£¬Ò²¾ÍÊÇ¶ÓÁĞÔªËØÊıÁ¿
-	int		size = 0;            // ¶ÓÁĞËùÓĞÔªËØµÄÊı¾İ´óĞ¡×ÜºÍ
-	int64_t		duration = 0;    // ¶ÓÁĞËùÓĞÔªËØµÄÊı¾İ²¥·Å³ÖĞøÊ±¼ä
-	int		abort_request = 0;   // ÓÃ»§ÍË³öÇëÇó±êÖ¾
-	int		serial = 0;          // ²¥·ÅĞòÁĞºÅ£¬ºÍMyAVPacketListµÄserial×÷ÓÃÏàÍ¬£¬µ«¸Ä±äµÄÊ±ĞòÉÔÎ¢ÓĞµã²»Í¬
-	std::mutex* mutex_t = nullptr;       // ÓÃÓÚÎ¬³ÖPacketQueueµÄ¶àÏß³Ì°²È«(¿ÉÒÔ°´pthread_mutex_tÀí½â£©
-	std::condition_variable* cond_t = nullptr;      // ÓÃÓÚ¶Á¡¢Ğ´Ïß³ÌÏà»¥Í¨Öª(¿ÉÒÔ°´pthread_cond_tÀí½â)
+	MyAVPacketList	*first_pkt = nullptr, *last_pkt = nullptr;  // é˜Ÿé¦–ï¼Œé˜Ÿå°¾æŒ‡é’ˆ
+	int		nb_packets = 0;      // åŒ…æ•°é‡ï¼Œä¹Ÿå°±æ˜¯é˜Ÿåˆ—å…ƒç´ æ•°é‡
+	int		size = 0;            // é˜Ÿåˆ—æ‰€æœ‰å…ƒç´ çš„æ•°æ®å¤§å°æ€»å’Œ
+	int64_t		duration = 0;    // é˜Ÿåˆ—æ‰€æœ‰å…ƒç´ çš„æ•°æ®æ’­æ”¾æŒç»­æ—¶é—´
+	int		abort_request = 0;   // ç”¨æˆ·é€€å‡ºè¯·æ±‚æ ‡å¿—
+	int		serial = 0;          // æ’­æ”¾åºåˆ—å·ï¼Œå’ŒMyAVPacketListçš„serialä½œç”¨ç›¸åŒï¼Œä½†æ”¹å˜çš„æ—¶åºç¨å¾®æœ‰ç‚¹ä¸åŒ
+	std::mutex* mutex_t = nullptr;       // ç”¨äºç»´æŒPacketQueueçš„å¤šçº¿ç¨‹å®‰å…¨(å¯ä»¥æŒ‰pthread_mutex_tç†è§£ï¼‰
+	std::condition_variable* cond_t = nullptr;      // ç”¨äºè¯»ã€å†™çº¿ç¨‹ç›¸äº’é€šçŸ¥(å¯ä»¥æŒ‰pthread_cond_tç†è§£)
 } PacketQueue;
 
 typedef struct AudioParams {
-	int			freq;                   // ²ÉÑùÂÊ
-	int			channels;               // Í¨µÀÊı
-	int64_t		channel_layout;         // Í¨µÀ²¼¾Ö£¬±ÈÈç2.1ÉùµÀ£¬5.1ÉùµÀµÈ
-	enum AVSampleFormat	fmt;            // ÒôÆµ²ÉÑù¸ñÊ½£¬±ÈÈçAV_SAMPLE_FMT_S16±íÊ¾ÎªÓĞ·ûºÅ16bitÉî¶È£¬½»´íÅÅÁĞÄ£Ê½¡£
-	int			frame_size;             // Ò»¸ö²ÉÑùµ¥ÔªÕ¼ÓÃµÄ×Ö½ÚÊı£¨±ÈÈç2Í¨µÀÊ±£¬Ôò×óÓÒÍ¨µÀ¸÷²ÉÑùÒ»´ÎºÏ³ÉÒ»¸ö²ÉÑùµ¥Ôª£©
-	int			bytes_per_sec;          // Ò»ÃëÊ±¼äµÄ×Ö½ÚÊı£¬±ÈÈç²ÉÑùÂÊ48Khz£¬2 channel£¬16bit£¬ÔòÒ»Ãë48000*2*16/8=192000
+	int			freq;                   // é‡‡æ ·ç‡
+	int			channels;               // é€šé“æ•°
+	int64_t		channel_layout;         // é€šé“å¸ƒå±€ï¼Œæ¯”å¦‚2.1å£°é“ï¼Œ5.1å£°é“ç­‰
+	enum AVSampleFormat	fmt;            // éŸ³é¢‘é‡‡æ ·æ ¼å¼ï¼Œæ¯”å¦‚AV_SAMPLE_FMT_S16è¡¨ç¤ºä¸ºæœ‰ç¬¦å·16bitæ·±åº¦ï¼Œäº¤é”™æ’åˆ—æ¨¡å¼ã€‚
+	int			frame_size;             // ä¸€ä¸ªé‡‡æ ·å•å…ƒå ç”¨çš„å­—èŠ‚æ•°ï¼ˆæ¯”å¦‚2é€šé“æ—¶ï¼Œåˆ™å·¦å³é€šé“å„é‡‡æ ·ä¸€æ¬¡åˆæˆä¸€ä¸ªé‡‡æ ·å•å…ƒï¼‰
+	int			bytes_per_sec;          // ä¸€ç§’æ—¶é—´çš„å­—èŠ‚æ•°ï¼Œæ¯”å¦‚é‡‡æ ·ç‡48Khzï¼Œ2 channelï¼Œ16bitï¼Œåˆ™ä¸€ç§’48000*2*16/8=192000
 } AudioParams;
 
-// ffmpeg ½âÂëÆ÷
+// ffmpeg è§£ç å™¨
 typedef struct FFDecoder {
-	AVStream *video_st = nullptr;             // ÊÓÆµÁ÷
+	AVStream *video_st = nullptr;             // è§†é¢‘æµ
 
 	//
 	AVPacket pkt;
-	PacketQueue	*queue = nullptr;                  // Êı¾İ°ü¶ÓÁĞ
-	AVFormatContext* avformat_context = nullptr;   // iformatµÄÉÏÏÂÎÄ
-	AVCodecContext* codec_context = nullptr;       // ½âÂëÆ÷ÉÏÏÂÎÄ
-	AVCodec* avcodec = nullptr;                    // ½âÂëÆ÷
-	int		pkt_serial = 0;         // °üĞòÁĞ
-	int		finished = 0;           // =0£¬½âÂëÆ÷´¦ÓÚ¹¤×÷×´Ì¬£»=·Ç0£¬½âÂëÆ÷´¦ÓÚ¿ÕÏĞ×´Ì¬
-	int		packet_pending = 0;     // =0£¬½âÂëÆ÷´¦ÓÚÒì³£×´Ì¬£¬ĞèÒª¿¼ÂÇÖØÖÃ½âÂëÆ÷£»=1£¬½âÂëÆ÷´¦ÓÚÕı³£×´Ì¬
-	std::condition_variable	*empty_queue_cond = nullptr;  // ¼ì²éµ½packet¶ÓÁĞ¿ÕÊ±·¢ËÍ signal»º´æread_thread¶ÁÈ¡Êı¾İ
-	int64_t		start_pts = 0;          // ³õÊ¼»¯Ê±ÊÇstreamµÄstart time
-	AVRational	start_pts_tb;       // ³õÊ¼»¯Ê±ÊÇstreamµÄtime_base
-	int64_t		next_pts = 0;           // ¼ÇÂ¼×î½üÒ»´Î½âÂëºóµÄframeµÄpts£¬µ±½â³öÀ´µÄ²¿·ÖÖ¡Ã»ÓĞÓĞĞ§µÄptsÊ±ÔòÊ¹ÓÃnext_pts½øĞĞÍÆËã
-	AVRational	next_pts_tb;        // next_ptsµÄµ¥Î»
+	PacketQueue	*queue = nullptr;                  // æ•°æ®åŒ…é˜Ÿåˆ—
+	AVFormatContext* avformat_context = nullptr;   // iformatçš„ä¸Šä¸‹æ–‡
+	AVCodecContext* codec_context = nullptr;       // è§£ç å™¨ä¸Šä¸‹æ–‡
+	AVCodec* avcodec = nullptr;                    // è§£ç å™¨
+	int		pkt_serial = 0;         // åŒ…åºåˆ—
+	int		finished = 0;           // =0ï¼Œè§£ç å™¨å¤„äºå·¥ä½œçŠ¶æ€ï¼›=é0ï¼Œè§£ç å™¨å¤„äºç©ºé—²çŠ¶æ€
+	int		packet_pending = 0;     // =0ï¼Œè§£ç å™¨å¤„äºå¼‚å¸¸çŠ¶æ€ï¼Œéœ€è¦è€ƒè™‘é‡ç½®è§£ç å™¨ï¼›=1ï¼Œè§£ç å™¨å¤„äºæ­£å¸¸çŠ¶æ€
+	std::condition_variable	*empty_queue_cond = nullptr;  // æ£€æŸ¥åˆ°packeté˜Ÿåˆ—ç©ºæ—¶å‘é€ signalç¼“å­˜read_threadè¯»å–æ•°æ®
+	int64_t		start_pts = 0;          // åˆå§‹åŒ–æ—¶æ˜¯streamçš„start time
+	AVRational	start_pts_tb;       // åˆå§‹åŒ–æ—¶æ˜¯streamçš„time_base
+	int64_t		next_pts = 0;           // è®°å½•æœ€è¿‘ä¸€æ¬¡è§£ç åçš„frameçš„ptsï¼Œå½“è§£å‡ºæ¥çš„éƒ¨åˆ†å¸§æ²¡æœ‰æœ‰æ•ˆçš„ptsæ—¶åˆ™ä½¿ç”¨next_ptsè¿›è¡Œæ¨ç®—
+	AVRational	next_pts_tb;        // next_ptsçš„å•ä½
 	int     out_width = 0;
 	int     out_height = 0;
 }FFDecoder;
 
-// ÓÃÓÚ»º´æ½âÂëºóµÄÊı¾İ
+// ç”¨äºç¼“å­˜è§£ç åçš„æ•°æ®
 typedef struct Frame {
-	AVFrame		*frame;         // Ö¸ÏòÊı¾İÖ¡
-	AVSubtitle	sub;            // ÓÃÓÚ×ÖÄ»
-	int		serial;             // Ö¡ĞòÁĞ£¬ÔÚseekµÄ²Ù×÷Ê±serial»á±ä»¯
-	double		pts;            // Ê±¼ä´Á£¬µ¥Î»ÎªÃë
-	double		duration;       // ¸ÃÖ¡³ÖĞøÊ±¼ä£¬µ¥Î»ÎªÃë
-	int64_t		pos;            // ¸ÃÖ¡ÔÚÊäÈëÎÄ¼şÖĞµÄ×Ö½ÚÎ»ÖÃ
-	int		width;              // Í¼Ïñ¿í¶È
-	int		height;             // Í¼Ïñ¸ß¶Á
-	int		format;             // ¶ÔÓÚÍ¼ÏñÎª(enum AVPixelFormat)£¬
-	// ¶ÔÓÚÉùÒôÔòÎª(enum AVSampleFormat)
-	AVRational	sar;            // Í¼ÏñµÄ¿í¸ß±È£¨16:9£¬4:3...£©£¬Èç¹ûÎ´Öª»òÎ´Ö¸¶¨ÔòÎª0/1
-	int		uploaded;           // ÓÃÀ´¼ÇÂ¼¸ÃÖ¡ÊÇ·ñÒÑ¾­ÏÔÊ¾¹ı£¿
-	int		flip_v;             // =1Ôò´¹Ö±·­×ª£¬ = 0ÔòÕı³£²¥·Å
+	AVFrame		*frame;         // æŒ‡å‘æ•°æ®å¸§
+	AVSubtitle	sub;            // ç”¨äºå­—å¹•
+	int		serial;             // å¸§åºåˆ—ï¼Œåœ¨seekçš„æ“ä½œæ—¶serialä¼šå˜åŒ–
+	double		pts;            // æ—¶é—´æˆ³ï¼Œå•ä½ä¸ºç§’
+	double		duration;       // è¯¥å¸§æŒç»­æ—¶é—´ï¼Œå•ä½ä¸ºç§’
+	int64_t		pos;            // è¯¥å¸§åœ¨è¾“å…¥æ–‡ä»¶ä¸­çš„å­—èŠ‚ä½ç½®
+	int		width;              // å›¾åƒå®½åº¦
+	int		height;             // å›¾åƒé«˜è¯»
+	int		format;             // å¯¹äºå›¾åƒä¸º(enum AVPixelFormat)ï¼Œ
+	// å¯¹äºå£°éŸ³åˆ™ä¸º(enum AVSampleFormat)
+	AVRational	sar;            // å›¾åƒçš„å®½é«˜æ¯”ï¼ˆ16:9ï¼Œ4:3...ï¼‰ï¼Œå¦‚æœæœªçŸ¥æˆ–æœªæŒ‡å®šåˆ™ä¸º0/1
+	int		uploaded;           // ç”¨æ¥è®°å½•è¯¥å¸§æ˜¯å¦å·²ç»æ˜¾ç¤ºè¿‡ï¼Ÿ
+	int		flip_v;             // =1åˆ™å‚ç›´ç¿»è½¬ï¼Œ = 0åˆ™æ­£å¸¸æ’­æ”¾
 } Frame;
 
-/* ÕâÊÇÒ»¸öÑ­»·¶ÓÁĞ£¬windexÊÇÖ¸ÆäÖĞµÄÊ×ÔªËØ£¬rindexÊÇÖ¸ÆäÖĞµÄÎ²²¿ÔªËØ. */
+/* è¿™æ˜¯ä¸€ä¸ªå¾ªç¯é˜Ÿåˆ—ï¼Œwindexæ˜¯æŒ‡å…¶ä¸­çš„é¦–å…ƒç´ ï¼Œrindexæ˜¯æŒ‡å…¶ä¸­çš„å°¾éƒ¨å…ƒç´ . */
 typedef struct FrameQueue {
-	Frame	queue[FRAME_QUEUE_SIZE];        // FRAME_QUEUE_SIZE  ×î´ósize, Êı×ÖÌ«´óÊ±»áÕ¼ÓÃ´óÁ¿µÄÄÚ´æ£¬ĞèÒª×¢Òâ¸ÃÖµµÄÉèÖÃ
-	int		rindex = 0;                         // ¶ÁË÷Òı¡£´ı²¥·ÅÊ±¶ÁÈ¡´ËÖ¡½øĞĞ²¥·Å£¬²¥·Åºó´ËÖ¡³ÉÎªÉÏÒ»Ö¡
-	int		windex = 0;                         // Ğ´Ë÷Òı
-	int		size = 0;                           // µ±Ç°×ÜÖ¡Êı
-	int		max_size = 0;                       // ¿É´æ´¢×î´óÖ¡Êı
-	int		keep_last = 0;                      // = 1ËµÃ÷ÒªÔÚ¶ÓÁĞÀïÃæ±£³Ö×îºóÒ»Ö¡µÄÊı¾İ²»ÊÍ·Å£¬Ö»ÔÚÏú»Ù¶ÓÁĞµÄÊ±ºò²Å½«ÆäÕæÕıÊÍ·Å
-	int		rindex_shown = 0;                   // ³õÊ¼»¯Îª0£¬ÅäºÏkeep_last=1Ê¹ÓÃ
-	std::mutex*	mutex_t = nullptr;                     // »¥³âÁ¿
-	std::condition_variable	*cond = nullptr;                      // Ìõ¼ş±äÁ¿
-	PacketQueue	*pktq = nullptr;                      // Êı¾İ°ü»º³å¶ÓÁĞ
+	Frame	queue[FRAME_QUEUE_SIZE];        // FRAME_QUEUE_SIZE  æœ€å¤§size, æ•°å­—å¤ªå¤§æ—¶ä¼šå ç”¨å¤§é‡çš„å†…å­˜ï¼Œéœ€è¦æ³¨æ„è¯¥å€¼çš„è®¾ç½®
+	int		rindex = 0;                         // è¯»ç´¢å¼•ã€‚å¾…æ’­æ”¾æ—¶è¯»å–æ­¤å¸§è¿›è¡Œæ’­æ”¾ï¼Œæ’­æ”¾åæ­¤å¸§æˆä¸ºä¸Šä¸€å¸§
+	int		windex = 0;                         // å†™ç´¢å¼•
+	int		size = 0;                           // å½“å‰æ€»å¸§æ•°
+	int		max_size = 0;                       // å¯å­˜å‚¨æœ€å¤§å¸§æ•°
+	int		keep_last = 0;                      // = 1è¯´æ˜è¦åœ¨é˜Ÿåˆ—é‡Œé¢ä¿æŒæœ€åä¸€å¸§çš„æ•°æ®ä¸é‡Šæ”¾ï¼Œåªåœ¨é”€æ¯é˜Ÿåˆ—çš„æ—¶å€™æ‰å°†å…¶çœŸæ­£é‡Šæ”¾
+	int		rindex_shown = 0;                   // åˆå§‹åŒ–ä¸º0ï¼Œé…åˆkeep_last=1ä½¿ç”¨
+	std::mutex*	mutex_t = nullptr;                     // äº’æ–¥é‡
+	std::condition_variable	*cond = nullptr;                      // æ¡ä»¶å˜é‡
+	PacketQueue	*pktq = nullptr;                      // æ•°æ®åŒ…ç¼“å†²é˜Ÿåˆ—
 } FrameQueue;
 
-// ÕâÀï½²µÄÏµÍ³Ê±ÖÓ ÊÇÍ¨¹ıav_gettime_relative()»ñÈ¡µ½µÄÊ±ÖÓ£¬µ¥Î»ÎªÎ¢Ãî
+// è¿™é‡Œè®²çš„ç³»ç»Ÿæ—¶é’Ÿ æ˜¯é€šè¿‡av_gettime_relative()è·å–åˆ°çš„æ—¶é’Ÿï¼Œå•ä½ä¸ºå¾®å¦™
 typedef struct Clock {
-	double	pts;            // Ê±ÖÓ»ù´¡, µ±Ç°Ö¡(´ı²¥·Å)ÏÔÊ¾Ê±¼ä´Á£¬²¥·Åºó£¬µ±Ç°Ö¡±ä³ÉÉÏÒ»Ö¡
-	// µ±Ç°ptsÓëµ±Ç°ÏµÍ³Ê±ÖÓµÄ²îÖµ, audio¡¢video¶ÔÓÚ¸ÃÖµÊÇ¶ÀÁ¢µÄ
+	double	pts;            // æ—¶é’ŸåŸºç¡€, å½“å‰å¸§(å¾…æ’­æ”¾)æ˜¾ç¤ºæ—¶é—´æˆ³ï¼Œæ’­æ”¾åï¼Œå½“å‰å¸§å˜æˆä¸Šä¸€å¸§
+	// å½“å‰ptsä¸å½“å‰ç³»ç»Ÿæ—¶é’Ÿçš„å·®å€¼, audioã€videoå¯¹äºè¯¥å€¼æ˜¯ç‹¬ç«‹çš„
 	double	pts_drift;      // clock base minus time at which we updated the clock
-	// µ±Ç°Ê±ÖÓ(ÈçÊÓÆµÊ±ÖÓ)×îºóÒ»´Î¸üĞÂÊ±¼ä£¬Ò²¿É³Æµ±Ç°Ê±ÖÓÊ±¼ä
-	double	last_updated;   // ×îºóÒ»´Î¸üĞÂµÄÏµÍ³Ê±ÖÓ
-	double	speed;          // Ê±ÖÓËÙ¶È¿ØÖÆ£¬ÓÃÓÚ¿ØÖÆ²¥·ÅËÙ¶È
-	// ²¥·ÅĞòÁĞ£¬ËùÎ½²¥·ÅĞòÁĞ¾ÍÊÇÒ»¶ÎÁ¬ĞøµÄ²¥·Å¶¯×÷£¬Ò»¸öseek²Ù×÷»áÆô¶¯Ò»¶ÎĞÂµÄ²¥·ÅĞòÁĞ
+	// å½“å‰æ—¶é’Ÿ(å¦‚è§†é¢‘æ—¶é’Ÿ)æœ€åä¸€æ¬¡æ›´æ–°æ—¶é—´ï¼Œä¹Ÿå¯ç§°å½“å‰æ—¶é’Ÿæ—¶é—´
+	double	last_updated;   // æœ€åä¸€æ¬¡æ›´æ–°çš„ç³»ç»Ÿæ—¶é’Ÿ
+	double	speed;          // æ—¶é’Ÿé€Ÿåº¦æ§åˆ¶ï¼Œç”¨äºæ§åˆ¶æ’­æ”¾é€Ÿåº¦
+	// æ’­æ”¾åºåˆ—ï¼Œæ‰€è°“æ’­æ”¾åºåˆ—å°±æ˜¯ä¸€æ®µè¿ç»­çš„æ’­æ”¾åŠ¨ä½œï¼Œä¸€ä¸ªseekæ“ä½œä¼šå¯åŠ¨ä¸€æ®µæ–°çš„æ’­æ”¾åºåˆ—
 	int	serial;             // clock is based on a packet with this serial
-	int	paused;             // = 1 ËµÃ÷ÊÇÔİÍ£×´Ì¬
-	// Ö¸Ïòpacket_serial
+	int	paused;             // = 1 è¯´æ˜æ˜¯æš‚åœçŠ¶æ€
+	// æŒ‡å‘packet_serial
 	int *queue_serial;      /* pointer to the current packet queue serial, used for obsolete clock detection */
 } Clock;
 
@@ -151,7 +151,7 @@ typedef struct Clock {
 //	AVClock avclock;
 //}VideoState;
 
-// ÒôÊÓÆµ½âÂë¶ÓÁĞ
+// éŸ³è§†é¢‘è§£ç é˜Ÿåˆ—
 class AVPacketQueue {
 
 public:
@@ -160,54 +160,54 @@ public:
 
 	//////////////////////packet///////////////////////
 
-	// ¶ÓÁĞ³õÊ¼»¯
+	// é˜Ÿåˆ—åˆå§‹åŒ–
 	int  packet_vidio_queue_init();
 	int  packet_audio_queue_init();
 
-	// ¶ÓÁĞÏú»Ù
+	// é˜Ÿåˆ—é”€æ¯
 	void packet_video_queue_destroy();
 	void packet_audio_queue_destroy();
 
-	// ¶ÓÁĞÇëÇóÍË³ö
+	// é˜Ÿåˆ—è¯·æ±‚é€€å‡º
 	void packet_video_queue_about() { packet_queue_about(&m_video_packet_queue); }
 	void packet_audio_queue_about() { packet_queue_about(&m_audio_packet_queue); }
 
-	// Çå¿Õ¶ÓÁĞ
+	// æ¸…ç©ºé˜Ÿåˆ—
 	void packet_video_queue_flash() { packet_queue_flush(&m_video_packet_queue); }
 	void packet_audio_queue_flash() { packet_queue_flush(&m_audio_packet_queue); }
 
-	// ÆôÓÃ¶ÓÁĞ
+	// å¯ç”¨é˜Ÿåˆ—
 	void packet_video_queue_start() { packet_queue_start(&m_video_packet_queue); }
 	void packet_audio_queue_start() { packet_queue_start(&m_audio_packet_queue); }
 
-	// ·ÅÈëflash_pktÍ¬Ê±Çå¿Õ½âÂëÆ÷
+	// æ”¾å…¥flash_pktåŒæ—¶æ¸…ç©ºè§£ç å™¨
 	void video_queue_put_flash() { packet_video_queue_put(&m_flush_pkt); }
 	void audio_queue_put_flash() { packet_audio_queue_put(&m_flush_pkt); }
 
-	// ·ÅÈë¿Õ°ü
+	// æ”¾å…¥ç©ºåŒ…
 	void video_queue_put_nullpacket(int stream_index);
 	void audio_queue_put_nullpacket(int stream_index);
 
-	// Íù¶ÓÁĞ·ÅÈëÒ»Ö¡
+	// å¾€é˜Ÿåˆ—æ”¾å…¥ä¸€å¸§
 	void packet_video_queue_put(AVPacket* avpacket);
 	void packet_audio_queue_put(AVPacket* avpacket);
 
-	// ´Ó¶ÓÁĞ»ñÈ¡AVPacket
+	// ä»é˜Ÿåˆ—è·å–AVPacket
 	int video_queue_get(AVPacket* pkt, int& pkt_serial);
 	int audio_queue_get(AVPacket* pkt, int& pkt_serial);
 
-	// ÅĞ¶ÏÊÇ·ñĞèÒªË¢ĞÂ¶ÓÁĞ
+	// åˆ¤æ–­æ˜¯å¦éœ€è¦åˆ·æ–°é˜Ÿåˆ—
 	bool isNeedFlashbuffers(AVPacket* pkt) { return pkt->data == m_flush_pkt.data; }
 
-	// »ñÈ¡¶ÓÁĞÖ¸Õë
+	// è·å–é˜Ÿåˆ—æŒ‡é’ˆ
 	PacketQueue* get_video_packet_point() { return &m_video_packet_queue; }
 	PacketQueue* get_audio_packet_point() { return &m_audio_packet_queue; }
 
-	// »ñÈ¡¶ÓÁĞsize
+	// è·å–é˜Ÿåˆ—size
 	int get_video_packet_size() { return m_video_packet_queue.size; }
 	int get_audio_packet_size() { return m_audio_packet_queue.size; }
 
-	// »ñÈ¡½âÂëÊÓÆµ¶ÓÁĞÖ¸Õë
+	// è·å–è§£ç è§†é¢‘é˜Ÿåˆ—æŒ‡é’ˆ
 	FrameQueue* get_frame_video_queue() { return &m_video_frame_queue; }
 	FrameQueue* get_frame_audio_queue() { return &m_audio_frame_queue; }
 
@@ -215,34 +215,34 @@ public:
 
 	int frame_queue_init(FrameQueue *f, PacketQueue *pktq, int max_size, int keep_last);
 
-	// ½«½âÂëºóµÄframe·Åµ½¶ÓÁĞ
+	// å°†è§£ç åçš„frameæ”¾åˆ°é˜Ÿåˆ—
 	int frame_video_frame_put(AVFrame* src_frame, double pts, double duration, int64_t pos, int serial);
 	int frame_audio_frame_put(AVFrame* src_frame, double pts, double duration, int64_t pos, int serial);
 
-	// ¶ÓÁĞÇëÇóÍË³ö
+	// é˜Ÿåˆ—è¯·æ±‚é€€å‡º
 	void frame_video_queue_signal() { frame_queue_signal(&m_video_frame_queue); }
 	void frame_audio_queue_signal() { frame_queue_signal(&m_audio_frame_queue); }
 
 	void frame_queue_video_destory() { frame_queue_destory(&m_video_frame_queue); }
 	void frame_queue_audio_destory() { frame_queue_destory(&m_audio_frame_queue); }
 
-	// ´Óframe»ñÈ¡Ò»Ö¡
+	// ä»frameè·å–ä¸€å¸§
 	Frame* video_frame_get() { return frame_queue_peek_readable(&m_video_frame_queue); }
 	Frame* audio_frame_get() { return frame_queue_peek_readable(&m_audio_frame_queue); }
 
-	// ÊÍ·Åµ±Ç°frame£¬²¢¸üĞÂ¶ÁË÷Òırindex
+	// é‡Šæ”¾å½“å‰frameï¼Œå¹¶æ›´æ–°è¯»ç´¢å¼•rindex
 	void video_frame_queue_next() { frame_queue_next(&m_video_frame_queue); }
 	void audio_frame_queue_next() { frame_queue_next(&m_audio_frame_queue); }
 
-	// »ñÈ¡¶ÓÁĞÖĞÊÇ·ñÓĞÖ¡ÏÔÊ¾
+	// è·å–é˜Ÿåˆ—ä¸­æ˜¯å¦æœ‰å¸§æ˜¾ç¤º
 	int video_frame_queue_nb_remaining() { return frame_queue_nb_remaining(&m_video_frame_queue); }
 	int audio_frame_queue_nb_remaining() { return frame_queue_nb_remaining(&m_audio_frame_queue); }
 
-	// »ñÈ¡ÉÏÒ»Ö¡
+	// è·å–ä¸Šä¸€å¸§
 	Frame* video_frame_queue_peek_last() { return frame_queue_peek_last(&m_video_frame_queue); }
-	// »ñÈ¡¶ÓÁĞµ±Ç°Frame
+	// è·å–é˜Ÿåˆ—å½“å‰Frame
 	Frame* video_frame_queue_peek() { return frame_queue_peek(&m_video_frame_queue); }
-	// »ñÈ¡µ±Ç°FrameµÄÏÂÒ»Frame, ´ËÊ±ÒªÈ·±£queueÀïÃæÖÁÉÙÓĞ2¸öFrame
+	// è·å–å½“å‰Frameçš„ä¸‹ä¸€Frame, æ­¤æ—¶è¦ç¡®ä¿queueé‡Œé¢è‡³å°‘æœ‰2ä¸ªFrame
 	Frame* video_frame_queue_peek_next() { return frame_queue_peek_next(&m_video_frame_queue); }
 
 private:
@@ -251,42 +251,42 @@ private:
 	void packet_queue_flush(PacketQueue *q);
 	void packet_queue_start(PacketQueue *q);
 	int  packet_queue_put_private(PacketQueue *q, AVPacket *pkt);
-	// »ñÈ¡¿ÉĞ´Ö¸Õë
+	// è·å–å¯å†™æŒ‡é’ˆ
 	Frame *frame_queue_peek_writable(FrameQueue *f);
-	// ¸üĞÂĞ´Ö¸Õë
+	// æ›´æ–°å†™æŒ‡é’ˆ
 	void frame_queue_push(FrameQueue *f);
-	// »ñÈ¡Ö¸Ïò¿É¶ÁÖ¡
+	// è·å–æŒ‡å‘å¯è¯»å¸§
 	Frame *frame_queue_peek_readable(FrameQueue *f);
-	// ÊÍ·ÅÄÚ´æ
+	// é‡Šæ”¾å†…å­˜
 	void frame_queue_unref_item(Frame *vp);
-	/* ÊÍ·Åµ±Ç°frame£¬²¢¸üĞÂ¶ÁË÷Òırindex£¬
-    * µ±keep_lastÎª1, rindex_showÎª0Ê±²»È¥¸üĞÂrindex,Ò²²»ÊÍ·Åµ±Ç°frame */
+	/* é‡Šæ”¾å½“å‰frameï¼Œå¹¶æ›´æ–°è¯»ç´¢å¼•rindexï¼Œ
+    * å½“keep_lastä¸º1, rindex_showä¸º0æ—¶ä¸å»æ›´æ–°rindex,ä¹Ÿä¸é‡Šæ”¾å½“å‰frame */
 	void frame_queue_next(FrameQueue *f);
 	/* return the number of undisplayed frames in the queue */
 	int frame_queue_nb_remaining(FrameQueue *f);
 	Frame *frame_queue_peek_last(FrameQueue *f);
-	/* »ñÈ¡¶ÓÁĞµ±Ç°Frame, ÔÚµ÷ÓÃ¸Ãº¯ÊıÇ°ÏÈµ÷ÓÃframe_queue_nb_remainingÈ·±£ÓĞframe¿É¶Á */
+	/* è·å–é˜Ÿåˆ—å½“å‰Frame, åœ¨è°ƒç”¨è¯¥å‡½æ•°å‰å…ˆè°ƒç”¨frame_queue_nb_remainingç¡®ä¿æœ‰frameå¯è¯» */
 	Frame *frame_queue_peek(FrameQueue *f);
-	/* »ñÈ¡µ±Ç°FrameµÄÏÂÒ»Frame, ´ËÊ±ÒªÈ·±£queueÀïÃæÖÁÉÙÓĞ2¸öFrame */
-    // ²»¹ÜÄãÊ²Ã´Ê±ºòµ÷ÓÃ£¬·µ»ØÀ´¿Ï¶¨²»ÊÇ NULL
+	/* è·å–å½“å‰Frameçš„ä¸‹ä¸€Frame, æ­¤æ—¶è¦ç¡®ä¿queueé‡Œé¢è‡³å°‘æœ‰2ä¸ªFrame */
+    // ä¸ç®¡ä½ ä»€ä¹ˆæ—¶å€™è°ƒç”¨ï¼Œè¿”å›æ¥è‚¯å®šä¸æ˜¯ NULL
 	Frame *frame_queue_peek_next(FrameQueue *f);
-	// ¶ÓÁĞÇëÇóÍË³ö
+	// é˜Ÿåˆ—è¯·æ±‚é€€å‡º
 	void packet_queue_about(PacketQueue *q);
 	void frame_queue_signal(FrameQueue *f);
 	// farme destory
 	void frame_queue_destory(FrameQueue *f);
 
 private:
-	AVPacket m_flush_pkt; // ÓÃÓÚË¢ĞÂ¶ÓÁĞ
+	AVPacket m_flush_pkt; // ç”¨äºåˆ·æ–°é˜Ÿåˆ—
 
-	PacketQueue m_video_packet_queue; // Î´½âÂëÊÓÆµ¶ÓÁĞ
-	PacketQueue m_audio_packet_queue; // Î´½âÂëÒôÆµ¶ÓÁĞ
+	PacketQueue m_video_packet_queue; // æœªè§£ç è§†é¢‘é˜Ÿåˆ—
+	PacketQueue m_audio_packet_queue; // æœªè§£ç éŸ³é¢‘é˜Ÿåˆ—
 
-	FrameQueue m_video_frame_queue;   // ½âÂëºóµÄÊÓÆµ¶ÓÁĞ
-	FrameQueue m_audio_frame_queue;   // ½âÂëºóµÄÒôÆµ¶ÓÁĞ
+	FrameQueue m_video_frame_queue;   // è§£ç åçš„è§†é¢‘é˜Ÿåˆ—
+	FrameQueue m_audio_frame_queue;   // è§£ç åçš„éŸ³é¢‘é˜Ÿåˆ—
 };
 
-// Ê±ÖÓÀà
+// æ—¶é’Ÿç±»
 class AVClock {
 public:
 	AVClock();
@@ -296,21 +296,21 @@ public:
 
 	void set_clock_at(Clock *c, double pts, int serial, double time);
 	void set_clock(Clock *c, double pts, int serial);
-	// ³õÊ¼»¯Ê±ÖÓ
+	// åˆå§‹åŒ–æ—¶é’Ÿ
 	void init_clock(Clock *c, int* queue_serial);
 
 	/**
-     * »ñÈ¡µ½µÄÊµ¼ÊÉÏÊÇ:×îºóÒ»Ö¡µÄpts ¼ÓÉÏ ´Ó´¦Àí×îºóÒ»Ö¡¿ªÊ¼µ½ÏÖÔÚµÄÊ±¼ä,¾ßÌå²Î¿¼set_clock_at ºÍget_clockµÄ´úÂë
-     * c->pts_drift=×îºóÒ»Ö¡µÄpts-´Ó´¦Àí×îºóÒ»Ö¡Ê±¼ä
-     * clock=c->pts_drift+ÏÖÔÚµÄÊ±ºò
+     * è·å–åˆ°çš„å®é™…ä¸Šæ˜¯:æœ€åä¸€å¸§çš„pts åŠ ä¸Š ä»å¤„ç†æœ€åä¸€å¸§å¼€å§‹åˆ°ç°åœ¨çš„æ—¶é—´,å…·ä½“å‚è€ƒset_clock_at å’Œget_clockçš„ä»£ç 
+     * c->pts_drift=æœ€åä¸€å¸§çš„pts-ä»å¤„ç†æœ€åä¸€å¸§æ—¶é—´
+     * clock=c->pts_drift+ç°åœ¨çš„æ—¶å€™
      * get_clock(&is->vidclk) ==is->vidclk.pts, av_gettime_relative() / 1000000.0 -is->vidclk.last_updated  +is->vidclk.pts
      */
 	double get_clock(Clock *c)
 	{
 		if (*c->queue_serial != c->serial)
-			return NAN; // ²»ÊÇÍ¬Ò»¸ö²¥·ÅĞòÁĞ£¬Ê±ÖÓÊÇÎŞĞ§
+			return NAN; // ä¸æ˜¯åŒä¸€ä¸ªæ’­æ”¾åºåˆ—ï¼Œæ—¶é’Ÿæ˜¯æ— æ•ˆ
 		if (c->paused) {
-			return c->pts;  // ÔİÍ£µÄÊ±ºò·µ»ØµÄÊÇpts
+			return c->pts;  // æš‚åœçš„æ—¶å€™è¿”å›çš„æ˜¯pts
 		}
 		else {
 			double time = av_gettime_relative() / 1000000.0;
@@ -342,13 +342,13 @@ public:
 		//	if (is->video_st)
 		//		return AV_SYNC_VIDEO_MASTER;
 		//	else
-		//		return AV_SYNC_AUDIO_MASTER;	 /* Èç¹ûÃ»ÓĞÊÓÆµ³É·ÖÔòÊ¹ÓÃ audio master */
+		//		return AV_SYNC_AUDIO_MASTER;	 /* å¦‚æœæ²¡æœ‰è§†é¢‘æˆåˆ†åˆ™ä½¿ç”¨ audio master */
 		//}
 		//else if (is->av_sync_type == AV_SYNC_AUDIO_MASTER) {
 		//	if (is->audio_st)
 		//		return AV_SYNC_AUDIO_MASTER;
 		//	else
-		//		return AV_SYNC_EXTERNAL_CLOCK;	 /* Ã»ÓĞÒôÆµµÄÊ±ºòÄÇ¾ÍÓÃÍâ²¿Ê±ÖÓ */
+		//		return AV_SYNC_EXTERNAL_CLOCK;	 /* æ²¡æœ‰éŸ³é¢‘çš„æ—¶å€™é‚£å°±ç”¨å¤–éƒ¨æ—¶é’Ÿ */
 		//}
 		//else {
 		//	return AV_SYNC_EXTERNAL_CLOCK;
@@ -370,14 +370,14 @@ public:
 		sync_clock_to_slave(&extclk, &vidclk);
 	}
 
-	Clock	audclk;             // ÒôÆµÊ±ÖÓ
-	Clock	vidclk;             // ÊÓÆµÊ±ÖÓ
-	Clock	extclk;             // Íâ²¿Ê±ÖÓ
+	Clock	audclk;             // éŸ³é¢‘æ—¶é’Ÿ
+	Clock	vidclk;             // è§†é¢‘æ—¶é’Ÿ
+	Clock	extclk;             // å¤–éƒ¨æ—¶é’Ÿ
 
-	int av_sync_type = AV_SYNC_AUDIO_MASTER;           // ÒôÊÓÆµÍ¬²½ÀàĞÍ, Ä¬ÈÏaudio master
+	int av_sync_type = AV_SYNC_AUDIO_MASTER;           // éŸ³è§†é¢‘åŒæ­¥ç±»å‹, é»˜è®¤audio master
 
-	double	audio_clock;            // µ±Ç°ÒôÆµÖ¡µÄPTS+µ±Ç°Ö¡Duration
-	int     audio_clock_serial;     // ²¥·ÅĞòÁĞ£¬seek¿É¸Ä±ä´ËÖµ
+	double	audio_clock;            // å½“å‰éŸ³é¢‘å¸§çš„PTS+å½“å‰å¸§Duration
+	int     audio_clock_serial;     // æ’­æ”¾åºåˆ—ï¼Œseekå¯æ”¹å˜æ­¤å€¼
 
-	double max_frame_duration;      // ÊÓÆµÒ»Ö¡×î´ó¼ä¸ô. above this, we consider the jump a timestamp discontinuity
+	double max_frame_duration;      // è§†é¢‘ä¸€å¸§æœ€å¤§é—´éš”. above this, we consider the jump a timestamp discontinuity
 };

@@ -21,90 +21,90 @@ public:
     ~AnalyzeFrameEngine();
 
     /*
-     * @brief ¿ªÊ¼½âÎöÊÓÆµ
+     * @brief å¼€å§‹è§£æè§†é¢‘
      */
     int startAnalyze(std::string file_name);
 
     /*
-     * @brief Çå¿Õ»º´æÊÓÆµÖ¡
+     * @brief æ¸…ç©ºç¼“å­˜è§†é¢‘å¸§
      */
     void clearFrame();
 
     /*
-     * @brief »ñÈ¡ÎÄ¼şµÄ×ÜÊ±³¤ µ¥Î»Î¢Ãî
+     * @brief è·å–æ–‡ä»¶çš„æ€»æ—¶é•¿ å•ä½å¾®å¦™
      */
     int64_t get_file_duration() { if (m_avformat_context == nullptr) return 0; else return m_avformat_context->duration; }
 
     /*
-     * @brief »ñÈ¡ÎÄ¼şÃû
+     * @brief è·å–æ–‡ä»¶å
      */
     std::string get_file_name();
 
     /*
-     * @brief ¿ªÊ¼½âÂë
+     * @brief å¼€å§‹è§£ç 
      */
     void startDecode(int width = 0, int height = 0);
 
     /*
-     * @brief ²¥·Å
+     * @brief æ’­æ”¾
      */
     void play(StartplayCallBack cb);
 
     /*
-     *  @brief ÔİÍ£
+     *  @brief æš‚åœ
      */
     void Pause();
 
     /**
      * @brief seek in the stream
-     * @param pos  ¾ßÌåseekµ½µÄÎ»ÖÃ
-     * @param rel  ÔöÁ¿Çé¿ö
+     * @param pos  å…·ä½“seekåˆ°çš„ä½ç½®
+     * @param rel  å¢é‡æƒ…å†µ
      * @param seek_by_bytes
      */
     void Seek(int64_t pos, int64_t rel, int seek_by_bytes);
 
     /*
-     * @brief »ñÈ¡IÖ¡
+     * @brief è·å–Iå¸§
      */
     std::list<AVFrame*> getIFrameList()  { return m_IFrame; };
 
     /*
-     * @brief »ñÈ¡¿í¸ßÖ¡ÂÊ
+     * @brief è·å–å®½é«˜å¸§ç‡
      */
     int get_video_width() { return m_avformat_context->streams[m_video_stream]->codecpar->width;}
     int get_video_height() { return m_avformat_context->streams[m_video_stream]->codecpar->height; };
     int get_video_fps() { return av_q2d(m_avformat_context->streams[m_video_stream]->r_frame_rate); };
 
     /*
-     * @brief »ñÈ¡Ò»Ö¡ÒôÊÓÆµ½âÂëºóµÄÊı¾İ
+     * @brief è·å–ä¸€å¸§éŸ³è§†é¢‘è§£ç åçš„æ•°æ®
      */
     AVFrame* getVideoDecodeFrame();
     AVFrame* getAudioDecodeFrame();
 
     /*
-     * @beief »ñÈ¡ÊÓÆµ½âÂëÆ÷
+     * @beief è·å–è§†é¢‘è§£ç å™¨
     */
     FFDecoder* getVideoDecoder() { return &m_video_decoder; }
 
     /*
-    * @beief »ñÈ¡ÒôÆµ½âÂëÆ÷
+    * @beief è·å–éŸ³é¢‘è§£ç å™¨
     */
     FFDecoder* getAudioDecoder() { return &m_audio_decoder; }
 
     /*
-     * @brief »ñÈ¡ÒôÊÓÆµ½âÂëÏß³Ì
+     * @brief è·å–éŸ³è§†é¢‘è§£ç çº¿ç¨‹
      */
     cvpublish::AVDecoder* getVidioDecode();
     cvpublish::AVDecoder* getAudioDecode();
 
     /*
-     * @brief ÉèÖÃ²Ã¼ô¿ªÊ¼Ê±¼ä µ¥Î»Ãë
+     * @brief è®¾ç½®è£å‰ªå¼€å§‹æ—¶é—´ å•ä½ç§’
      */
     void setStartTime(int64_t startTime) { m_start_time = startTime; }
     int64_t getStartTime() { return m_start_time; }
 
     /*
-     * @brief ÉèÖÃ²Ã¼ô½áÊøÊ±¼ä µ¥Î»Ãë
+     * @brief è®¾ç½®è£å‰ªç»“æŸæ—¶é—´ å•ä½ç§’
      */
     void setEndTime(int64_t endtime) { m_end_time = endtime; }
     int64_t getEndTime() { return m_end_time; }
@@ -114,7 +114,7 @@ public:
     void setMuxerIndex(int index) { m_muxer_index = index; }
 
     /*
-    *  ÉèÖÃ²¥·ÅÆ÷ÊÂ¼ş»Øµ÷Ö¸Õë
+    *  è®¾ç½®æ’­æ”¾å™¨äº‹ä»¶å›è°ƒæŒ‡é’ˆ
     */
     void setMediaPlayerEventHandler(MediaPlayerEventHandler* eventHandler) { m_mediaplayerEventHandler = eventHandler; }
 
@@ -128,7 +128,7 @@ private:
 
     RET_CODE allocation_decoder(FFDecoder* coder, int stream);
     RET_CODE release_decoder(FFDecoder* coder);
-    // ·µ»Ø×´Ì¬Âë
+    // è¿”å›çŠ¶æ€ç 
     void setPlayerStateChanged(MediaPlayerState state, MediaPlayerError error);
 
 private:
@@ -140,51 +140,51 @@ private:
     int m_video_stream = -1;
     int m_fps = 0;
     int m_video_index = 0;
-    int  m_eof = 0;        // ÊÇ·ñ¶ÁÈ¡½áÊø
+    int  m_eof = 0;        // æ˜¯å¦è¯»å–ç»“æŸ
 
     // seek
-    int	    m_seek_req = 0;    // ±êÊ¶Ò»´ÎseekÇëÇó
-    int	    m_seek_flags = AVSEEK_FLAG_BYTE;  // seek±êÖ¾£¬ÖîÈçAVSEEK_FLAG_BYTEµÈ
-    int64_t	m_seek_pos = 0;    // ÇëÇóseekµÄÄ¿±êÎ»ÖÃ(µ±Ç°Î»ÖÃ+ÔöÁ¿)
-    int64_t	m_seek_rel = 0;    // ±¾´ÎseekµÄÎ»ÖÃÔöÁ¿
+    int	    m_seek_req = 0;    // æ ‡è¯†ä¸€æ¬¡seekè¯·æ±‚
+    int	    m_seek_flags = AVSEEK_FLAG_BYTE;  // seekæ ‡å¿—ï¼Œè¯¸å¦‚AVSEEK_FLAG_BYTEç­‰
+    int64_t	m_seek_pos = 0;    // è¯·æ±‚seekçš„ç›®æ ‡ä½ç½®(å½“å‰ä½ç½®+å¢é‡)
+    int64_t	m_seek_rel = 0;    // æœ¬æ¬¡seekçš„ä½ç½®å¢é‡
 
     MediaPlayerEventHandler* m_mediaplayerEventHandler = nullptr;
 
-    AVPacket* m_avpacket = nullptr; // av_read_frame »ñÈ¡µÄavpacket
+    AVPacket* m_avpacket = nullptr; // av_read_frame è·å–çš„avpacket
 
     AVFormatContext* m_avformat_context = nullptr;
 
-    AVPacketQueue m_avpacket_queue; // ÒôÊÓÆµ¶ÓÁĞ
+    AVPacketQueue m_avpacket_queue; // éŸ³è§†é¢‘é˜Ÿåˆ—
 
-    FFDecoder m_video_decoder; // ÊÓÆµ½âÂëÆ÷
-    FFDecoder m_audio_decoder; // ÒôÆµ½âÂëÆ÷
+    FFDecoder m_video_decoder; // è§†é¢‘è§£ç å™¨
+    FFDecoder m_audio_decoder; // éŸ³é¢‘è§£ç å™¨
 
-    AVClock m_av_clock; // Ê±ÖÓ
+    AVClock m_av_clock; // æ—¶é’Ÿ
 
-    cvpublish::AVDecoder* m_video_decode_thread = NULL; // ÊÓÆµ½âÂëÏß³Ì
-    cvpublish::AVDecoder* m_audio_decode_thread = NULL; // ÒôÆµ½âÂëÏß³Ì
+    cvpublish::AVDecoder* m_video_decode_thread = NULL; // è§†é¢‘è§£ç çº¿ç¨‹
+    cvpublish::AVDecoder* m_audio_decode_thread = NULL; // éŸ³é¢‘è§£ç çº¿ç¨‹
 
     std::list<AVFrame*> m_IFrame;
 
-    std::thread* m_async_thread = nullptr; // Òì²½²Ù×÷Ïß³Ì
-    std::thread* m_read_thread = nullptr;  // ¶ÁÈ¡Êı¾İÏß³Ì
-    std::mutex* m_wait_mutex = nullptr;    // ¶ÁÈ¡Êı¾İËø
-    std::condition_variable* m_cond_t_read_thread = nullptr; // »½ĞÑ¶ÁÈ¡Êı¾İÏß³ÌÌõ¼ş±äÁ¿
+    std::thread* m_async_thread = nullptr; // å¼‚æ­¥æ“ä½œçº¿ç¨‹
+    std::thread* m_read_thread = nullptr;  // è¯»å–æ•°æ®çº¿ç¨‹
+    std::mutex* m_wait_mutex = nullptr;    // è¯»å–æ•°æ®é”
+    std::condition_variable* m_cond_t_read_thread = nullptr; // å”¤é†’è¯»å–æ•°æ®çº¿ç¨‹æ¡ä»¶å˜é‡
 
     bool m_isDone = false;
-    bool m_paused = false; // ÔİÍ£
+    bool m_paused = false; // æš‚åœ
 
-    bool m_bReadFrame = true; // ´ò¶Ï¶ÂÈû£¬ÀıÈçav_read_frame¶ÂÈû
-    int m_timeoutReadFrame = 0; // ´ò¶Ï¶ÂÈû£¬ÀıÈçav_read_frame¶ÂÈû
+    bool m_bReadFrame = true; // æ‰“æ–­å µå¡ï¼Œä¾‹å¦‚av_read_frameå µå¡
+    int m_timeoutReadFrame = 0; // æ‰“æ–­å µå¡ï¼Œä¾‹å¦‚av_read_frameå µå¡
     uint64_t m_readframe_callback_time = 0;
 
-    int m_muxer_index = 0; //ÊÓÆµºÏ²¢ÅÅĞòË÷Òı
+    int m_muxer_index = 0; //è§†é¢‘åˆå¹¶æ’åºç´¢å¼•
 
-    // ²Ã¼ôÊÓÆµÆğÊ¼½áÊøÎ»ÖÃ-µ¥Î»ºÁÃë
+    // è£å‰ªè§†é¢‘èµ·å§‹ç»“æŸä½ç½®-å•ä½æ¯«ç§’
     uint64_t m_start_time = 0;
     uint64_t m_end_time = 0; 
 
-    // ÀÛ¼ÆÊ±³¤
+    // ç´¯è®¡æ—¶é•¿
     uint64_t m_video_total_time = 0;
     uint64_t m_audio_total_time = 0;
 };

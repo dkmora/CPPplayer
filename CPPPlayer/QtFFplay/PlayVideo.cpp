@@ -51,7 +51,7 @@ void PlayVideo::sloTimerRender() {
 			time1 = time2;
 		}
 		else {
-			printf("Ê±¼ä²î : %d\n", time2 - time1);
+			printf("æ—¶é—´å·® : %d\n", time2 - time1);
 			time1 = time2;
 		}*/
 

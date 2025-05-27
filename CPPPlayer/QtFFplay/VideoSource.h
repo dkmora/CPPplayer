@@ -24,7 +24,7 @@ namespace cvpublish {
 		int openFile(const char *file_name);
 		int closeYuvFile();
 
-	private: // 测试：输出视频数据到文件
+	private: // 娴嬭瘯锛氳緭鍑鸿棰戞暟鎹埌鏂囦欢
 		int m_video_test = 0;
 		FILE* m_video_save_fp = NULL;
 		int openSaveVideoFile(const char* filename);

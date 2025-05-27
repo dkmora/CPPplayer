@@ -1,4 +1,4 @@
-﻿#include "OpenGLWidget.h"
+#include "OpenGLWidget.h"
 #include <QGraphicsView>
 #include <QVBoxLayout>
 

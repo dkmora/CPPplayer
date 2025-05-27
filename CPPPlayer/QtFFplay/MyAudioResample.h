@@ -1,8 +1,8 @@
 #pragma once
 
 /*
-* ffmpeg ÒôÆµÖØ²ÉÑù·â×°
-* ×÷Õß£ºdk
+* ffmpeg éŸ³é¢‘é‡é‡‡æ ·å°è£…
+* ä½œè€…ï¼šdk
 */
 
 extern "C" {
@@ -20,28 +20,28 @@ extern "C" {
 
 #include <iostream>
 
-// ÖØ²ÉÑùµÄ²ÎÊı
+// é‡é‡‡æ ·çš„å‚æ•°
 typedef struct audio_resampler_params {
-	// ÊäÈë²ÎÊı
-	enum AVSampleFormat src_sample_fmt;  // ÊäÈë¸ñÊ½
-	int src_sample_rate = 0;             // ÊäÈë²ÉÑùÂÊ
-	uint64_t src_channel_layout = 0;     // ÊäÈëÍ¨µÀÊı
-	int src_nb_channels = 0;             // ²¼¾ÖÍ¨µÀÊı
-	int src_linesize = 0;                // »º³åÇø´óĞ¡ (²ÉÑùµã*Í¨µÀÊı*²ÉÑùÎ»Êı) ²ÉÑùÎ»ÊıºÍÒôÆµ¸ñÊ½ÓĞ¹Ø
-	int src_nb_samples = 0;              // ²ÉÑùµã
-	uint8_t **src_data = NULL;           // Êı¾İ»º³åÇø
+	// è¾“å…¥å‚æ•°
+	enum AVSampleFormat src_sample_fmt;  // è¾“å…¥æ ¼å¼
+	int src_sample_rate = 0;             // è¾“å…¥é‡‡æ ·ç‡
+	uint64_t src_channel_layout = 0;     // è¾“å…¥é€šé“æ•°
+	int src_nb_channels = 0;             // å¸ƒå±€é€šé“æ•°
+	int src_linesize = 0;                // ç¼“å†²åŒºå¤§å° (é‡‡æ ·ç‚¹*é€šé“æ•°*é‡‡æ ·ä½æ•°) é‡‡æ ·ä½æ•°å’ŒéŸ³é¢‘æ ¼å¼æœ‰å…³
+	int src_nb_samples = 0;              // é‡‡æ ·ç‚¹
+	uint8_t **src_data = NULL;           // æ•°æ®ç¼“å†²åŒº
 
-	// Êä³ö²ÎÊı
-	enum AVSampleFormat dst_sample_fmt;  // Êä³ö¸ñÊ½
-	int dst_sample_rate = 0;             // Êä³ö²ÉÑùÂÊ
-	uint64_t dst_channel_layout = 0;     // Êä³öÍ¨µÀÊı
-	int dst_nb_channels = 0;             // ²¼¾ÖÍ¨µÀÊı
-	int dst_linesize = 0;                // »º³åÇø´óĞ¡ (²ÉÑùµã*Í¨µÀÊı*²ÉÑùÎ»Êı) ²ÉÑùÎ»ÊıºÍÒôÆµ¸ñÊ½ÓĞ¹Ø
-	int dst_nb_samples = 0;              // ²ÉÑùµã
-	uint8_t **dst_data = NULL;           // Êı¾İ»º³åÇø
+	// è¾“å‡ºå‚æ•°
+	enum AVSampleFormat dst_sample_fmt;  // è¾“å‡ºæ ¼å¼
+	int dst_sample_rate = 0;             // è¾“å‡ºé‡‡æ ·ç‡
+	uint64_t dst_channel_layout = 0;     // è¾“å‡ºé€šé“æ•°
+	int dst_nb_channels = 0;             // å¸ƒå±€é€šé“æ•°
+	int dst_linesize = 0;                // ç¼“å†²åŒºå¤§å° (é‡‡æ ·ç‚¹*é€šé“æ•°*é‡‡æ ·ä½æ•°) é‡‡æ ·ä½æ•°å’ŒéŸ³é¢‘æ ¼å¼æœ‰å…³
+	int dst_nb_samples = 0;              // é‡‡æ ·ç‚¹
+	uint8_t **dst_data = NULL;           // æ•°æ®ç¼“å†²åŒº
 
-	int frame_size;                      // Ò»¸ö²ÉÑùµ¥ÔªÕ¼ÓÃµÄ×Ö½ÚÊı£¨±ÈÈç2Í¨µÀÊ±£¬Ôò×óÓÒÍ¨µÀ¸÷²ÉÑùÒ»´ÎºÏ³ÉÒ»¸ö²ÉÑùµ¥Ôª£©
-	int bytes_per_sec;                   // Ò»ÃëÊ±¼äµÄ×Ö½ÚÊı£¬±ÈÈç²ÉÑùÂÊ48Khz£¬2 channel£¬16bit£¬ÔòÒ»Ãë48000*2*16/8=192000
+	int frame_size;                      // ä¸€ä¸ªé‡‡æ ·å•å…ƒå ç”¨çš„å­—èŠ‚æ•°ï¼ˆæ¯”å¦‚2é€šé“æ—¶ï¼Œåˆ™å·¦å³é€šé“å„é‡‡æ ·ä¸€æ¬¡åˆæˆä¸€ä¸ªé‡‡æ ·å•å…ƒï¼‰
+	int bytes_per_sec;                   // ä¸€ç§’æ—¶é—´çš„å­—èŠ‚æ•°ï¼Œæ¯”å¦‚é‡‡æ ·ç‡48Khzï¼Œ2 channelï¼Œ16bitï¼Œåˆ™ä¸€ç§’48000*2*16/8=192000
 
 }audio_resampler_params_t;
 
@@ -52,176 +52,176 @@ public:
 	~AudioResample();
 
 	/*
-	* @brief ÉèÖÃÖØ²ÉÑù²ÎÊı
+	* @brief è®¾ç½®é‡é‡‡æ ·å‚æ•°
 	* @return 
 	*/
 	void set_samples_param(audio_resampler_params_t* resampler_param);
 
 	/**
-    * @brief ·ÖÅäÖØ²ÉÑùÆ÷
-    * @param resampler_params ÖØ²ÉÑùµÄÉèÖÃ²ÎÊı
-    * @return ³É¹¦·µ»Ø½á¹û£»Ê§°Ü·µ»Ø-1
+    * @brief åˆ†é…é‡é‡‡æ ·å™¨
+    * @param resampler_params é‡é‡‡æ ·çš„è®¾ç½®å‚æ•°
+    * @return æˆåŠŸè¿”å›ç»“æœï¼›å¤±è´¥è¿”å›-1
     */
 	int audio_resampler_alloc();
 
 	/**
-	* @brief ¸øÊäÈëÔ´·ÖÅä¿Õ¼ä
+	* @brief ç»™è¾“å…¥æºåˆ†é…ç©ºé—´
 	* @param 
-	* @return ³É¹¦·µ»Ø·ÖÅäµÄ¿Õ¼ä´óĞ¡£»Ê§°Ü·µ»Ø¸ºÊı
+	* @return æˆåŠŸè¿”å›åˆ†é…çš„ç©ºé—´å¤§å°ï¼›å¤±è´¥è¿”å›è´Ÿæ•°
 	*/
 	int audio_source_samples_alloc();
 
 	/**
-	* @brief ¸øÊä³öÔ´·ÖÅä¿Õ¼ä
+	* @brief ç»™è¾“å‡ºæºåˆ†é…ç©ºé—´
 	* @param
-	* @return ³É¹¦·µ»Ø·ÖÅäµÄ¿Õ¼ä´óĞ¡£»Ê§°Ü·µ»Ø¸ºÊı
+	* @return æˆåŠŸè¿”å›åˆ†é…çš„ç©ºé—´å¤§å°ï¼›å¤±è´¥è¿”å›è´Ÿæ•°
 	*/
 	int audio_destination_samples_alloc();
 
 	/**
-     * @brief ÊÍ·Å·ÖÅäµÄ¿Õ¼ä
+     * @brief é‡Šæ”¾åˆ†é…çš„ç©ºé—´
      * @param 
      * @return 
      */
 	void free_alloc();
 
 	/**
-	 * @brief ÒôÆµÖØ²ÉÑù
-	 * @param in_data  ÊäÈëÒôÆµ»º³åÇøÖ¸Õë
-	 * @param out_data Êä³öÒôÆµ»º³åÇøÖ¸Õë
-	 * @return µÃµ½µÄÊä³öÒôÆµ²ÉÑùµãÊı
+	 * @brief éŸ³é¢‘é‡é‡‡æ ·
+	 * @param in_data  è¾“å…¥éŸ³é¢‘ç¼“å†²åŒºæŒ‡é’ˆ
+	 * @param out_data è¾“å‡ºéŸ³é¢‘ç¼“å†²åŒºæŒ‡é’ˆ
+	 * @return å¾—åˆ°çš„è¾“å‡ºéŸ³é¢‘é‡‡æ ·ç‚¹æ•°
 	 */
 	int do_audio_resampler(uint8_t **in_data, uint8_t **out_data);
 
 	/**
-    * @brief ·¢ËÍÒª½øĞĞÖØ²ÉÑùµÄÖ¡
+    * @brief å‘é€è¦è¿›è¡Œé‡é‡‡æ ·çš„å¸§
     * @param resampler
     * @param frame
-    * @return Õâ´ÎÖØ²ÉÑùºóµÃµ½µÄ²ÉÑùµãÊı
+    * @return è¿™æ¬¡é‡é‡‡æ ·åå¾—åˆ°çš„é‡‡æ ·ç‚¹æ•°
     */
 	int audio_resampler_send_frame(AVFrame* frame);
 
 	/**
-     * @brief ·¢ËÍÒª½øĞĞÖØ²ÉÑùµÄÖ¡
-     * @param in_data ¶ş¼¶Ö¸Õë
-     * @param in_nb_samples ÊäÈëµÄ²ÉÑùµãÊıÁ¿(µ¥¸öÍ¨µÀ)
+     * @brief å‘é€è¦è¿›è¡Œé‡é‡‡æ ·çš„å¸§
+     * @param in_data äºŒçº§æŒ‡é’ˆ
+     * @param in_nb_samples è¾“å…¥çš„é‡‡æ ·ç‚¹æ•°é‡(å•ä¸ªé€šé“)
      * @param pts       pts
-     * @return Õâ´ÎÖØ²ÉÑùºóµÃµ½µÄ²ÉÑùµãÊı
+     * @return è¿™æ¬¡é‡é‡‡æ ·åå¾—åˆ°çš„é‡‡æ ·ç‚¹æ•°
      */
 	int audio_resampler_send_frame(uint8_t** in_data, int in_nb_samples, int64_t pts);
 
 	/**
-     * @brief ·¢ËÍÒª½øĞĞÖØ²ÉÑùµÄÖ¡
+     * @brief å‘é€è¦è¿›è¡Œé‡é‡‡æ ·çš„å¸§
      * @param resampler
-     * @param in_data Ò»¼¶Ö¸Õë
-     * @param in_bytes ´«ÈëÊı¾İµÄ×Ö½Ú´óĞ¡
+     * @param in_data ä¸€çº§æŒ‡é’ˆ
+     * @param in_bytes ä¼ å…¥æ•°æ®çš„å­—èŠ‚å¤§å°
      * @param pts
      * @return
      */
 	int audio_resampler_send_frame_byte(uint8_t* in_data, int in_bytes, int64_t pts);
 
 	/**
-     * @brief »ñÈ¡ÖØ²ÉÑùºóµÄÊı¾İ
-     * @param nb_samples    ÎÒÃÇĞèÒª¶ÁÈ¡¶àÉÙ²ÉÑùÊıÁ¿: Èç¹ûnb_samples>0£¬Ö»ÓĞaudio fifo>=nb_samples²ÅÄÜ»ñÈ¡µ½Êı¾İ;nb_samples=0,ÓĞ¶àÉÙ¾Í¸ø¶àÉÙ
+     * @brief è·å–é‡é‡‡æ ·åçš„æ•°æ®
+     * @param nb_samples    æˆ‘ä»¬éœ€è¦è¯»å–å¤šå°‘é‡‡æ ·æ•°é‡: å¦‚æœnb_samples>0ï¼Œåªæœ‰audio fifo>=nb_samplesæ‰èƒ½è·å–åˆ°æ•°æ®;nb_samples=0,æœ‰å¤šå°‘å°±ç»™å¤šå°‘
      *
-     * @return Èç¹û»ñÈ¡µ½²ÉÑùµãÊıÔò·ÇNULL
+     * @return å¦‚æœè·å–åˆ°é‡‡æ ·ç‚¹æ•°åˆ™éNULL
      */
 	AVFrame *audio_resampler_receive_frame(int nb_samples);
 
 	/**
-     * @brief »ñÈ¡ÖØ²ÉÑùºóµÄÊı¾İ
-     * @param out_data »º´æ»ñÈ¡µ½µÄÖØ²ÉÑùÊı¾İ£¬bufÒ»¶¨Òª³ä×ã
-     * @param nb_samples ÎÒÃÇĞèÒª¶ÁÈ¡¶àÉÙ²ÉÑùÊıÁ¿: Èç¹ûnb_samples>0£¬Ö»ÓĞaudio fifo>=nb_samples²ÅÄÜ»ñÈ¡µ½Êı¾İ;nb_samples=0,ÓĞ¶àÉÙ¾Í¸ø¶àÉÙ
-     * @param pts  »ñÈ¡Ö¡µÄptsÖµ
-     * @return »ñÈ¡µ½µÄ²ÉÑùµãÊıÁ¿
+     * @brief è·å–é‡é‡‡æ ·åçš„æ•°æ®
+     * @param out_data ç¼“å­˜è·å–åˆ°çš„é‡é‡‡æ ·æ•°æ®ï¼Œbufä¸€å®šè¦å……è¶³
+     * @param nb_samples æˆ‘ä»¬éœ€è¦è¯»å–å¤šå°‘é‡‡æ ·æ•°é‡: å¦‚æœnb_samples>0ï¼Œåªæœ‰audio fifo>=nb_samplesæ‰èƒ½è·å–åˆ°æ•°æ®;nb_samples=0,æœ‰å¤šå°‘å°±ç»™å¤šå°‘
+     * @param pts  è·å–å¸§çš„ptså€¼
+     * @return è·å–åˆ°çš„é‡‡æ ·ç‚¹æ•°é‡
      */
 	int audio_resampler_receive_frame(uint8_t **out_data, int nb_samples, int64_t *pts);
 
 	/*
-	* @beief flush ´¦Àí ²¹³¥×îºóÒ»ÒôÆµÖ¡ (Ö»ÓĞ¶ÔÊı¾İÍêÕû¶ÈÒªÇó·Ç³£¸ßµÄ³¡¾°²ÅĞèÒª×öflush)
+	* @beief flush å¤„ç† è¡¥å¿æœ€åä¸€éŸ³é¢‘å¸§ (åªæœ‰å¯¹æ•°æ®å®Œæ•´åº¦è¦æ±‚éå¸¸é«˜çš„åœºæ™¯æ‰éœ€è¦åšflush)
 	* @param 
 	*/
 	int audio_resampler_flush(uint8_t **out_data);
 
 	/**
      * @brief audio_resampler_get_fifo_size
-     * @return audio fifoµÄ»º´æµÄ²ÉÑùµãÊıÁ¿
+     * @return audio fifoçš„ç¼“å­˜çš„é‡‡æ ·ç‚¹æ•°é‡
      */
 	int audio_resampler_get_fifo_size();
 
 	 /**
 	 * @brief audio_resampler_get_start_pts
-	 * @return ÆğÊ¼µÄpts
+	 * @return èµ·å§‹çš„pts
 	 */
 	int64_t audio_resampler_get_start_pts();
 
 	/**
 	 * @brief audio_resampler_get_cur_pts
-	 * @return µ±Ç°µÄpts
+	 * @return å½“å‰çš„pts
 	 */
 	int64_t audio_resampler_get_cur_pts();
 
 	/*
-	* @brief ´ò¿ª±£´æÖØ²ÉÑùºóÒôÆµÎÄ¼ş
-	* @return < 0 ´ò¿ªÎÄ¼şÊ§°Ü
+	* @brief æ‰“å¼€ä¿å­˜é‡é‡‡æ ·åéŸ³é¢‘æ–‡ä»¶
+	* @return < 0 æ‰“å¼€æ–‡ä»¶å¤±è´¥
 	*/
 	int open_dst_file(std::string filename);
 
 	/*
-	* @brief ´ò¿ªÎÄ¼ş»ñÈ¡ÒôÆµÎÄ¼ş ±à½âÂëÆ÷
-	* @return < 0 »ñÈ¡±à½âÂëÆ÷Ê§°Ü
+	* @brief æ‰“å¼€æ–‡ä»¶è·å–éŸ³é¢‘æ–‡ä»¶ ç¼–è§£ç å™¨
+	* @return < 0 è·å–ç¼–è§£ç å™¨å¤±è´¥
 	*/
 	int open_audio_info_codec(std::string filename);
 
 	/*
-	* @brief »ñÈ¡Ô­Ê¼ÒôÆµÖ¡
-	* @return < 0 »ñÈ¡Ê§°Ü
+	* @brief è·å–åŸå§‹éŸ³é¢‘å¸§
+	* @return < 0 è·å–å¤±è´¥
 	*/
 	int get_audio_frame(AVFrame* frame);
 
 	/*
-	* @beief »ñÈ¡Êä³öÒôÆµÎÄ¼şÖ¸Õë
-	* @return ·µ»ØÊä³öÎÄ¼şÖ¸Õë
+	* @beief è·å–è¾“å‡ºéŸ³é¢‘æ–‡ä»¶æŒ‡é’ˆ
+	* @return è¿”å›è¾“å‡ºæ–‡ä»¶æŒ‡é’ˆ
 	*/
 	FILE* get_out_file() { return m_dst_file; }
 
 private:
-	// »ñÈ¡ÒôÆµÖ¡
+	// è·å–éŸ³é¢‘å¸§
 	AVFrame* get_one_frame(const int nb_samples);
-	// ´´½¨ÒôÆµÖ¡ÄÚ´æ
+	// åˆ›å»ºéŸ³é¢‘å¸§å†…å­˜
 	AVFrame *alloc_out_frame(const int nb_samples, const audio_resampler_params_t *resampler_params);
-	// ÊÇ·ñĞèÒªÖØ²ÉÑù
+	// æ˜¯å¦éœ€è¦é‡é‡‡æ ·
 	bool is_need_resampler();
-	// ³õÊ¼»¯²ÉÑùÆ÷ÄÚ´æ¿Õ¼ä
+	// åˆå§‹åŒ–é‡‡æ ·å™¨å†…å­˜ç©ºé—´
 	int init_resampled_data();
-	// Ğ´ÎÄ¼ş´íÎó
+	// å†™æ–‡ä»¶é”™è¯¯
 	void write_file_error(int ret_size);
 
 private:
-	audio_resampler_params_t* m_resameler_params = NULL;  // ÖØ²ÉÑùÉèÖÃ²ÎÊı
-	AVFormatContext* m_av_format_context = NULL;          // ÖØ²ÉÑùÉÏÏÂÎÄ
-	AVCodecContext*  m_av_codec_context = NULL;           // ÖØ²ÉÑù½âÂëÆ÷ÉÏÏÂÎÄ
+	audio_resampler_params_t* m_resameler_params = NULL;  // é‡é‡‡æ ·è®¾ç½®å‚æ•°
+	AVFormatContext* m_av_format_context = NULL;          // é‡é‡‡æ ·ä¸Šä¸‹æ–‡
+	AVCodecContext*  m_av_codec_context = NULL;           // é‡é‡‡æ ·è§£ç å™¨ä¸Šä¸‹æ–‡
 	int m_stream_index = 0;
 
-	struct SwrContext* m_swr_ctx = NULL;          // ÖØ²ÉÑùºËĞÄ
-	int m_is_fifo_only = 0;                       // ²»ĞèÒª×öÖØ²ÉÑù, Ö»ĞèÒª»º´æµ½ audio_fifo
-	int m_is_flushed = 0;                         // flushµÄÊ±ºòÊ¹ÓÃ
+	struct SwrContext* m_swr_ctx = NULL;          // é‡é‡‡æ ·æ ¸å¿ƒ
+	int m_is_fifo_only = 0;                       // ä¸éœ€è¦åšé‡é‡‡æ ·, åªéœ€è¦ç¼“å­˜åˆ° audio_fifo
+	int m_is_flushed = 0;                         // flushçš„æ—¶å€™ä½¿ç”¨
 
-	AVAudioFifo* m_audio_fifo = NULL;             // ÖØ²ÉÑùµãµÄ»º´æ
-	int64_t m_start_pts = AV_NOPTS_VALUE;         // ÆğÊ¼pts
-	int64_t m_cur_pts = AV_NOPTS_VALUE;           // µ±Ç°pts
+	AVAudioFifo* m_audio_fifo = NULL;             // é‡é‡‡æ ·ç‚¹çš„ç¼“å­˜
+	int64_t m_start_pts = AV_NOPTS_VALUE;         // èµ·å§‹pts
+	int64_t m_cur_pts = AV_NOPTS_VALUE;           // å½“å‰pts
 
-	uint8_t** m_resameler_data = NULL;            // ÓÃÀ´»º´æÖØ²ÉÑùºóµÄÊı¾İ
-	int m_resampled_data_size = 0;                // ÖØ²ÉÑùºóµÄ²ÉÑùÊı
-	int m_src_channels = 0;                       // ÊäÈëµÄÍ¨µÀÊı
-	int m_dst_channels = 0;                       // Êä³öµÄÍ¨µÀÊı
-	int64_t m_total_resampled_num = 0;            // Í³¼Æ×Ü½áµÄ²ÉÑùµãÊı
+	uint8_t** m_resameler_data = NULL;            // ç”¨æ¥ç¼“å­˜é‡é‡‡æ ·åçš„æ•°æ®
+	int m_resampled_data_size = 0;                // é‡é‡‡æ ·åçš„é‡‡æ ·æ•°
+	int m_src_channels = 0;                       // è¾“å…¥çš„é€šé“æ•°
+	int m_dst_channels = 0;                       // è¾“å‡ºçš„é€šé“æ•°
+	int64_t m_total_resampled_num = 0;            // ç»Ÿè®¡æ€»ç»“çš„é‡‡æ ·ç‚¹æ•°
 
-	int m_audio_frame = 0;                        // ÒôÆµÖ¡ĞòºÅ
-	int m_in_pts = 0;                             // ÊäÈëpts
-	int64_t m_out_pts = 0;                        // Êä³öpts
+	int m_audio_frame = 0;                        // éŸ³é¢‘å¸§åºå·
+	int m_in_pts = 0;                             // è¾“å…¥pts
+	int64_t m_out_pts = 0;                        // è¾“å‡ºpts
 
-	// Êä³öÎÄ¼ş
+	// è¾“å‡ºæ–‡ä»¶
 	FILE* m_dst_file = NULL;
 	const char* m_dst_filename = NULL;
 	const char* m_dst_fmt = NULL;

@@ -20,7 +20,7 @@ namespace cvpublish {
 			m_callable_object = callable_object;
 		}
 
-	private: // 测试：输出音频数据到文件
+	private: // 娴嬭瘯锛氳緭鍑洪煶棰戞暟鎹埌鏂囦欢
 		int openSaveAudioFile(const char* filename);
 		int saveFile(uint8_t* data, size_t size);
 		int closeSaveAudioFile();

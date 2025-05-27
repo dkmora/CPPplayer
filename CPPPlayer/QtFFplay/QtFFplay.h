@@ -27,7 +27,7 @@ public:
 
 private:
 	std::mutex m_mutex;
-	AVPlayer* m_avplayer = nullptr;     // ÒôÊÓÆµ½â¸´ÓÃ
-	PlayAudio* m_audioplayer = nullptr; // ÒôÆµ²¥·ÅÆ÷
-	PlayVideo* m_videoplayer = nullptr; // ÊÓÆµ²¥·ÅÆ÷
+	AVPlayer* m_avplayer = nullptr;     // éŸ³è§†é¢‘è§£å¤ç”¨
+	PlayAudio* m_audioplayer = nullptr; // éŸ³é¢‘æ’­æ”¾å™¨
+	PlayVideo* m_videoplayer = nullptr; // è§†é¢‘æ’­æ”¾å™¨
 };

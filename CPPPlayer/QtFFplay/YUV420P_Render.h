@@ -15,21 +15,21 @@ public:
 	YUV420P_Render(QWidget* parent = nullptr);
 	~YUV420P_Render();
 
-	//³õÊ¼»¯gl
+	//åˆå§‹åŒ–gl
 	void initialize();
-	//Ë¢ĞÂÏÔÊ¾
+	//åˆ·æ–°æ˜¾ç¤º
 	void render(uchar* py, uchar* pu, uchar* pv, int width, int height);
 	void render(uchar* ptr, int width, int height);
 	void resizeGL(int width, int height);
 
 private:
-	//shader³ÌĞò
+	//shaderç¨‹åº
 	QOpenGLShaderProgram m_program;
-	//shaderÖĞyuv±äÁ¿µØÖ·
+	//shaderä¸­yuvå˜é‡åœ°å€
 	GLuint m_textureUniformY, m_textureUniformU, m_textureUniformV;
-	//´´½¨ÎÆÀí
+	//åˆ›å»ºçº¹ç†
 	GLuint m_idy, m_idu, m_idv;
-	//»º³åÇø¶ÔÏó
+	//ç¼“å†²åŒºå¯¹è±¡
 	GLuint m_renderbuffer;
 	// 
 	GLuint m_vertexAttr, m_textureAttr;

@@ -27,9 +27,9 @@ private:
 	/* prepare a new audio buffer */
     /**
     * @brief sdl_audio_callback
-    * @param opaque    Ö¸ÏòuserµÄÊı¾İ
-    * @param stream    ¿½±´PCMµÄµØÖ·
-    * @param len       ĞèÒª¿½±´µÄ³¤¶È
+    * @param opaque    æŒ‡å‘userçš„æ•°æ®
+    * @param stream    æ‹·è´PCMçš„åœ°å€
+    * @param len       éœ€è¦æ‹·è´çš„é•¿åº¦
     */
 	static void sdl_audio_callback(void *opaque, Uint8 *stream, int len);
 

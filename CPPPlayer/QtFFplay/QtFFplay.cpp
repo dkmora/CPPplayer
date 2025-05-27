@@ -19,12 +19,12 @@ RET_CODE QtFFplay::Play(QString filename) {
 	m_mutex.lock();
 	int ret = 0;
 	ret = m_avplayer->play(filename.toStdString(), [=] {
-		// ¿ªÊ¼²¥·ÅÒôÆµ
+		// å¼€å§‹æ’­æ”¾éŸ³é¢‘
 		if (m_audioplayer == nullptr
 			&& m_avplayer->IsHaveAudioStream()) {
 			m_audioplayer = new PlayAudio(m_avplayer, this);
 		}
-		// ¿ªÊ¼äÖÈ¾ÊÓÆµ
+		// å¼€å§‹æ¸²æŸ“è§†é¢‘
 		if (m_avplayer->IsHaveVideoStream()) {
 			m_videoplayer->StartRender(m_avplayer);
 		}
@@ -36,9 +36,9 @@ RET_CODE QtFFplay::Play(QString filename) {
 void QtFFplay::Stop() {
 	qDebug() << "QtFFplay::Stop()";
 	m_mutex.lock();
-	// ½áÊøäÖÈ¾ÊÓÆµ
+	// ç»“æŸæ¸²æŸ“è§†é¢‘
 	m_videoplayer->StopRender();
-	// ½áÊø²¥·ÅÒôÆµ
+	// ç»“æŸæ’­æ”¾éŸ³é¢‘
 	if (m_audioplayer != nullptr) {
 		delete m_audioplayer;
 		m_audioplayer = nullptr;

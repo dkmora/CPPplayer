@@ -18,21 +18,21 @@ bool MuxerVideo::startMuxer(std::string _file_name, int _width, int _height, int
         return false;
     }
 
-    // Ìí¼ÓÊÓÆµÁ÷
+    // æ·»åŠ è§†é¢‘æµ
     m_video_stream = add_video_stream(m_fmt_ctx, AV_CODEC_ID_H264, _width, _height, _fps);
     if (!m_video_stream) {
         std::cerr << "Failed to create video stream\n";
         return false;
     }
 
-    // Ìí¼ÓÒôÆµÁ÷
+    // æ·»åŠ éŸ³é¢‘æµ
     m_audio_stream = add_audio_stream(m_fmt_ctx, AV_CODEC_ID_AAC, _sample_rate, _channels);
     if (!m_audio_stream) {
         std::cerr << "Failed to create audio stream\n";
         return false;
     }
 
-    // ´ò¿ªÊä³öÎÄ¼ş
+    // æ‰“å¼€è¾“å‡ºæ–‡ä»¶
     if (!(m_fmt_ctx->flags & AVFMT_NOFILE)) {
         if (avio_open(&m_fmt_ctx->pb, _file_name.c_str(), AVIO_FLAG_WRITE) < 0) {
             std::cerr << "Could not open output file\n";
@@ -40,7 +40,7 @@ bool MuxerVideo::startMuxer(std::string _file_name, int _width, int _height, int
         }
     }
 
-    // Ğ´ÎÄ¼şÍ·
+    // å†™æ–‡ä»¶å¤´
     if (avformat_write_header(m_fmt_ctx, nullptr) < 0) {
         std::cerr << "Error occurred when writing header\n";
         return false;
@@ -61,15 +61,15 @@ void MuxerVideo::pushPCM(AVFrame* frame, double pts)
 void MuxerVideo::endMuxer()
 {   
     // flush
-    // ËùÓĞ avcodec_send_frame() ¶¼Íê³É£¬
-    // ²¢ÇÒÃ»ÓĞ¸ü¶àÖ¡ÒªËÍÈë±àÂëÆ÷Ö®ºó£¬Á¢¼´Ö´ĞĞ¡£
+    // æ‰€æœ‰ avcodec_send_frame() éƒ½å®Œæˆï¼Œ
+    // å¹¶ä¸”æ²¡æœ‰æ›´å¤šå¸§è¦é€å…¥ç¼–ç å™¨ä¹‹åï¼Œç«‹å³æ‰§è¡Œã€‚
     flush_encoder(m_video_stream->codec, m_fmt_ctx, m_video_stream);
     flush_encoder(m_audio_stream->codec, m_fmt_ctx, m_audio_stream);
 
-	// Ğ´ÎÄ¼şÎ²²¿
+	// å†™æ–‡ä»¶å°¾éƒ¨
 	av_write_trailer(m_fmt_ctx);
 
-	// ÇåÀí×ÊÔ´
+	// æ¸…ç†èµ„æº
 	if (!(m_fmt_ctx->oformat->flags & AVFMT_NOFILE)) {
 		avio_close(m_fmt_ctx->pb);
 	}
@@ -91,7 +91,7 @@ void MuxerVideo::flush_encoder(AVCodecContext* enc_ctx, AVFormatContext* fmt_ctx
     }
 }
 
-// ³õÊ¼»¯ÊÓÆµÁ÷
+// åˆå§‹åŒ–è§†é¢‘æµ
 AVStream* MuxerVideo::add_video_stream(AVFormatContext* fmt_ctx, AVCodecID codec_id, int width, int height, int fps) {
     AVCodec* codec = avcodec_find_encoder(codec_id);
     if (!codec) {
@@ -123,8 +123,8 @@ AVStream* MuxerVideo::add_video_stream(AVFormatContext* fmt_ctx, AVCodecID codec
     codec_ctx->width = width;
     codec_ctx->height = height;
     codec_ctx->framerate = { fps, 1 };
-    // ÊÓÆµµÄ Èç¹û²»Ö÷¶¯ÉèÖÃ£ºThe encoder timebase is not set
-    codec_ctx->time_base = { 1, 1000000 };   // µ¥Î»ÎªÎ¢Ãî
+    // è§†é¢‘çš„ å¦‚æœä¸ä¸»åŠ¨è®¾ç½®ï¼šThe encoder timebase is not set
+    codec_ctx->time_base = { 1, 1000000 };   // å•ä½ä¸ºå¾®å¦™
 
     codec_ctx->gop_size = fps;
     codec_ctx->max_b_frames = 0;
@@ -145,7 +145,7 @@ AVStream* MuxerVideo::add_video_stream(AVFormatContext* fmt_ctx, AVCodecID codec
     return stream;
 }
 
-// ³õÊ¼»¯ÒôÆµÁ÷
+// åˆå§‹åŒ–éŸ³é¢‘æµ
 AVStream* MuxerVideo::add_audio_stream(AVFormatContext* fmt_ctx, AVCodecID codec_id, int sample_rate, int channels) {
     AVCodec* codec = avcodec_find_encoder(codec_id);
     if (!codec) {
@@ -219,7 +219,7 @@ void MuxerVideo::write_video_frames(AVFormatContext* fmt_ctx, AVStream* video_st
         pts = av_rescale_q(pts, AVRational{ 1, (int)1000000 }, video_codec_ctx->time_base);
         frame->pts = pts;
 
-        // ·¢ËÍÖ¡µ½±àÂëÆ÷
+        // å‘é€å¸§åˆ°ç¼–ç å™¨
         int ret = avcodec_send_frame(video_codec_ctx, frame);
         if (ret < 0) {
             std::cerr << "Error sending video frame for encoding\n";
@@ -245,12 +245,12 @@ void MuxerVideo::write_video_frames(AVFormatContext* fmt_ctx, AVStream* video_st
             }
             packet->stream_index = video_stream->index;
 
-            AVRational src_time_base;   // ±àÂëºóµÄ°ü
-            AVRational dst_time_base;   // mp4Êä³öÎÄ¼ş¶ÔÓ¦Á÷µÄtime_base
+            AVRational src_time_base;   // ç¼–ç åçš„åŒ…
+            AVRational dst_time_base;   // mp4è¾“å‡ºæ–‡ä»¶å¯¹åº”æµçš„time_base
             src_time_base = video_codec_ctx->time_base;
             dst_time_base = video_stream->time_base;
 
-            // Ê±¼ä»ù×ª»»
+            // æ—¶é—´åŸºè½¬æ¢
             packet->pts = av_rescale_q(packet->pts, src_time_base, dst_time_base);
             packet->dts = av_rescale_q(packet->dts, src_time_base, dst_time_base);
             packet->duration = av_rescale_q(packet->duration, src_time_base, dst_time_base);
@@ -295,12 +295,12 @@ void MuxerVideo::write_audio_frames(AVFormatContext* fmt_ctx, AVStream* audio_st
                 ret = -1;
             }
 
-            AVRational src_time_base;   // ±àÂëºóµÄ°ü
-            AVRational dst_time_base;   // mp4Êä³öÎÄ¼ş¶ÔÓ¦Á÷µÄtime_base
+            AVRational src_time_base;   // ç¼–ç åçš„åŒ…
+            AVRational dst_time_base;   // mp4è¾“å‡ºæ–‡ä»¶å¯¹åº”æµçš„time_base
             src_time_base = audio_codec_ctx->time_base;
             dst_time_base = audio_stream->time_base;
 
-            // Ê±¼ä»ù×ª»»
+            // æ—¶é—´åŸºè½¬æ¢
             packet->pts = av_rescale_q(packet->pts, src_time_base, dst_time_base);
             packet->dts = av_rescale_q(packet->dts, src_time_base, dst_time_base);
             packet->duration = av_rescale_q(packet->duration, src_time_base, dst_time_base);

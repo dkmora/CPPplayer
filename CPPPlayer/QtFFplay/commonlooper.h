@@ -1,4 +1,4 @@
-﻿#ifndef COMMONLOOPER_H
+#ifndef COMMONLOOPER_H
 #define COMMONLOOPER_H
 #include <thread>
 #include "mediabase.h"

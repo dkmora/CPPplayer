@@ -1,4 +1,4 @@
-﻿#include "commonlooper.h"
+#include "commonlooper.h"
 #include "dlog.h"
 
 namespace cvpublish

@@ -9,16 +9,16 @@
 class MyDevice : public QIODevice
 {
 public:
-	MyDevice(cvpublish::AVDecoder* audio_decoder, QByteArray pcm); //´´½¨¶ÔÏó´«µİpcmÊı¾İ
+	MyDevice(cvpublish::AVDecoder* audio_decoder, QByteArray pcm); //åˆ›å»ºå¯¹è±¡ä¼ é€’pcmæ•°æ®
 	~MyDevice();
 
-	qint64 readData(char *data, qint64 maxlen); //ÖØĞÂÊµÏÖµÄĞéº¯Êı
-	qint64 writeData(const char *data, qint64 len); //ËüÊÇ¸ö´¿Ğéº¯Êı£¬ ²»µÃ²»ÊµÏÖ
+	qint64 readData(char *data, qint64 maxlen); //é‡æ–°å®ç°çš„è™šå‡½æ•°
+	qint64 writeData(const char *data, qint64 len); //å®ƒæ˜¯ä¸ªçº¯è™šå‡½æ•°ï¼Œ ä¸å¾—ä¸å®ç°
 
 private:
 	QFile* pcm_file;
-	QByteArray data_pcm; //´æ·ÅpcmÊı¾İ
-	int        len_written; //¼ÇÂ¼ÒÑĞ´Èë¶àÉÙ×Ö½Ú
+	QByteArray data_pcm; //å­˜æ”¾pcmæ•°æ®
+	int        len_written; //è®°å½•å·²å†™å…¥å¤šå°‘å­—èŠ‚
 	cvpublish::AVDecoder* m_audio_decoder;
 
 	int64_t callbacktime = 0;
