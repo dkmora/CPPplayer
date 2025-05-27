@@ -186,16 +186,27 @@ void AVDecoder::Loop() {
 	int64_t		pos;  // 该帧在输入文件中的字节位置
 	AVRational tb;    // 获取stream timebase
 	int		serial;   // 帧序列，在seek的操作时serial会变化
-	double		duration;       // 该帧持续时间，单位为秒
+	double  duration; // 该帧持续时间，单位为秒
+
+	double audio_frame_duration = 0;
+	double video_frame_duration = 0;
+
+	double video_pts_end = 0;
+	double audio_pts_end = 0;
+
+	uint64_t end_time = getEndTime() * 1000000; // 解码结束时间
 
 	m_av_frame = av_frame_alloc();  // 分配解码帧
 
 	if (m_codec_type == AVMEDIA_TYPE_VIDEO) {
 		LogInfo("vidio decode thread start");
 		tb = m_decoder->video_st->time_base; // 获取stream timebase
+		AVRational frame_rate = av_guess_frame_rate(m_decoder->avformat_context, m_decoder->video_st, NULL);
+		video_frame_duration = 1.0 / frame_rate.den / frame_rate.num * 1000000;
 	}
 	else if (m_codec_type == AVMEDIA_TYPE_AUDIO) {
 		LogInfo("audio decode thread start");
+		audio_frame_duration = 1.0 * 1024 / 44100 * 1000000;
 	}
 
 	while (!request_exit_) {
@@ -207,7 +218,7 @@ void AVDecoder::Loop() {
 		if(!ret)
 			continue;
 
-		if (m_codec_type == AVMEDIA_TYPE_VIDEO) {
+		if (m_codec_type == AVMEDIA_TYPE_VIDEO && (video_pts_end <= end_time)) {
 			// 视频解码 计算pts
 			//2 获取帧率，以便计算每帧picture的duration
 			AVRational frame_rate = av_guess_frame_rate(m_decoder->avformat_context, m_decoder->video_st, NULL);
@@ -221,8 +232,10 @@ void AVDecoder::Loop() {
 
 			// 解码后放到队列
 			m_avpacketqueue->frame_video_frame_put(m_av_frame, pts, duration, pos, m_decoder->pkt_serial);
+			// 累计时长
+			video_pts_end += video_frame_duration;
 		}
-		else if (m_codec_type == AVMEDIA_TYPE_AUDIO) {
+		else if (m_codec_type == AVMEDIA_TYPE_AUDIO &&(audio_pts_end <= end_time)) {
 			// 音频解码
 			tb = { 1, m_av_frame->sample_rate };
 			pts = (m_av_frame->pts == AV_NOPTS_VALUE) ? NAN : m_av_frame->pts * av_q2d(tb);
@@ -230,6 +243,8 @@ void AVDecoder::Loop() {
 			pos = m_av_frame->pkt_pos;
 			serial = m_decoder->pkt_serial;
 			m_avpacketqueue->frame_audio_frame_put(m_av_frame, pts, duration, pos, m_decoder->pkt_serial);
+			// 累计时长
+			audio_pts_end += audio_frame_duration;
 		}
 
 		// 释放数据

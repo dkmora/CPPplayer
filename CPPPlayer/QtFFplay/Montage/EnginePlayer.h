@@ -41,6 +41,8 @@ public:
     explicit EnginePlayAudio(AnalyzeFrameEngine* engine, QObject* parent = nullptr);
     ~EnginePlayAudio();
 
+    void setEngine(AnalyzeFrameEngine* engine);
+
 private:
     /* prepare a new audio buffer */
     /**
@@ -75,6 +77,8 @@ public:
     void Play(AnalyzeFrameEngine* engine);
 
     EnginePlayVideo* GetVideoView() { return m_videoplayer; }
+
+
 
 private:
 

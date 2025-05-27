@@ -16,9 +16,7 @@ public:
 		m_pInstance(mediaplayer)
 	{}
 
-	virtual void onPlayerStateChange(MediaPlayerState state, MediaPlayerError error) {
-		qDebug() << "onPlayerStateChange " << "state:" << state << " " << "error:" << error;
-	}
+	virtual void onPlayerStateChange(MediaPlayerState state, MediaPlayerError error);
 
 private:
 	QtMediaPlayer& m_pInstance;
@@ -38,7 +36,7 @@ protected:
 	//void dropEvent(QDropEvent* event) Q_DECL_OVERRIDE;
 	bool nativeEvent(const QByteArray& eventType, void* message, long* result);
 
-private slots:
+public slots:
 	bool StartPublish();
 	void StopPublish();
 	void Pause();
@@ -56,6 +54,8 @@ private:
 	std::unique_ptr<MediaPlayerEventHandler> m_MediaEventHandler;
 
 	ExportVideoWidget* m_export_video_widget = nullptr;
+
+	int m_engineplay_index = 0;
 };
 
 extern QtMediaPlayer* g_MediaPlayer;

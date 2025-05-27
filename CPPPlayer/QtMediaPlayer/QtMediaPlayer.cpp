@@ -3,6 +3,17 @@
 
 QtMediaPlayer* g_MediaPlayer = nullptr;
 
+static bool _next = false;
+
+void CMediaPlayerEvent::onPlayerStateChange(MediaPlayerState state, MediaPlayerError error) {
+	qDebug() << "onPlayerStateChange " << "state:" << state << " " << "error:" << error;
+	if (state == PLAYER_STATE_PLAYBACK_COMPLETED && error == PLAYER_ERROR_NONE)
+	{
+		_next = true;
+		m_pInstance.StartPublish();
+	}
+}
+
 QtMediaPlayer::QtMediaPlayer(QWidget* parent)
 	: QMainWindow(parent),
 	m_MediaEventHandler(new CMediaPlayerEvent(*this))
@@ -59,14 +70,13 @@ QtMediaPlayer::~QtMediaPlayer()
 }
 
 bool QtMediaPlayer::StartPublish() {
-	int ret = 0;
-	//ret = m_ffplay->Play(filename);
-	for (const auto& item : vAnalyzeManager->getExportSeq()) {
-		auto engine = vAnalyzeManager->getAnalyzeEngine(item.afId);
-		engine->play([=] {
-			m_engine_player.Play(engine.get());
-	    });
-	}
+	if (_next) m_engineplay_index++;
+	auto afMsg = vAnalyzeManager->getExportSeq().at(m_engineplay_index);
+	auto engine = vAnalyzeManager->getAnalyzeEngine(afMsg.afId);
+	engine->setMediaPlayerEventHandler(m_MediaEventHandler.get());
+	engine->play([=] {
+		m_engine_player.Play(engine.get());
+		});
 
 	//ui.m_slider_seek->setValue(0);
 	//ui.m_slider_playrate->setValue(2);

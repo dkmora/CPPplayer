@@ -3,11 +3,14 @@
 #include "ffmpegbase.h"
 #include "mediabase.h"
 #include "AVDecoder.h"
+#include "MediaPlayerEvent.h"
 
 #include <list>
 #include <queue>
 #include <iostream>
 #include <future>
+
+#define ONPLAYERSTATECHANGED_EVENT(state, error) setPlayerStateChanged(state, error);
 
 typedef std::function<void(void)> StartplayCallBack;
 
@@ -46,6 +49,11 @@ public:
      * @brief 播放
      */
     void play(StartplayCallBack cb);
+
+    /*
+     *  @brief 暂停
+     */
+    void Pause();
 
     /**
      * @brief seek in the stream
@@ -101,10 +109,14 @@ public:
     void setEndTime(int64_t endtime) { m_end_time = endtime; }
     int64_t getEndTime() { return m_end_time; }
 
-
     bool getIsPlay() { return m_isDone; }
 
     void setMuxerIndex(int index) { m_muxer_index = index; }
+
+    /*
+    *  设置播放器事件回调指针
+    */
+    void setMediaPlayerEventHandler(MediaPlayerEventHandler* eventHandler) { m_mediaplayerEventHandler = eventHandler; }
 
 private:
     void read_thread();
@@ -116,6 +128,8 @@ private:
 
     RET_CODE allocation_decoder(FFDecoder* coder, int stream);
     RET_CODE release_decoder(FFDecoder* coder);
+    // 返回状态码
+    void setPlayerStateChanged(MediaPlayerState state, MediaPlayerError error);
 
 private:
     std::string m_file_name;
@@ -133,6 +147,8 @@ private:
     int	    m_seek_flags = AVSEEK_FLAG_BYTE;  // seek标志，诸如AVSEEK_FLAG_BYTE等
     int64_t	m_seek_pos = 0;    // 请求seek的目标位置(当前位置+增量)
     int64_t	m_seek_rel = 0;    // 本次seek的位置增量
+
+    MediaPlayerEventHandler* m_mediaplayerEventHandler = nullptr;
 
     AVPacket* m_avpacket = nullptr; // av_read_frame 获取的avpacket
 

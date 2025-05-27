@@ -17,9 +17,12 @@ EnginePlayVideo::~EnginePlayVideo()
 void EnginePlayVideo::StartRender(AnalyzeFrameEngine* engine)
 {
 	if (m_timer_render == nullptr) {
-		m_frame_engine = engine;
 		m_render = true;
 		m_timer_render = new std::thread(&EnginePlayVideo::sloTimerRender, this);
+	}
+
+	if (engine != nullptr){
+		m_frame_engine = engine;
 	}
 }
 void EnginePlayVideo::StopRender()
@@ -170,6 +173,13 @@ EnginePlayAudio::~EnginePlayAudio()
 	SDL_CloseAudio();
 }
 
+void EnginePlayAudio::setEngine(AnalyzeFrameEngine* engine)
+{
+	if (engine != nullptr) {
+		m_frame_engine = engine;
+	}
+}
+
 void EnginePlayAudio::sdl_audio_callback(void* opaque, Uint8* stream, int len) {
 	EnginePlayAudio* is = (EnginePlayAudio*)opaque;
 
@@ -194,6 +204,10 @@ void EnginePlayer::Play(AnalyzeFrameEngine* engine)
 	// ¿ªÊ¼²¥·ÅÒôÆµ
 	if (m_audioplayer == nullptr) {
 		m_audioplayer = new EnginePlayAudio(engine, this);
+	}
+	else
+	{
+		m_audioplayer->setEngine(engine);
 	}
 
 	m_videoplayer->StartRender(engine);

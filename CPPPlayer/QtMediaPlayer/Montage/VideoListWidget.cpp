@@ -51,6 +51,8 @@ VideoListWidget::VideoListWidget(AFMsg afMsg, QWidget* parent /*= nullptr*/) :
             seek(startTime, engine);
 
             qDebug() << "startTime:" << startTime;
+
+            //engine->setEndTime(_mod_duration); // TODO:拖动滚动条也需要设置
         });
 }
 

@@ -126,6 +126,13 @@ RET_CODE AnalyzeFrameEngine::release_decoder(FFDecoder* coder) {
 	return RET_OK;
 }
 
+void AnalyzeFrameEngine::setPlayerStateChanged(MediaPlayerState state, MediaPlayerError error) {
+	if (m_mediaplayerEventHandler != nullptr) {
+		m_mediaplayerEventHandler->onPlayerStateChange(state, error);
+		LogInfo("PlayerState state:%d, error:%d", state, error);
+	}
+}
+
 void AnalyzeFrameEngine::startDecode(int width, int height)
 {
 	if (m_isDone)
@@ -155,6 +162,7 @@ void AnalyzeFrameEngine::startDecode(int width, int height)
 		m_video_decoder.out_width = width;
 		m_video_decoder.out_height = height;
 		m_video_decode_thread = new cvpublish::AVDecoder(&m_video_decoder, &m_avpacket_queue, &m_av_clock);
+		m_video_decode_thread->setEndTime(m_end_time);
 		m_video_decode_thread->Start();
 	}
 
@@ -164,6 +172,7 @@ void AnalyzeFrameEngine::startDecode(int width, int height)
 		allocation_decoder(&m_audio_decoder, m_audio_stream);
 		// 创建音频解码线程
 		m_audio_decode_thread = new cvpublish::AVDecoder(&m_audio_decoder, &m_avpacket_queue, &m_av_clock);
+		m_audio_decode_thread->setEndTime(m_end_time);
 		m_audio_decode_thread->Start();
 	}
 
@@ -198,30 +207,47 @@ void AnalyzeFrameEngine::play(StartplayCallBack cb)
 	m_startplay_callback = cb;
 
 	startDecode();
+
+	if (m_paused) Pause();
+}
+
+void AnalyzeFrameEngine::Pause() {
+	if (!m_isDone)
+		return;
+
+	m_paused = !m_paused;
+	m_video_decode_thread->Pause();
+	m_audio_decode_thread->Pause();
 }
 
 void AnalyzeFrameEngine::Seek(int64_t pos, int64_t rel, int seek_by_bytes) {
 	//if (!m_isDone)
 	//	return;
 
-    m_seek_pos = pos;
-    m_seek_rel = rel;
-    m_seek_flags &= ~AVSEEK_FLAG_BYTE; // 不按字节的方式去seek
-    if (seek_by_bytes)
-        m_seek_flags |= AVSEEK_FLAG_BYTE; // 强制按字节的方式去seek
-    m_seek_req = 1;  // 请求seek， 在read_thread线程seek成功才将其置为0
-    //m_cond_t_read_thread->notify_all(); // 唤醒
+	if (!m_seek_req) {
 
-	int64_t seek_target = m_seek_pos;
-	int64_t seek_min = m_seek_rel > 0 ? seek_target - m_seek_rel + 2 : INT64_MIN;
-	int64_t seek_max = m_seek_rel < 0 ? seek_target = m_seek_rel - 2 : INT64_MAX;
+		if (!m_paused) 
+			Pause();
 
-	av_log(NULL, AV_LOG_INFO, "seek_target: %lld\n", seek_target);
-
-	int ret = avformat_seek_file(m_avformat_context, -1, seek_min, seek_target, seek_max, m_seek_flags);
-	if (ret < 0) {
-		av_log(NULL, AV_LOG_ERROR, "%s: error while seeking\n", m_avformat_context->url);
+		m_seek_pos = pos;
+		m_seek_rel = rel;
+		m_seek_flags &= ~AVSEEK_FLAG_BYTE; // 不按字节的方式去seek
+		if (seek_by_bytes)
+			m_seek_flags |= AVSEEK_FLAG_BYTE; // 强制按字节的方式去seek
+		m_seek_req = 1;  // 请求seek， 在read_thread线程seek成功才将其置为0
+		m_cond_t_read_thread->notify_all(); // 唤醒
 	}
+
+	//int64_t seek_target = m_seek_pos;
+	//int64_t seek_min = m_seek_rel > 0 ? seek_target - m_seek_rel + 2 : INT64_MIN;
+	//int64_t seek_max = m_seek_rel < 0 ? seek_target = m_seek_rel - 2 : INT64_MAX;
+
+	//av_log(NULL, AV_LOG_INFO, "seek_target: %lld\n", seek_target);
+
+	//int ret = avformat_seek_file(m_avformat_context, -1, seek_min, seek_target, seek_max, m_seek_flags);
+	//if (ret < 0) {
+	//	av_log(NULL, AV_LOG_ERROR, "%s: error while seeking\n", m_avformat_context->url);
+	//}
 }
 
 std::string AnalyzeFrameEngine::get_file_name()
@@ -243,13 +269,6 @@ AVFrame* AnalyzeFrameEngine::getVideoDecodeFrame()
 {
 	AVFrame* frame = m_video_decode_thread->getVideoAVFrame();
 	if (frame == NULL) return NULL;
-
-	//double video_frame_duration = 1.0 / av_q2d(m_avformat_context->streams[m_video_stream]->r_frame_rate);
-	//m_video_total_time += video_frame_duration * 1000;
-	//printf("Video frame duration: %lld seconds\n", m_video_total_time);
-	//if (m_video_total_time > m_end_time) {
-	//	return NULL;
-	//}
 	return frame;
 }
 
@@ -522,32 +541,32 @@ AVStream* AnalyzeFrameEngine::add_audio_stream(AVFormatContext* fmt_ctx, AVCodec
 void AnalyzeFrameEngine::read_thread() {
 	while (m_isDone) {
 		int ret;
-		//if (m_seek_req) { // 是否有seek请求
-		//	int64_t seek_target = m_seek_pos;
-		//	int64_t seek_min = m_seek_rel > 0 ? seek_target - m_seek_rel + 2 : INT64_MIN;
-		//	int64_t seek_max = m_seek_rel < 0 ? seek_target = m_seek_rel - 2 : INT64_MAX;
+		if (m_seek_req) { // 是否有seek请求
+			int64_t seek_target = m_seek_pos;
+			int64_t seek_min = m_seek_rel > 0 ? seek_target - m_seek_rel + 2 : INT64_MIN;
+			int64_t seek_max = m_seek_rel < 0 ? seek_target = m_seek_rel - 2 : INT64_MAX;
 
-		//	ret = avformat_seek_file(m_avformat_context, -1, seek_min, seek_target, seek_max, m_seek_flags);
-		//	if (ret < 0) {
-		//		av_log(NULL, AV_LOG_ERROR, "%s: error while seeking\n", m_avformat_context->url);
-		//	}
-		//	else {
-		//		/* seek的时候，要把原先的数据清空，并重启解码器，
-		//		 * put flush_pkt的目的是告知解码线程需要reset decoder
-		//		 */
-		//		if (m_audio_stream >= 0) {  // 如果有音频流
-		//			m_avpacket_queue.packet_audio_queue_flash();
-		//			m_avpacket_queue.audio_queue_put_flash();
-		//		}
-		//		if (m_video_stream >= 0) { // 如果有视频流
-		//			m_avpacket_queue.packet_video_queue_flash();
-		//			m_avpacket_queue.video_queue_put_flash();
-		//		}
-		//		m_seek_req = 0;
-		//		//queue_attachments_req = 1; // 封面
-		//		m_eof = 0;
-		//	}
-		//}
+			ret = avformat_seek_file(m_avformat_context, -1, seek_min, seek_target, seek_max, m_seek_flags);
+			if (ret < 0) {
+				av_log(NULL, AV_LOG_ERROR, "%s: error while seeking\n", m_avformat_context->url);
+			}
+			else {
+				/* seek的时候，要把原先的数据清空，并重启解码器，
+				 * put flush_pkt的目的是告知解码线程需要reset decoder
+				 */
+				if (m_audio_stream >= 0) {  // 如果有音频流
+					m_avpacket_queue.packet_audio_queue_flash();
+					m_avpacket_queue.audio_queue_put_flash();
+				}
+				if (m_video_stream >= 0) { // 如果有视频流
+					m_avpacket_queue.packet_video_queue_flash();
+					m_avpacket_queue.video_queue_put_flash();
+				}
+				m_seek_req = 0;
+				//queue_attachments_req = 1; // 封面
+				m_eof = 0;
+			}
+		}
 
 		// 判断队列最大值,此处判断队列是否有足够的数据，进行休眠
 		if (m_paused || m_avpacket_queue.get_video_packet_size() + m_avpacket_queue.get_audio_packet_size() > MAX_QUEUE_SIZE) {
@@ -584,10 +603,10 @@ void AnalyzeFrameEngine::read_thread() {
 			if (m_avformat_context->pb && m_avformat_context->pb->error) {
 				LogInfo("av_read_frame pb & error. errorcode: %d", m_avformat_context->pb->error);
 				if (m_bReadFrame) { // 超时
-					//ONPLAYERSTATECHANGED_EVENT(PLAYER_STATE_FAILED, PLAYER_ERROR_READFRAME_TIMEOUT);
+					ONPLAYERSTATECHANGED_EVENT(PLAYER_STATE_FAILED, PLAYER_ERROR_READFRAME_TIMEOUT);
 				}
 				else { // 被打断阻塞 强制结束播放
-					//ONPLAYERSTATECHANGED_EVENT(PLAYER_STATE_PLAYBACK_COMPLETED, PLAYER_ERROR_NONE);
+					ONPLAYERSTATECHANGED_EVENT(PLAYER_STATE_PLAYBACK_COMPLETED, PLAYER_ERROR_NONE);
 				}
 				//m_isDone = false;
 				break; // thread end
@@ -595,6 +614,16 @@ void AnalyzeFrameEngine::read_thread() {
 
 			std::unique_lock<std::mutex> lock(*m_wait_mutex);
 			m_cond_t_read_thread->wait_for(lock, std::chrono::milliseconds(10));
+
+			auto audio_queue = m_audio_decode_thread->getAVPacketQueue();
+			auto video_queue = m_video_decode_thread->getAVPacketQueue();
+			if (video_queue->video_frame_queue_nb_remaining() <= 0 && audio_queue->audio_frame_queue_nb_remaining() <= 0)
+			{
+				// 文件播放完成
+				ONPLAYERSTATECHANGED_EVENT(PLAYER_STATE_PLAYBACK_COMPLETED, PLAYER_ERROR_NONE);
+				break;
+			}
+
 			continue; // 继续循环
 		}
 		//m_bReadFrame = false;

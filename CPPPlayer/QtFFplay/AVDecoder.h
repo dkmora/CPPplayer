@@ -38,9 +38,14 @@ public:
 	void setPlaybackVolume(float volume);
 	// 获取音频重采样参数
 	audio_resampler_params_t* get_resampler_params() { return &m_resampler_params; }
-
+	// 获取音视频AVFrame
 	AVFrame* getVideoAVFrame();
 	AVFrame* getAudioAVFrame();
+	// 解码后队列
+	AVPacketQueue* getAVPacketQueue() { return m_avpacketqueue; }
+	//设置裁剪结束时间 单位秒
+	void setEndTime(int64_t endtime) { m_end_time = endtime; }
+	int64_t getEndTime() { return m_end_time; }
 
 private:
 	virtual void Loop();

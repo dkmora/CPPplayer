@@ -25,7 +25,6 @@ VideoScaleWidget::VideoScaleWidget(QWidget* parent/* = nullptr*/) : QWidget(pare
 
     //ui.m_draglistwidget->setViewMode(QListView::IconMode);  // 设置为图标模式
     
-    //sound_in_sync_test
     AFMsg afMsg;
     afMsg.fileName = "D:\\jingluo.mp4";
     afMsg.afId = generateUniqueID("D:\\jingluo.mp4");
@@ -34,13 +33,14 @@ VideoScaleWidget::VideoScaleWidget(QWidget* parent/* = nullptr*/) : QWidget(pare
     m_frameless_map.insert(afMsg.afId, fremeLess_1);
     connect(m_frameless_map[afMsg.afId].data(), &FrameLess::sigFrameLessWidth, this, &VideoScaleWidget::sloFrameLessWidth);
 
-   /* afMsg.fileName = "D:\\jingluo.mp4";
-    afMsg.afId = generateUniqueID("D:\\jingluo.mp4");
+    afMsg.fileName = "D:\\sound_in_sync_test.mp4";
+    afMsg.afId = generateUniqueID("D:\\sound_in_sync_test.mp4");
     VideoListWidget* item2 = new VideoListWidget(afMsg);
     QSharedPointer<FrameLess> fremeLess_2 = QSharedPointer<FrameLess>(new FrameLess(1, item2));
     m_frameless_map.insert(afMsg.afId, fremeLess_2);
     connect(m_frameless_map[afMsg.afId].data(), &FrameLess::sigFrameLessWidth, this, &VideoScaleWidget::sloFrameLessWidth);
 
+    /*
     afMsg.fileName = "D:\\media.mp4";
     afMsg.afId = generateUniqueID("D:\\media.mp4");
     VideoListWidget* item3 = new VideoListWidget(afMsg);
@@ -49,7 +49,7 @@ VideoScaleWidget::VideoScaleWidget(QWidget* parent/* = nullptr*/) : QWidget(pare
     connect(m_frameless_map[afMsg.afId].data(), &FrameLess::sigFrameLessWidth, this, &VideoScaleWidget::sloFrameLessWidth);*/
 
     ui.m_draglistwidget->AddWidgetItem(item1);
-    //ui.m_draglistwidget->AddWidgetItem(item2);
+    ui.m_draglistwidget->AddWidgetItem(item2);
     //ui.m_draglistwidget->AddWidgetItem(item3);
 
     connect(ui.m_draglistwidget, &DragListWidget::sigInsertDragItem, this, [=] (AFMsg afMsg){
@@ -99,7 +99,7 @@ void VideoScaleWidget::sloFrameLessWidth(int _width, int _index)
     _drag_item->setDropData(afmsg);
 
     auto engine = vAnalyzeManager->getAnalyzeEngine(afmsg.afId);
-    engine->setEndTime(_mod_duration);
+    engine->setEndTime(_mod_duration); 
 
     qDebug() << "endTime:" << engine->getEndTime();
 }
