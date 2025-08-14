@@ -121,15 +121,23 @@
     <QtUic Include="QtMediaPlayer.ui" />
     <QtMoc Include="QtMediaPlayer.h" />
     <ClCompile Include="AnalyzeManager.cpp" />
+    <ClCompile Include="Common\ColorfulTextWidget.cpp" />
     <ClCompile Include="Common\DragListWidget.cpp" />
     <ClCompile Include="Common\DragShadow.cpp" />
     <ClCompile Include="Common\FrameLess.cpp" />
     <ClCompile Include="Export\ExportVideoWidget.cpp" />
     <ClCompile Include="Montage\VideoListWidget.cpp" />
+    <ClCompile Include="Montage\VideoMainSeek.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
     <ClCompile Include="Montage\VideoScaleWidget.cpp" />
     <ClCompile Include="QtMediaPlayer.cpp" />
     <ClCompile Include="main.cpp" />
     <QtUic Include="VideoListWidget.ui" />
+    <QtUic Include="VideoMainSeek.ui" />
     <QtUic Include="VideoScaleWidget.ui" />
   </ItemGroup>
   <ItemGroup>
@@ -139,11 +147,13 @@
     <QtMoc Include="Common\FrameLess.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="Montage\VideoMainSeek.h" />
     <QtMoc Include="Montage\VideoScaleWidget.h" />
     <QtMoc Include="Montage\VideoListWidget.h" />
     <QtMoc Include="Export\ExportVideoWidget.h" />
     <ClInclude Include="AnalyzeManager.h" />
     <QtMoc Include="Common\DragListWidget.h" />
+    <QtMoc Include="Common\ColorfulTextWidget.h" />
     <ClInclude Include="Common\gStruct.h" />
     <ClInclude Include="gQGlobal.h" />
   </ItemGroup>

@@ -76,6 +76,12 @@
     <ClCompile Include="Common\DragListWidget.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="Common\ColorfulTextWidget.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Montage\VideoMainSeek.cpp">
+      <Filter>Montage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="VideoScaleWidget.ui">
@@ -89,6 +95,9 @@
     </QtUic>
     <QtUic Include="QtMediaPlayer.ui">
       <Filter>UI</Filter>
+    </QtUic>
+    <QtUic Include="VideoMainSeek.ui">
+      <Filter>UI\Montage</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -107,11 +116,17 @@
     <QtMoc Include="QtMediaPlayer.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="Montage\VideoScaleWidget.h">
-      <Filter>Resource Files</Filter>
-    </QtMoc>
     <QtMoc Include="Common\DragListWidget.h">
       <Filter>Common</Filter>
+    </QtMoc>
+    <QtMoc Include="Common\ColorfulTextWidget.h">
+      <Filter>Common</Filter>
+    </QtMoc>
+    <QtMoc Include="Montage\VideoScaleWidget.h">
+      <Filter>Montage</Filter>
+    </QtMoc>
+    <QtMoc Include="Montage\VideoMainSeek.h">
+      <Filter>Montage</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

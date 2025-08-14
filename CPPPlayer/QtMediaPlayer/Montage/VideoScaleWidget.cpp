@@ -22,14 +22,13 @@ VideoScaleWidget::VideoScaleWidget(QWidget* parent/* = nullptr*/) : QWidget(pare
         //    FrameLess *fremeLess_2 = new FrameLess(widget_2);
         //    m_video_list.push_back(widget_2);
     //});
-
     //ui.m_draglistwidget->setViewMode(QListView::IconMode);  // 设置为图标模式
-    
+
     AFMsg afMsg;
     afMsg.fileName = "D:\\jingluo.mp4";
     afMsg.afId = generateUniqueID("D:\\jingluo.mp4");
     VideoListWidget* item1 = new VideoListWidget(afMsg);
-    QSharedPointer<FrameLess> fremeLess_1 =  QSharedPointer<FrameLess>(new FrameLess(0, item1));
+    QSharedPointer<FrameLess> fremeLess_1 = QSharedPointer<FrameLess>(new FrameLess(0, item1));
     m_frameless_map.insert(afMsg.afId, fremeLess_1);
     connect(m_frameless_map[afMsg.afId].data(), &FrameLess::sigFrameLessWidth, this, &VideoScaleWidget::sloFrameLessWidth);
 
@@ -52,7 +51,7 @@ VideoScaleWidget::VideoScaleWidget(QWidget* parent/* = nullptr*/) : QWidget(pare
     ui.m_draglistwidget->AddWidgetItem(item2);
     //ui.m_draglistwidget->AddWidgetItem(item3);
 
-    connect(ui.m_draglistwidget, &DragListWidget::sigInsertDragItem, this, [=] (AFMsg afMsg){
+    connect(ui.m_draglistwidget, &DragListWidget::sigInsertDragItem, this, [=](AFMsg afMsg) {
         disconnect(m_frameless_map[afMsg.afId].data(), &FrameLess::sigFrameLessWidth, this, &VideoScaleWidget::sloFrameLessWidth);
         m_frameless_map.remove(afMsg.afId);
 
@@ -70,7 +69,8 @@ VideoScaleWidget::VideoScaleWidget(QWidget* parent/* = nullptr*/) : QWidget(pare
             m_frameless_map[item.afId]->setIndex(index);
             index++;
         }
-    });
+        });
+
 }
 
 VideoScaleWidget::~VideoScaleWidget()
@@ -88,6 +88,7 @@ void VideoScaleWidget::sloFrameLessWidth(int _width, int _index)
     int max_width = _drag_item->maximumWidth();
     if (max_width < _width)
         return;
+
     QListWidgetItem* item = ui.m_draglistwidget->item(_index);
     item->setSizeHint(QSize(_width, 55));
 
@@ -102,4 +103,109 @@ void VideoScaleWidget::sloFrameLessWidth(int _width, int _index)
     engine->setEndTime(_mod_duration); 
 
     qDebug() << "endTime:" << engine->getEndTime();
+}
+
+void VideoScaleWidget::showMainSeek()
+{
+    if (!m_VideoMainSeek)
+    {
+        m_VideoMainSeek = new VideoMainSeek(ui.widgetAllFrame);
+        m_timer_all_seek = new QTimer(this);
+        m_timer_all_seek->setInterval(10);
+
+        connect(ui.slider_allseek, &QSlider::sliderPressed, this, [=]() {
+            m_timer_all_seek->start();
+            });
+
+        connect(ui.slider_allseek, &QSlider::sliderReleased, this, [=]() {
+            m_timer_all_seek->stop();
+            });
+
+        connect(m_timer_all_seek, &QTimer::timeout, this, [=] {
+            int _value = ui.slider_allseek->value();
+            if (_value >= 99)
+            {
+                int barValue = ui.m_draglistwidget->getHorizontalScrollBar();
+                barValue += 10;
+                ui.m_draglistwidget->setHorizontalScrollBar(barValue);
+            }
+            else if (_value <= 1) {
+                int barValue = ui.m_draglistwidget->getHorizontalScrollBar();
+                barValue -= 10;
+                ui.m_draglistwidget->setHorizontalScrollBar(barValue);
+            }
+
+            int hbar_value = ui.m_draglistwidget->getHorizontalScrollBar();
+
+            int totalwidth = 0;
+            auto itemList = ui.m_draglistwidget->GetItemDataList();
+            for (int i = 0; i < itemList.size(); i++) {
+                //qDebug() << "itemList.at(i).itemWidth = " << itemList.at(i).itemWidth;
+                totalwidth += itemList.at(i).itemWidth;
+            }
+
+            // draglistwidget 当前滑动的位置
+            int dragValue = ui.m_draglistwidget->getHorizontalScrollBar();
+            qDebug() << "dragValue = " << dragValue;
+            dragValue /= 10;
+
+            if (_value >= 99 && dragValue > 0) {
+                dragValue += _value;
+                //dragValue /= 10
+            }
+            else if (dragValue > 0 && _value > 0 && _value < 99) {
+                dragValue = dragValue - _value;
+            }
+            else {
+                dragValue = _value;
+            }
+            qDebug() << "seek value = " << dragValue;
+
+            });
+
+        connect(ui.slider_allseek, &QSlider::valueChanged, this, [=](int value) {
+            m_VideoMainSeek->setSeekValue(value);
+
+            ////总时长
+            //int total_duration = 0;
+            //std::shared_ptr<AnalyzeFrameEngine> engine;
+            //for (const auto& item : vAnalyzeManager->getExportSeq()) {
+            //    engine = vAnalyzeManager->getAnalyzeEngine(item.afId);
+            //    total_duration += engine->get_file_duration();
+            //    break;
+            //}
+
+            //double incr, pos, frac;
+            //double x = 100.0f;
+            //int64_t ts;
+            //int ns, hh, mm, ss;
+            //int tns, thh, tmm, tss;
+            //tns = total_duration / 1000000LL;
+            //thh = tns / 3600;
+            //tmm = (tns % 3600) / 60;
+            //tss = (tns % 60);
+            //frac = (double)value / 100;
+            //ns = frac * tns;
+            //hh = ns / 3600;
+            //mm = (ns % 3600) / 60;
+            //ss = (ns % 60);
+            ////av_log(NULL, AV_LOG_INFO, "Seek to %2.0f%% (%2d:%02d:%02d) of total duration (%2d:%02d:%02d)       \n", frac * 100, hh, mm, ss, thh, tmm, tss);
+            //ts = frac * total_duration;
+            ////if (cur_stream->ic->start_time != AV_NOPTS_VALUE) // 是否指定播放起始时间
+            ////	ts += cur_stream->ic->start_time;
+            //engine->Seek(ts, 0, 0);
+
+            });
+    }
+    m_VideoMainSeek->setGeometry(0, 0, ui.widgetAllFrame->width(), ui.widgetAllFrame->height());
+ }
+
+void VideoScaleWidget::resizeEvent(QResizeEvent* event)
+{
+    showMainSeek();
+}
+
+void VideoScaleWidget::showEvent(QShowEvent* event)
+{
+    showMainSeek();
 }

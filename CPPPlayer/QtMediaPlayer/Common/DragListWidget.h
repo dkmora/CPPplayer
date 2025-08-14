@@ -83,6 +83,8 @@ public:
 	void AddWidgetItem(DragItemWidget* widgetItem);
 	void InsertWidgetItem(int insertrow, DragItemWidget* widgetItem);
 	QList<AFMsg> GetItemDataList();
+	int getHorizontalScrollBar();
+	void setHorizontalScrollBar(int value);
 
 	bool isDraging() const { return m_isdraging; }
 	int offset() const { return 19; }

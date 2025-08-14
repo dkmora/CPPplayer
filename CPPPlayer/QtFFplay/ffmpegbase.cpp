@@ -190,7 +190,7 @@ int AVPacketQueue::packet_queue_put_private(PacketQueue *q, AVPacket *pkt)
 	if (pkt == &m_flush_pkt)//如果放入的是flush_pkt，需要增加队列的播放序列号，以区分不连续的两段数据
 	{
 		q->serial++;
-		printf("q->serial = %d\n", q->serial);
+		//printf("q->serial = %d\n", q->serial);
 	}
 	pkt1->serial = q->serial;   //用队列序列号标记节点
 	/* 队列操作：如果last_pkt为空，说明队列是空的，新增节点为队头；

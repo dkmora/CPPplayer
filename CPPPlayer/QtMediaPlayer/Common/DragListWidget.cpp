@@ -113,6 +113,18 @@ QList<AFMsg> DragListWidget::GetItemDataList()
 	return list;
 }
 
+int DragListWidget::getHorizontalScrollBar()
+{
+	QScrollBar* hScrollBar = this->horizontalScrollBar();
+	if(hScrollBar) return hScrollBar->value();
+}
+
+void DragListWidget::setHorizontalScrollBar(int value)
+{
+	QScrollBar* hScrollBar = this->horizontalScrollBar();
+	if(hScrollBar) hScrollBar->setValue(value);
+}
+
 //ÍÏ×§Æðµã
 void DragListWidget::mousePressEvent(QMouseEvent* event)
 {

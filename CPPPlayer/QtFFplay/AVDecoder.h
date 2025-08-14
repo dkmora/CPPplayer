@@ -22,8 +22,11 @@ public:
 	AVDecoder(FFDecoder* ffmpegdecoder, AVPacketQueue* avpacketQueue, AVClock* videostate);
 	virtual ~AVDecoder();
 
-	// 暂停
+	void Play();
+	// 暂停/播放
 	void Pause();
+	// 暂停
+	void Stop();
 	// 获取一帧yuv视频数据
 	int getVideoYuv420Frame(uint8_t** y, uint8_t** u, uint8_t** v, int& width, int& height);
 	// 获取一帧pcm音频数据
@@ -129,6 +132,9 @@ private:
 
 	uint64_t m_start_time = 0;
 	uint64_t m_end_time = 0;
+
+	double m_video_pts_end = 0;
+	double m_audio_pts_end = 0;
 };
 
 }

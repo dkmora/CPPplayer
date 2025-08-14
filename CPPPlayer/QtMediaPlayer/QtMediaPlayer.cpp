@@ -40,8 +40,11 @@ QtMediaPlayer::QtMediaPlayer(QWidget* parent)
 	ui.m_slider_playrate->setMaximum(4);
 	ui.m_slider_playrate->setValue(2);
 
-	QHBoxLayout* mainlayout = new QHBoxLayout(ui.m_widget_video);
+	m_color_text = new ColorfulLabel(QStringLiteral("CPPPlayer"), ui.m_widget_video);
+
+	QVBoxLayout* mainlayout = new QVBoxLayout(ui.m_widget_video);
 	mainlayout->addWidget(m_engine_player.GetVideoView());
+	mainlayout->addWidget(m_color_text);
 	mainlayout->setMargin(0);
 	mainlayout->setSpacing(0);
 

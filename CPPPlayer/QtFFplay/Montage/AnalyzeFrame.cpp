@@ -205,10 +205,15 @@ void AnalyzeFrameEngine::startDecode(int width, int height)
 void AnalyzeFrameEngine::play(StartplayCallBack cb)
 {
 	m_startplay_callback = cb;
-
 	startDecode();
+	play();
+}
 
-	if (m_paused) Pause();
+void AnalyzeFrameEngine::play()
+{
+	m_paused = false;
+	if(m_video_decode_thread) m_video_decode_thread->Play();
+	if(m_audio_decode_thread) m_audio_decode_thread->Play();
 }
 
 void AnalyzeFrameEngine::Pause() {
@@ -216,18 +221,26 @@ void AnalyzeFrameEngine::Pause() {
 		return;
 
 	m_paused = !m_paused;
-	m_video_decode_thread->Pause();
-	m_audio_decode_thread->Pause();
+	if (m_video_decode_thread) m_video_decode_thread->Pause();
+	if (m_audio_decode_thread) m_audio_decode_thread->Pause();
+}
+
+void AnalyzeFrameEngine::Stop()
+{
+	m_paused = true;
+	if (m_video_decode_thread) m_video_decode_thread->Stop();
+	if (m_audio_decode_thread) m_audio_decode_thread->Stop();
 }
 
 void AnalyzeFrameEngine::Seek(int64_t pos, int64_t rel, int seek_by_bytes) {
 	//if (!m_isDone)
 	//	return;
 
-	if (!m_seek_req) {
+	if (!m_seek_req && m_cond_t_read_thread) {
 
-		if (!m_paused) 
-			Pause();
+		//if (!m_paused) Pause();
+
+		//av_log(NULL, AV_LOG_INFO, "ts %d\n", pos);
 
 		m_seek_pos = pos;
 		m_seek_rel = rel;
@@ -547,6 +560,7 @@ void AnalyzeFrameEngine::read_thread() {
 			int64_t seek_max = m_seek_rel < 0 ? seek_target = m_seek_rel - 2 : INT64_MAX;
 
 			ret = avformat_seek_file(m_avformat_context, -1, seek_min, seek_target, seek_max, m_seek_flags);
+			//av_log(NULL, AV_LOG_INFO, "seek_target: %d\n", seek_target);
 			if (ret < 0) {
 				av_log(NULL, AV_LOG_ERROR, "%s: error while seeking\n", m_avformat_context->url);
 			}

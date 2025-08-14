@@ -19,9 +19,6 @@ VideoListWidget::VideoListWidget(AFMsg afMsg, QWidget* parent /*= nullptr*/) :
         ptr_af = ptr;
     }
 
-    setDropData(m_afMsg);
-    vAnalyzeManager->addExportSeq(m_afMsg);
-
     //文件名
     ui.labfilename->setText(ptr_af.lock()->get_file_name().c_str());
     //文件总时长
@@ -41,6 +38,10 @@ VideoListWidget::VideoListWidget(AFMsg afMsg, QWidget* parent /*= nullptr*/) :
     qint64 totalSeconds = duration / 1000000;
     ptr_af.lock()->setEndTime(totalSeconds);
 
+    m_afMsg.itemWidth = this->width();
+    setDropData(m_afMsg);
+    vAnalyzeManager->addExportSeq(m_afMsg);
+
     connect(ui.m_starttime_scroll->horizontalScrollBar(), &QScrollBar::valueChanged, this, [=](int value) {
             int64_t startTime = 0;
             startTime = m_file_duration / 1000000 * (double)value / m_frame_long;
@@ -48,11 +49,27 @@ VideoListWidget::VideoListWidget(AFMsg afMsg, QWidget* parent /*= nullptr*/) :
             auto afMsg = getDropData();
             auto engine = vAnalyzeManager->getAnalyzeEngine(afMsg.afId);
             engine->setStartTime(startTime);
-            seek(startTime, engine);
 
-            qDebug() << "startTime:" << startTime;
+            int _max = ui.m_starttime_scroll->horizontalScrollBar()->maximum();
+            int _min = ui.m_starttime_scroll->horizontalScrollBar()->minimum();
 
+            int _seek_value = 100 * (double)value / _max;
+            seek(_seek_value, engine);
+
+            //qDebug() << "_seek_value:" << _seek_value;
             //engine->setEndTime(_mod_duration); // TODO:拖动滚动条也需要设置
+        });
+
+    connect(ui.m_starttime_scroll->horizontalScrollBar(), &QScrollBar::sliderPressed, this, [=]() {
+        auto afMsg = getDropData();
+        auto engine = vAnalyzeManager->getAnalyzeEngine(afMsg.afId);
+        if(engine) engine->play();
+        });
+
+    connect(ui.m_starttime_scroll->horizontalScrollBar(), &QScrollBar::sliderReleased, this, [=]() {
+        auto afMsg = getDropData();
+        auto engine = vAnalyzeManager->getAnalyzeEngine(afMsg.afId);
+        if (engine) engine->Stop();
         });
 }
 

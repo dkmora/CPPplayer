@@ -49,11 +49,17 @@ public:
      * @brief 播放
      */
     void play(StartplayCallBack cb);
+    void play();
+
+    /*
+     *  @brief 暂停/播放
+     */
+    void Pause();
 
     /*
      *  @brief 暂停
      */
-    void Pause();
+    void Stop();
 
     /**
      * @brief seek in the stream
@@ -106,7 +112,11 @@ public:
     /*
      * @brief 设置裁剪结束时间 单位秒
      */
-    void setEndTime(int64_t endtime) { m_end_time = endtime; }
+    void setEndTime(int64_t endtime) { 
+        m_end_time = endtime; 
+        if(m_video_decode_thread) m_video_decode_thread->setEndTime(m_end_time);
+        if(m_audio_decode_thread) m_audio_decode_thread->setEndTime(m_end_time);
+    }
     int64_t getEndTime() { return m_end_time; }
 
     bool getIsPlay() { return m_isDone; }

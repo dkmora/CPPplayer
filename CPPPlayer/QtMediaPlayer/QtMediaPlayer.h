@@ -6,6 +6,7 @@
 #include "MediaPlayerEvent.h"
 #include "./Export/ExportVideoWidget.h"
 #include "./Montage/EnginePlayer.h"
+#include "./Common/ColorfulTextWidget.h"
 #include <QDebug>
 #include <QHBoxLayout>
 
@@ -54,6 +55,7 @@ private:
 	std::unique_ptr<MediaPlayerEventHandler> m_MediaEventHandler;
 
 	ExportVideoWidget* m_export_video_widget = nullptr;
+	ColorfulLabel* m_color_text = nullptr;
 
 	int m_engineplay_index = 0;
 };
